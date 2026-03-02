@@ -342,8 +342,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 18,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Server action getComparativoVRPO in src/application/usecases/comparativoActions.ts: fetches all user procedures + VRPO refs in parallel, computes meuPreco/diferencaReais/diferencaPerc/situacao for each, sorts by most negative diferencaPerc first (sem_referencia last), returns totalAbaixo/totalAcima/totalSemReferencia counts + all 11 especialidades. Page at src/app/(dashboard)/comparativo-vrpo/page.tsx. ComparativoVRPOPage client component: summary stat pills (clickable to filter by situação), dual selects (situação + especialidade) for filtering, table with 7 columns (Código/Procedimento/Especialidade/Meu Preço/VRPO Ref./Diferença R$/Diferença %) with row highlighting (red for abaixo, green for acima), VRPO Popover using @radix-ui/react-popover inline in table header. Typecheck passes."
     },
     {
       "id": "US-019",

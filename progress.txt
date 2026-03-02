@@ -1,3 +1,17 @@
+## 2026-03-02 - US-018
+- What was implemented: Página de Comparativo VRPO (/comparativo-vrpo) com resumo por situação, filtros e tabela completa
+- Files changed:
+  - src/application/usecases/comparativoActions.ts (new — getComparativoVRPO server action; fetches all user procedures + VRPO refs, computes diferença, default sort most-negative-first)
+  - src/app/(dashboard)/comparativo-vrpo/page.tsx (new — server component fetches data and passes to client)
+  - src/presentation/components/comparativo-vrpo/ComparativoVRPOPage.tsx (new — client component with stat pills, dual filters, full table with row highlighting, inline VRPO popover)
+  - prd.json (US-018 marked passes: true)
+- **Learnings for future iterations:**
+  - @radix-ui/react-popover is already in package.json — use it inline in client components (no need for a separate UI component file for one-off popovers)
+  - Sorting null diferencaPerc values to the end: sort((a,b) => { if a===null return 1; if b===null return -1; return a-b })
+  - Summary stat pills double as filter buttons — onClick sets the situacaoFilter state — nice UX pattern for summary+filter combo
+  - ComparativoSituacao = 'abaixo' | 'acima' | 'sem_referencia' — export from actions.ts and import in client component via `import type`
+---
+
 ## 2026-03-02 - US-017
 - What was implemented: Página de Dashboard (/dashboard) com cards de estatísticas, alertas de dados desatualizados, tabelas de procedimentos e ações rápidas
 - Files changed:
