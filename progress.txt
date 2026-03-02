@@ -1,3 +1,19 @@
+## 2026-03-02 - US-020
+- What was implemented: Página de Histórico de Snapshots (/historico) com lista, visualização, comparativo e criação de snapshots
+- Files changed:
+  - src/app/(dashboard)/historico/page.tsx (new — server component; fetches listSnapshots and passes to client)
+  - src/presentation/components/historico/HistoricoPage.tsx (new — client component with list/snapshot/comparison view modes, create modal, delete confirmation dialog)
+  - src/app/(dashboard)/dashboard/page.tsx (updated — added userId prop to DashboardPage)
+  - src/presentation/components/dashboard/DashboardPage.tsx (updated — wired 'Salvar Snapshot Atual' button to createSnapshot server action via modal dialog)
+  - prd.json (US-020 marked passes: true)
+- **Learnings for future iterations:**
+  - HistoricoPage uses 3 view modes (list/snapshot/comparison) managed by local state — no URL routing needed for sub-views since snapshots are user-specific data
+  - Dynamic import for listSnapshots refresh: `const { listSnapshots } = await import(...)` inside a startTransition callback to refresh local state after createSnapshot without full page reload
+  - compareSnapshotWithCurrent and getSnapshot can be called in parallel with Promise.all even though they're in the same 'use server' file
+  - DashboardPage required userId prop addition — always check if server components need to pass user identity to client components for server action calls
+  - Snapshot view shows dados.procedimentos (the frozen JSON) — no need for any additional server calls for the read-only view
+---
+
 ## 2026-03-02 - US-019
 - What was implemented: Server actions para Snapshots (CRUD) — GerarSnapshot use case + 5 server actions
 - Files changed:

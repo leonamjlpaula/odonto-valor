@@ -379,8 +379,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 20,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Server component page.tsx fetches initial snapshot list via listSnapshots(userId) and passes to HistoricoPage client component. HistoricoPage manages 3 view modes (list/snapshot/comparison). List view: table with nome/descrição/custo/min/data/ações columns; empty state message; X/10 counter (red when at limit); 'Salvar Snapshot Atual' button (disabled at limit). Snapshot view: read-only table of all procedures + custo/min banner + 'Comparar com Atual' button. Comparison view: side-by-side table (Procedimento/Especialidade/Preço na Versão/Preço Atual/Diferença R$/Diferença %) with green/red color coding. Delete requires confirmation dialog. DashboardPage also wired up: 'Salvar Snapshot Atual' button now opens modal dialog (nome + descrição) and calls createSnapshot server action. Typecheck passes."
     },
     {
       "id": "US-021",
