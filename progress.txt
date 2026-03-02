@@ -1,3 +1,17 @@
+## 2026-03-02 - US-010
+- What was implemented: Interface, repositório e server actions para CRUD de Materiais
+- Files changed:
+  - src/application/interfaces/IMaterialRepository.ts (new — interface with listByUserId, updatePrice, create, delete)
+  - src/infrastructure/repositories/PrismaMaterialRepository.ts (new — Prisma implementation; uses where: { id, userId } compound filter for ownership)
+  - src/application/usecases/materialActions.ts (new — 'use server' file with getMateriais, updateMaterialPrice, createMaterial, deleteMaterial)
+  - prd.json (US-010 marked passes: true)
+- **Learnings for future iterations:**
+  - deleteMaterial checks ProcedimentoMaterial before deleting; returns list of procedure names on conflict so UI can show specific error
+  - Repository uses Prisma compound where: { id, userId } to enforce ownership without extra lookup query
+  - createMaterial always sets isDefault: false — only seed data has isDefault: true
+  - Export CreateMaterialState.material (the created material) so the UI can optimistically add it without a refetch
+---
+
 ## Codebase Patterns
 - Toast: Toaster component must be in root layout.tsx (not dashboard layout) — use `useToast` hook + `toast({ title, description, variant })` in client components
 - Page split pattern: server component (page.tsx) fetches data + gets session → passes initialData as props to a client component for interactivity

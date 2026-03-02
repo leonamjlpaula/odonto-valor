@@ -188,8 +188,8 @@
         "Typecheck passes"
       ],
       "priority": 10,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "IMaterialRepository interface in src/application/interfaces/IMaterialRepository.ts. PrismaMaterialRepository in src/infrastructure/repositories/ (uses where: { id, userId } for ownership validation). All 4 server actions in src/application/usecases/materialActions.ts: getMateriais (ordered by name), updateMaterialPrice (validates preco > 0), createMaterial (Zod validation, isDefault: false), deleteMaterial (checks ProcedimentoMaterial usage, returns list of affected procedure names on conflict). Typecheck passes."
     },
     {
       "id": "US-011",
