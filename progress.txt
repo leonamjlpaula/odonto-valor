@@ -1,3 +1,36 @@
+## 2026-03-02 - US-012
+- What was implemented: Interface, repositório e server actions para listagem e cálculo de preço de Procedimentos
+- Files changed:
+  - src/application/interfaces/IProcedimentoRepository.ts (new — interface with listByUserAndEspecialidade, getDetail; exports ProcedimentoWithMateriais type)
+  - src/infrastructure/repositories/PrismaProcedimentoRepository.ts (new — Prisma implementation; includes especialidade + materiais with material, ordered by codigo/ordem)
+  - src/application/usecases/calcularPrecoProcedimento.ts (new — parseConsumoNumerico helper + calcularPrecoProcedimento function returning { custoVariavel, custoFixoTotal, precoFinal })
+  - src/application/usecases/procedimentoActions.ts (new — 'use server' file with getProcedimentosByEspecialidade and searchProcedimentos)
+  - prd.json (US-012 marked passes: true)
+- **Learnings for future iterations:**
+  - consumo field is a string like "1 par", "2 tubetes", "0,5ml", "cobertura" — use parseConsumoNumerico to extract numeric value (handles Brazilian comma decimals, defaults to 1 if no leading number)
+  - VRPOReferencia Prisma accessor: `prisma.vRPOReferencia` (first letter lowercased from `VRPOReferencia`)
+  - Especialidade lookup: server action resolves slug (e.g. 'diagnostico') → especialidade.id via prisma.especialidade.findUnique({ where: { codigo: slug } })
+  - Batch VRPO ref lookup: collect all codes from the procedures list, then prisma.vRPOReferencia.findMany({ where: { codigo: { in: codigos } } }), build a Map for O(1) lookup
+  - calcularPrecoProcedimento is a non-'use server' pure function — importable by both server and client code for real-time UI calculation
+  - searchProcedimentos uses mode: 'insensitive' for case-insensitive search — requires PostgreSQL full-text or simple index for perf at scale
+---
+
+## 2026-03-02 - US-011
+- What was implemented: Página de Materiais (/materiais) com tabela, busca, edição inline de preço, modal adicionar, exclusão com validação
+- Files changed:
+  - src/app/(dashboard)/materiais/page.tsx (new — server component, fetches materials, passes to client)
+  - src/presentation/components/materiais/MateriaisTable.tsx (new — client component with all features)
+  - src/presentation/components/ui/badge.tsx (new — Badge UI component, shadcn/ui style)
+  - src/presentation/components/ui/dialog.tsx (new — Dialog UI component using @radix-ui/react-dialog)
+  - prd.json (US-011 marked passes: true)
+- **Learnings for future iterations:**
+  - @radix-ui/react-dialog is already in package.json — use it for modals (Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose)
+  - Badge component lives at src/presentation/components/ui/badge.tsx — use variant="secondary" for neutral badges, variant="outline" for custom
+  - Inline edit pattern: track editingId + editingPreco in state; render input row when id matches; Enter/Escape keyboard shortcuts improve UX
+  - For delete with conflict, deleteMaterial returns errors.procedimentos array — join with ', ' for toast description
+  - Dialog open/close: use onOpenChange callback to reset form state when dialog closes
+---
+
 ## 2026-03-02 - US-010
 - What was implemented: Interface, repositório e server actions para CRUD de Materiais
 - Files changed:
@@ -17,6 +50,11 @@
 - Page split pattern: server component (page.tsx) fetches data + gets session → passes initialData as props to a client component for interactivity
 - Real-time computed values: mirror server-side domain logic (value object formulas) client-side in a plain function + useMemo — no need to import domain classes in client components
 - All-at-once save: manage items in local state, pass full array to upsert action on save (repository does delete+recreate — no need for individual add/delete server actions)
+
+- Procedimento price formula: custoVariavel = Σ (material.preco / pma.divisor) × parseConsumoNumerico(pma.consumo); precoFinal = (tempoMinutos × custoFixoPorMinuto) + custoVariavel
+- parseConsumoNumerico: replace ',' with '.', match leading number, default to 1 (handles "1 par", "0,5ml", "cobertura")
+- VRPOReferencia Prisma accessor is `prisma.vRPOReferencia` (V is lowercased)
+- Especialidade lookup by slug: prisma.especialidade.findUnique({ where: { codigo: slug } }) — slug is the `codigo` field (e.g. 'diagnostico')
 
 - Dashboard layout: server component (session check + redirect) wraps a client component (DashboardLayout) that handles nav, sidebar, and mobile bottom nav
 - Active nav state: use `'/' + href.split('/')[1]` vs `'/' + pathname.split('/')[1]` to match base segment (handles nested routes like /procedimentos/diagnostico)

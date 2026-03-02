@@ -226,8 +226,8 @@
         "Typecheck passes"
       ],
       "priority": 12,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "IProcedimentoRepository in src/application/interfaces/IProcedimentoRepository.ts (exports ProcedimentoWithMateriais type). PrismaProcedimentoRepository in src/infrastructure/repositories/ (listByUserAndEspecialidade includes especialidade + materiais with material). calcularPrecoProcedimento use case in src/application/usecases/ (parseConsumoNumerico handles Brazilian decimal comma). procedimentoActions.ts: getProcedimentosByEspecialidade (resolves slug→id via prisma.especialidade, batches VRPO ref lookup), searchProcedimentos (case-insensitive OR search on nome/codigo). Typecheck passes."
     },
     {
       "id": "US-013",
