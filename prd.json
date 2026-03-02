@@ -171,8 +171,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 9,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Server component page.tsx fetches config via getCustoFixoConfig(userId) and passes to CustosFixosForm client component. CustosFixosForm manages all state locally: config fields, items array (default + custom). Real-time custoFixoPorMinuto calculated client-side via useMemo (mirrors CustoFixoPorMinuto value object formula). Save sends all data at once via saveCustoFixoConfig (repository does delete+recreate items). Custom items deletable from local state. Add item inline form appears on button click. Toast on save via useToast. Toaster added to root layout.tsx. Typecheck passes."
     },
     {
       "id": "US-010",

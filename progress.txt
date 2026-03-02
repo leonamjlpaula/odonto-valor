@@ -1,4 +1,9 @@
 ## Codebase Patterns
+- Toast: Toaster component must be in root layout.tsx (not dashboard layout) — use `useToast` hook + `toast({ title, description, variant })` in client components
+- Page split pattern: server component (page.tsx) fetches data + gets session → passes initialData as props to a client component for interactivity
+- Real-time computed values: mirror server-side domain logic (value object formulas) client-side in a plain function + useMemo — no need to import domain classes in client components
+- All-at-once save: manage items in local state, pass full array to upsert action on save (repository does delete+recreate — no need for individual add/delete server actions)
+
 - Dashboard layout: server component (session check + redirect) wraps a client component (DashboardLayout) that handles nav, sidebar, and mobile bottom nav
 - Active nav state: use `'/' + href.split('/')[1]` vs `'/' + pathname.split('/')[1]` to match base segment (handles nested routes like /procedimentos/diagnostico)
 - Mobile nav "Mais" pattern: fixed bottom overlay grid with remaining nav items; close on backdrop click or item click
@@ -37,6 +42,21 @@
 - Use cases in src/application/usecases/ — non-server-action use cases are plain async functions (no 'use server')
 - Server actions grouped by domain in single 'use server' file (e.g., custoFixoActions.ts with getCustoFixo, saveCustoFixo, addItem, deleteItem)
 
+---
+
+## 2026-03-02 - US-009
+- What was implemented: Página de Custos Fixos (/custos-fixos) com banner, fórmula, 4 seções editáveis, add/delete itens customizados, toast on save
+- Files changed:
+  - src/app/(dashboard)/custos-fixos/page.tsx (new — server component fetches config, passes to CustosFixosForm)
+  - src/presentation/components/custos-fixos/CustosFixosForm.tsx (new — client component with all form logic, real-time calculation, local item state)
+  - src/app/layout.tsx (updated — added Toaster component for toast notifications)
+  - prd.json (US-009 marked passes: true)
+- **Learnings for future iterations:**
+  - Pages follow server+client split: server component gets session+data, client component handles state/interactions
+  - Real-time formula calculation: replicate value object math in a plain function + useMemo in client component (don't import server domain classes)
+  - Item management: keep in local state, save all at once via upsert action — simpler than individual add/delete DB calls during editing
+  - Toaster must be in root layout.tsx (not dashboard layout) to work across all pages
+  - `useTransition` + `startTransition(async () => {...})` for server action calls with pending state
 ---
 
 ## 2026-03-02 - US-008
