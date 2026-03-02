@@ -1,6 +1,8 @@
 'use client'
 
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/presentation/components/ui/button'
 import {
   Card,
@@ -9,9 +11,22 @@ import {
   CardTitle,
   CardDescription,
 } from '@/presentation/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/presentation/components/ui/dialog'
+import { Input } from '@/presentation/components/ui/input'
+import { Label } from '@/presentation/components/ui/label'
+import { useToast } from '@/presentation/hooks/use-toast'
+import { createSnapshot } from '@/application/usecases/snapshotActions'
 import type { DashboardStats, TopProcedimento, BottomVRPOProcedimento } from '@/application/usecases/dashboardActions'
 
 type Props = {
+  userId: string
   stats: DashboardStats
   topProcedimentos: TopProcedimento[]
   bottomVRPO: BottomVRPOProcedimento[]
@@ -29,19 +44,90 @@ function formatPerc(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
 }
 
-export function DashboardPage({ stats, topProcedimentos, bottomVRPO, lastUpdate }: Props) {
+export function DashboardPage({ userId, stats, topProcedimentos, bottomVRPO, lastUpdate }: Props) {
+  const router = useRouter()
+  const { toast } = useToast()
+  const [isPending, startTransition] = useTransition()
+  const [snapshotOpen, setSnapshotOpen] = useState(false)
+  const [snapNome, setSnapNome] = useState('')
+  const [snapDesc, setSnapDesc] = useState('')
+  const [snapError, setSnapError] = useState<string | null>(null)
+
   const sixMonthsAgo = new Date()
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
   const isStale = lastUpdate !== null && new Date(lastUpdate) < sixMonthsAgo
+
+  function handleSnapshotOpen() {
+    setSnapNome('')
+    setSnapDesc('')
+    setSnapError(null)
+    setSnapshotOpen(true)
+  }
+
+  function handleSnapshotSubmit() {
+    if (!snapNome.trim()) {
+      setSnapError('Nome é obrigatório')
+      return
+    }
+    startTransition(async () => {
+      const result = await createSnapshot(userId, snapNome.trim(), snapDesc.trim() || undefined)
+      if (!result.success) {
+        setSnapError(result.error ?? 'Erro ao salvar snapshot')
+        return
+      }
+      setSnapshotOpen(false)
+      toast({ title: 'Snapshot salvo!', description: 'Acesse o Histórico para visualizá-lo.' })
+      router.refresh()
+    })
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <Button variant="outline" disabled title="Disponível em breve">
+        <Button variant="outline" onClick={handleSnapshotOpen} disabled={isPending}>
           Salvar Snapshot Atual
         </Button>
       </div>
+
+      {/* Snapshot Dialog */}
+      <Dialog open={snapshotOpen} onOpenChange={setSnapshotOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Salvar Snapshot Atual</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="dash-snap-nome">Nome *</Label>
+              <Input
+                id="dash-snap-nome"
+                value={snapNome}
+                onChange={(e) => { setSnapNome(e.target.value); setSnapError(null) }}
+                placeholder="Ex: Março 2026"
+                onKeyDown={(e) => e.key === 'Enter' && handleSnapshotSubmit()}
+              />
+              {snapError && <p className="text-sm text-destructive">{snapError}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="dash-snap-desc">Descrição (opcional)</Label>
+              <Input
+                id="dash-snap-desc"
+                value={snapDesc}
+                onChange={(e) => setSnapDesc(e.target.value)}
+                placeholder="Ex: Antes do reajuste de materiais"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" disabled={isPending}>Cancelar</Button>
+            </DialogClose>
+            <Button onClick={handleSnapshotSubmit} disabled={isPending}>
+              {isPending ? 'Salvando…' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Stale warning */}
       {isStale && (

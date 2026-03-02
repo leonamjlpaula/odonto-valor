@@ -24,6 +24,7 @@ export default async function DashboardRoute() {
 
   return (
     <DashboardPage
+      userId={userId}
       stats={stats}
       topProcedimentos={topProcedimentos}
       bottomVRPO={bottomVRPO}
