@@ -30,6 +30,20 @@
 
 ---
 
+## 2026-03-02 - US-006
+- What was implemented: Página de login (/login) com formulário de email e senha
+- Files changed:
+  - src/app/(auth)/login/page.tsx (new — client component with signIn('credentials'), inline error, success message, link to /cadastro, placeholder 'Esqueci minha senha')
+  - prd.json (US-006 marked passes: true)
+- **Learnings for future iterations:**
+  - Login page uses `signIn('credentials', { email, password, redirect: false })` from 'next-auth/react' — check result.error for failures
+  - Use `useTransition` + `startTransition(async () => { ... })` for async signIn call with loading state
+  - Success message from /cadastro redirect passes via `?success=...` query param — read with `useSearchParams()`
+  - After successful login, use `router.push('/dashboard')` for client-side redirect
+  - `signIn` with `redirect: false` returns `{ error: string | null, status: number, ok: boolean, url: string | null }`
+  - The "Esqueci minha senha" is a disabled Button variant="link" (non-functional placeholder per MVP spec)
+---
+
 ## 2026-03-02 - US-003
 - What was implemented: Script de seed com dados VRPO (materiais, procedimentos, referências)
 - Files changed:

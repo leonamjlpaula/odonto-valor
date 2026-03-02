@@ -110,8 +110,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 6,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Client component using signIn('credentials') from next-auth/react with redirect: false. useTransition for loading state. Shows success message from ?success query param (from /cadastro redirect). Error displayed inline. Link to /cadastro and placeholder 'Esqueci minha senha' button. On success, router.push('/dashboard'). Typecheck passes."
     },
     {
       "id": "US-007",
