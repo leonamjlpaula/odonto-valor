@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String           @id @default(cuid())
+  nome                 String
+  email                String           @unique
+  passwordHash         String
+  onboardingCompleted  Boolean          @default(false)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  custoFixoConfig      CustoFixoConfig?
+  materiais            Material[]
+  procedimentos        Procedimento[]
+  snapshots            Snapshot[]
+}
+
+model CustoFixoConfig {
+  id                     String          @id @default(cuid())
+  userId                 String          @unique
+  user                   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  diasUteis              Int             @default(22)
+  horasTrabalho          Int             @default(8)
+  investimentoEquipamentos Float         @default(61009)
+  anosDepreciacao        Int             @default(10)
+  salarioBase            Float           @default(6000)
+  percFundoReserva       Float           @default(11)
+  percInsalubridade      Float           @default(40)
+  percImprevistos        Float           @default(20)
+  taxaRetornoPerc        Float           @default(3)
+  anosRetorno            Int             @default(3)
+  updatedAt              DateTime        @updatedAt
+  items                  CustoFixoItem[]
+}
+
+model CustoFixoItem {
+  id        String          @id @default(cuid())
+  configId  String
+  config    CustoFixoConfig @relation(fields: [configId], references: [id], onDelete: Cascade)
+  nome      String
+  valor     Float
+  ordem     Int
+  isCustom  Boolean         @default(false)
+}
+
+model Material {
+  id            String                @id @default(cuid())
+  userId        String
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nome          String
+  unidade       String
+  preco         Float
+  isDefault     Boolean               @default(false)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  procedimentos ProcedimentoMaterial[]
+}
+
+model Especialidade {
+  id           String         @id @default(cuid())
+  codigo       String         @unique
+  nome         String
+  faixaInicio  Int
+  faixaFim     Int
+  procedimentos Procedimento[]
+}
+
+model Procedimento {
+  id              String                 @id @default(cuid())
+  userId          String
+  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codigo          String
+  nome            String
+  especialidadeId String
+  especialidade   Especialidade          @relation(fields: [especialidadeId], references: [id])
+  tempoMinutos    Float
+  isCustom        Boolean                @default(false)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  materiais       ProcedimentoMaterial[]
+
+  @@unique([userId, codigo])
+}
+
+model ProcedimentoMaterial {
+  id              String       @id @default(cuid())
+  procedimentoId  String
+  procedimento    Procedimento @relation(fields: [procedimentoId], references: [id], onDelete: Cascade)
+  materialId      String
+  material        Material     @relation(fields: [materialId], references: [id])
+  consumo         String
+  divisor         Float
+  ordem           Int
+}
+
+model VRPOReferencia {
+  id              String @id @default(cuid())
+  codigo          String @unique
+  valorReferencia Float
+}
+
+model Snapshot {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nome                String
+  descricao           String?
+  dados               Json
+  custoFixoPorMinuto  Float
+  createdAt           DateTime @default(now())
+}
