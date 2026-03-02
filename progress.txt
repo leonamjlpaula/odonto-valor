@@ -1,4 +1,11 @@
 ## Codebase Patterns
+- useActionState from React 19 (not useFormState) for server action form state in client components
+- Auth pages go in src/app/(auth)/ route group
+- Server actions go in src/application/usecases/ as 'use server' files
+- On successful form submission, return { success: true } and use useEffect + router.push() for client-side redirect (server-side redirect() doesn't work well with useActionState)
+- Export both the action function AND the state type from server action files so client components can type the initialState
+
+
 - next-auth@4 stable: authOptions in src/lib/auth.ts, API route at app/api/auth/[...nextauth]/route.ts, session JWT strategy
 - next-auth type augmentation in src/types/next-auth.d.ts (extends Session.user with id: string, JWT with userId)
 - Middleware at src/middleware.ts uses withAuth from next-auth/middleware — protect /dashboard/:path*
@@ -93,4 +100,18 @@
   - withAuth in middleware handles redirect to signIn page (configured in authOptions.pages.signIn)
   - session.user.id sourced from JWT token.userId set in jwt() callback when user object is present (login only)
   - NEXTAUTH_SECRET and NEXTAUTH_URL were already documented in .env.example from US-001
+---
+
+## 2026-03-02 - US-005
+- What was implemented: Página de cadastro (/cadastro) com formulário de registro
+- Files changed:
+  - src/application/usecases/createUser.ts (new — server action with Zod validation, bcrypt, email uniqueness check, createDefaultDataForUser)
+  - src/app/(auth)/cadastro/page.tsx (new — client component using useActionState, form with name/email/password/confirm, inline errors, success redirect)
+  - prd.json (US-005 marked passes: true)
+- **Learnings for future iterations:**
+  - React 19 (used in Next.js 15) has `useActionState` stable — import from 'react', not 'react-dom'
+  - `useActionState(action, initialState)` requires the initialState to match the return type of the action — use a typed const: `const initialState: ActionState = {}`
+  - Route group `(auth)` in src/app/ — pages inside don't need auth, middleware already protects /dashboard only
+  - App directory is at `src/app/` (not root `app/`) in this project
+  - Server actions must be in separate files with 'use server' directive at the top
 ---

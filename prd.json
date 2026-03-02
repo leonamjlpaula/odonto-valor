@@ -92,8 +92,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Server action createUser in src/application/usecases/createUser.ts with Zod validation, bcrypt hashing, email uniqueness check, and createDefaultDataForUser call. Page at src/app/(auth)/cadastro/page.tsx uses useActionState from React 19 for form state management. On success, redirects to /login with success query param. Typecheck passes."
     },
     {
       "id": "US-006",
