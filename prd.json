@@ -1,0 +1,457 @@
+{
+  "project": "Precifica",
+  "branchName": "ralph/precifica-saas-odontologico",
+  "description": "SaaS de precificação para consultórios odontológicos baseado na metodologia VRPO (Valores Referenciais para Procedimentos Odontológicos). Permite que dentistas configurem seus custos fixos e variáveis e calculem automaticamente os preços de +200 procedimentos odontológicos.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Setup do projeto Next.js com stack completa",
+      "description": "Como desenvolvedor, preciso inicializar o projeto Next.js com todas as dependências da stack para que Ralph possa construir em cima de uma base sólida.",
+      "acceptanceCriteria": [
+        "Projeto Next.js 14+ criado com App Router e TypeScript",
+        "Tailwind CSS configurado com shadcn/ui inicializado (npx shadcn@latest init)",
+        "Prisma instalado e configurado com provider postgresql em schema.prisma",
+        "NextAuth.js instalado (next-auth@5 beta ou next-auth@4 estável)",
+        "Zod instalado para validação",
+        "Dependências de exportação instaladas: @react-pdf/renderer e xlsx",
+        "Arquivo .env.example com as variáveis: DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL",
+        "Estrutura de pastas criada: src/domain/entities, src/domain/value-objects, src/application/usecases, src/application/interfaces, src/infrastructure/repositories, src/infrastructure/services, src/presentation/components, src/presentation/hooks, src/lib",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Projeto criado manualmente (create-next-app não funciona em diretório com arquivos existentes). Next.js 15.5.12, shadcn/ui configurado manualmente com components.json e UI components base."
+    },
+    {
+      "id": "US-002",
+      "title": "Schema Prisma com todos os modelos do banco de dados",
+      "description": "Como desenvolvedor, preciso que todos os modelos do banco de dados estejam definidos no schema Prisma para que as camadas de repositório e seed possam ser construídas.",
+      "acceptanceCriteria": [
+        "Modelo User: id (cuid), nome (String), email (String @unique), passwordHash (String), onboardingCompleted (Boolean default false), createdAt, updatedAt",
+        "Modelo CustoFixoConfig: id, userId (FK User @unique), diasUteis (Int default 22), horasTrabalho (Int default 8), investimentoEquipamentos (Float default 61009), anosDepreciacao (Int default 10), salarioBase (Float default 6000), percFundoReserva (Float default 11), percInsalubridade (Float default 40), percImprevistos (Float default 20), taxaRetornoPerc (Float default 3), anosRetorno (Int default 3), updatedAt",
+        "Modelo CustoFixoItem: id, configId (FK CustoFixoConfig), nome (String), valor (Float), ordem (Int), isCustom (Boolean default false)",
+        "Modelo Material: id, userId (FK User), nome (String), unidade (String), preco (Float), isDefault (Boolean default false), createdAt, updatedAt",
+        "Modelo Especialidade: id, codigo (String @unique), nome (String), faixaInicio (Int), faixaFim (Int)",
+        "Modelo Procedimento: id, userId (FK User), codigo (String), nome (String), especialidadeId (FK Especialidade), tempoMinutos (Float), isCustom (Boolean default false), createdAt, updatedAt — índice único em (userId, codigo)",
+        "Modelo ProcedimentoMaterial: id, procedimentoId (FK Procedimento), materialId (FK Material), consumo (String), divisor (Float), ordem (Int)",
+        "Modelo VRPOReferencia: id, codigo (String @unique), valorReferencia (Float)",
+        "Modelo Snapshot: id, userId (FK User), nome (String), descricao (String?), dados (Json), custoFixoPorMinuto (Float), createdAt",
+        "Migration gerada e aplicada com sucesso (npx prisma migrate dev)",
+        "Typecheck passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Script de seed com dados VRPO (materiais, procedimentos, referências)",
+      "description": "Como desenvolvedor, preciso de um script de seed que popule o banco com os dados padrão da planilha VRPO para que novos usuários já tenham os valores de referência disponíveis.",
+      "acceptanceCriteria": [
+        "Arquivo prisma/seed.ts criado com script de seed",
+        "Seed popula Especialidade com as 11 especialidades: Diagnóstico (100-490), Radiologia (200-390), Testes e Exames (400-490), Prevenção (500-590), Odontopediatria (600-890), Dentística (900-1990), Endodontia (2000-2990), Periodontia (3000-3990), Prótese (4000-4990), Cirurgia (5000-5990), Ortodontia (6000-6990)",
+        "Seed popula VRPOReferencia com pelo menos os valores calculados da tabela VRPO final da planilha (mínimo 50 procedimentos com valorReferencia)",
+        "Arquivo src/lib/vrpo-seed-data.ts criado contendo arrays com os dados dos materiais padrão (mínimo 20 materiais representativos) e procedimentos padrão com suas composições de materiais",
+        "Função createDefaultDataForUser(userId) exportada de src/lib/vrpo-seed-data.ts que cria CustoFixoConfig, CustoFixoItems, Materials e Procedimentos para um novo usuário com os valores padrão da VRPO",
+        "Script executado com sucesso: npx prisma db seed",
+        "Typecheck passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "Dado o volume de dados (+200 procedimentos e +130 materiais), o seed pode usar dados representativos para as especialidades principais. Os dados completos podem ser expandidos incrementalmente."
+    },
+    {
+      "id": "US-004",
+      "title": "NextAuth configurado com provider Credentials (email/senha)",
+      "description": "Como desenvolvedor, preciso que a autenticação esteja configurada com NextAuth para que páginas protegidas possam verificar se o usuário está logado.",
+      "acceptanceCriteria": [
+        "Arquivo src/lib/auth.ts criado com configuração NextAuth e provider Credentials",
+        "Provider Credentials valida email e senha contra o banco via Prisma (bcrypt para comparar hash)",
+        "Sessão contém userId e nome do usuário",
+        "Arquivo src/middleware.ts criado com matcher protegendo rotas /dashboard/(.+) e redirecionando para /login se não autenticado",
+        "API route em app/api/auth/[...nextauth]/route.ts configurada",
+        "Variável NEXTAUTH_SECRET documentada no .env.example",
+        "Typecheck passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Página de cadastro (/cadastro)",
+      "description": "Como dentista, quero me cadastrar com email e senha para criar minha conta pessoal.",
+      "acceptanceCriteria": [
+        "Página em app/(auth)/cadastro/page.tsx com formulário: nome completo, email, senha, confirmação de senha",
+        "Validação com Zod: nome obrigatório, email válido, senha mínimo 8 caracteres, senhas coincidem",
+        "Server action createUser em src/application/usecases/ que: verifica email único, faz hash da senha com bcrypt, cria User no banco, chama createDefaultDataForUser(userId) para popular dados VRPO padrão",
+        "Exibe erro inline se email já cadastrado",
+        "Após cadastro bem-sucedido, redireciona para /login com mensagem de sucesso",
+        "Link para /login na página",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Página de login (/login)",
+      "description": "Como dentista, quero fazer login com email e senha para acessar minha conta.",
+      "acceptanceCriteria": [
+        "Página em app/(auth)/login/page.tsx com formulário: email e senha",
+        "Formulário usa signIn('credentials') do NextAuth",
+        "Exibe mensagem de erro se credenciais inválidas",
+        "Após login bem-sucedido, redireciona para /dashboard",
+        "Link para /cadastro na página",
+        "Placeholder de link 'Esqueci minha senha' (não funcional no MVP)",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Layout da área autenticada (sidebar + navegação mobile)",
+      "description": "Como dentista logado, quero ter um layout de navegação consistente para acessar todas as seções do sistema.",
+      "acceptanceCriteria": [
+        "Layout em app/(dashboard)/layout.tsx que verifica sessão e redireciona para /login se não autenticado",
+        "Sidebar fixa no desktop com links: Dashboard, Custos Fixos, Materiais, Procedimentos, Comparativo VRPO, Histórico, Exportar",
+        "Bottom navigation no mobile (telas < 768px) com ícones para: Dashboard, Procedimentos, Custos, Mais (menu)",
+        "Header com nome do usuário logado e botão de logout",
+        "Botão logout chama signOut() do NextAuth e redireciona para /login",
+        "Item de navegação ativo destacado visualmente",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Server actions e lógica de domínio para Custos Fixos",
+      "description": "Como desenvolvedor, preciso das server actions e do cálculo de custo fixo por minuto para que a página de custos fixos funcione.",
+      "acceptanceCriteria": [
+        "Interface ICustoFixoRepository em src/application/interfaces/ICustoFixoRepository.ts com métodos: getByUserId(userId), upsert(userId, data)",
+        "PrismaCustoFixoRepository em src/infrastructure/repositories/ implementando a interface",
+        "Value object CustoFixoPorMinuto em src/domain/value-objects/CustoFixoPorMinuto.ts com método estático calculate(config, items) que retorna o valor por minuto usando a fórmula: (totalItens / 11 / 22 / 8 / 60) + depreciacao + remuneracao + taxaRetorno",
+        "Use case CalcularCustoFixoPorMinuto em src/application/usecases/ que recebe userId e retorna o valor calculado",
+        "Server action getCustoFixoConfig(userId) que retorna config + items + custoFixoPorMinuto calculado",
+        "Server action saveCustoFixoConfig(userId, data) que persiste config e items no banco",
+        "Server action addCustoFixoItem(userId, nome, valor) para itens customizados",
+        "Server action deleteCustoFixoItem(itemId, userId) — apenas para itens customizados",
+        "Typecheck passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Página de Custos Fixos (/custos-fixos)",
+      "description": "Como dentista, quero configurar meus custos fixos mensais e ver o custo por minuto calculado em tempo real.",
+      "acceptanceCriteria": [
+        "Página em app/(dashboard)/custos-fixos/page.tsx",
+        "Banner no topo exibindo o Custo Fixo por Minuto atual em destaque (ex: 'R$ 2,47 / minuto')",
+        "Fórmula resumida visível: 'Total mensal ÷ 22 dias ÷ 8h ÷ 60min + Depreciação + Remuneração + Retorno'",
+        "Seção 1 — Custos Mensais: lista editável dos 14 itens padrão da VRPO com campos de valor monetário",
+        "Seção 2 — Depreciação: campos para valor total dos equipamentos (padrão R$61.009) e anos de vida útil (padrão 10)",
+        "Seção 3 — Remuneração Profissional: campos para salário base, % fundo de reserva (padrão 11%), % insalubridade (padrão 40%), % imprevistos (padrão 20%)",
+        "Seção 4 — Taxa de Retorno: campos para % de retorno (padrão 3%) e anos para retorno (padrão 3)",
+        "Configurações de jornada: dias úteis/mês (padrão 22) e horas/dia (padrão 8)",
+        "Botão 'Adicionar item' para custo customizado com campos nome e valor",
+        "Itens customizados têm botão de excluir (X)",
+        "Botão 'Salvar' persiste dados via server action",
+        "Toast de confirmação após salvar com sucesso",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Server actions para Materiais (CRUD)",
+      "description": "Como desenvolvedor, preciso das server actions de materiais para que a página de materiais funcione e os custos variáveis sejam atualizados.",
+      "acceptanceCriteria": [
+        "Interface IMaterialRepository em src/application/interfaces/IMaterialRepository.ts com métodos: listByUserId(userId), updatePrice(id, userId, preco), create(userId, data), delete(id, userId)",
+        "PrismaMaterialRepository em src/infrastructure/repositories/ implementando a interface",
+        "Server action getMateriais(userId) retorna lista de materiais ordenada por nome",
+        "Server action updateMaterialPrice(id, userId, preco) — valida que preço > 0",
+        "Server action createMaterial(userId, nome, unidade, preco) — adiciona material customizado (isDefault: false)",
+        "Server action deleteMaterial(id, userId) — bloqueia exclusão se material está em uso em algum ProcedimentoMaterial, retornando erro com lista de procedimentos afetados",
+        "Typecheck passes"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Página de Materiais (/materiais)",
+      "description": "Como dentista, quero gerenciar a lista de materiais do consultório com preços atualizados para que os custos variáveis sejam precisos.",
+      "acceptanceCriteria": [
+        "Página em app/(dashboard)/materiais/page.tsx",
+        "Tabela com colunas: Nº, Nome do Material, Unidade, Preço (R$), Ações",
+        "Campo de busca no topo que filtra materiais pelo nome em tempo real (client-side)",
+        "Botão 'Editar' (ícone de lápis) em cada linha abre inline um input de preço substituindo o valor exibido, com botões Confirmar e Cancelar",
+        "Botão 'Adicionar Material' abre modal/dialog com campos: nome, unidade (ex: 'caixa com 50'), preço",
+        "Materiais customizados (isDefault: false criados pelo usuário) mostram botão de excluir (X)",
+        "Ao clicar excluir, se material está em uso, exibe toast de erro com os nomes dos procedimentos que o utilizam",
+        "Badge visual distinguindo materiais 'Padrão VRPO' de materiais customizados",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Server actions para Procedimentos (listagem e cálculo de preço)",
+      "description": "Como desenvolvedor, preciso das server actions de procedimentos que calculam o preço final de cada procedimento usando custo fixo + custo variável.",
+      "acceptanceCriteria": [
+        "Interface IProcedimentoRepository em src/application/interfaces/IProcedimentoRepository.ts com métodos: listByUserAndEspecialidade(userId, especialidadeId), getDetail(id, userId)",
+        "PrismaProcedimentoRepository implementando a interface",
+        "Use case CalcularPrecoProcedimento em src/application/usecases/ que: recebe o procedimento com seus materiais e o custoFixoPorMinuto, retorna { custoVariavel, custoFixoTotal, precoFinal }",
+        "Fórmula custo variável: Σ (material.preco / pma.divisor) × pma.consumoNumerico para cada ProcedimentoMaterial",
+        "Fórmula preço final: (procedimento.tempoMinutos × custoFixoPorMinuto) + custoVariavel",
+        "Server action getProcedimentosByEspecialidade(userId, especialidadeSlug) retorna lista com precoCalculado e vrpoReferencia para cada procedimento",
+        "Server action searchProcedimentos(userId, query) busca por nome ou código em todas as especialidades",
+        "Typecheck passes"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Página de Listagem de Procedimentos (/procedimentos/[especialidade])",
+      "description": "Como dentista, quero visualizar todos os procedimentos organizados por especialidade com o preço calculado de cada um.",
+      "acceptanceCriteria": [
+        "Página em app/(dashboard)/procedimentos/[especialidade]/page.tsx",
+        "Navegação lateral no desktop com as 11 especialidades e contador de procedimentos por especialidade",
+        "No mobile, navegação em dropdown select ou carrossel horizontal de chips",
+        "Tabela de procedimentos com colunas: Código, Nome, Tempo (min), Custo Variável, Preço Calculado, VRPO Ref., Diferença (%)",
+        "Indicador visual por cor na coluna Diferença: verde se preço calculado >= VRPO, vermelho se abaixo, cinza se VRPO não disponível",
+        "Campo de busca global que redireciona ao filtrar pelo código/nome em qualquer especialidade",
+        "Botão 'Adicionar Procedimento' para criar procedimento customizado na especialidade atual",
+        "Procedimentos customizados (isCustom: true) têm badge 'Customizado'",
+        "Clicar em um procedimento navega para /procedimentos/[especialidade]/[id]",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "title": "Server actions para edição de Procedimentos (tempo e materiais)",
+      "description": "Como desenvolvedor, preciso das server actions de edição de procedimentos para que o dentista possa personalizar tempo e materiais.",
+      "acceptanceCriteria": [
+        "Server action getProcedimentoDetail(id, userId) retorna procedimento com todos os materiais e quantidades, preço calculado e VRPO referência",
+        "Server action updateProcedimentoTempo(id, userId, tempoMinutos) — valida tempoMinutos > 0",
+        "Server action addMaterialToProcedimento(procedimentoId, userId, materialId, consumo, divisor) — adiciona material ao procedimento",
+        "Server action removeMaterialFromProcedimento(pmaId, userId) — remove material do procedimento",
+        "Server action updateProcedimentoMaterial(pmaId, userId, consumo, divisor) — atualiza consumo e divisor",
+        "Server action createProcedimentoCustomizado(userId, especialidadeId, codigo, nome, tempoMinutos) — cria procedimento isCustom: true",
+        "Server action deleteProcedimento(id, userId) — apenas para procedimentos customizados (isCustom: true)",
+        "Typecheck passes"
+      ],
+      "priority": 14,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "title": "Página de Detalhes do Procedimento (/procedimentos/[especialidade]/[id])",
+      "description": "Como dentista, quero ver os detalhes de um procedimento e editar seu tempo de execução e materiais utilizados.",
+      "acceptanceCriteria": [
+        "Página em app/(dashboard)/procedimentos/[especialidade]/[id]/page.tsx",
+        "Header: código, nome do procedimento, badge de especialidade",
+        "Card de resumo financeiro: Custo Variável Total, Custo Fixo (tempo × custo/min), Preço Final calculado em destaque, VRPO Referência (se disponível) com diferença percentual",
+        "Botão 'Editar Tempo' abre inline input para alterar os minutos de execução, salva via server action, recalcula preço",
+        "Tabela de materiais: Nº, Material, Quantidade (embalagem), Consumo por uso, Divisor, Preço do Material, Custo por Porção",
+        "Botão 'Editar' em cada linha de material abre campos editáveis para consumo e divisor",
+        "Botão 'Remover' em cada linha de material remove o material do procedimento",
+        "Formulário 'Adicionar Material': select com busca dos materiais do usuário, campos consumo e divisor",
+        "Botão 'Excluir Procedimento' visível apenas para procedimentos customizados (isCustom: true), com confirmação",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 15,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-016",
+      "title": "Server actions para Dashboard (estatísticas resumidas)",
+      "description": "Como desenvolvedor, preciso das server actions do dashboard que agregam as métricas principais do consultório.",
+      "acceptanceCriteria": [
+        "Server action getDashboardStats(userId) retorna: custoFixoPorMinuto, totalCustosFixosMensais, totalProcedimentos, totalMateriais",
+        "Server action getTopProcedimentos(userId, limit=5, order='highest') retorna procedimentos com maior preço calculado",
+        "Server action getBottomProcedimentosVRPO(userId, limit=5) retorna procedimentos com maior percentual negativo em relação ao VRPO (mais abaixo da referência)",
+        "Server action getLastUpdateInfo(userId) retorna a data da última alteração nos custos fixos",
+        "Typecheck passes"
+      ],
+      "priority": 16,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-017",
+      "title": "Página de Dashboard (/dashboard)",
+      "description": "Como dentista logado, quero ver uma visão geral da minha precificação assim que entro no sistema.",
+      "acceptanceCriteria": [
+        "Página em app/(dashboard)/dashboard/page.tsx",
+        "Card 1: Custo Fixo por Minuto (ex: 'R$ 2,47 / min') com link para /custos-fixos",
+        "Card 2: Total Custos Fixos Mensais (ex: 'R$ 13.528,36 / mês')",
+        "Card 3: Procedimentos Cadastrados (ex: '204 procedimentos')",
+        "Aviso amarelo se a última atualização dos custos fixos foi há mais de 6 meses",
+        "Seção 'Procedimentos Mais Caros' com tabela de 5 itens: nome, preço calculado",
+        "Seção 'Mais Abaixo da Tabela VRPO' com tabela de 5 itens: nome, preço calculado, VRPO ref., diferença %",
+        "Botões de ação rápida: 'Editar Custos Fixos' → /custos-fixos, 'Ver Todos os Procedimentos' → /procedimentos/diagnostico",
+        "Botão 'Salvar Snapshot Atual' (funcionalidade implementada em US-019)",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 17,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-018",
+      "title": "Página de Comparativo VRPO (/comparativo-vrpo)",
+      "description": "Como dentista, quero comparar meus preços calculados com a tabela de referência VRPO para saber se estou cobrando valores adequados.",
+      "acceptanceCriteria": [
+        "Página em app/(dashboard)/comparativo-vrpo/page.tsx",
+        "Resumo no topo: X procedimentos abaixo da VRPO (vermelho), Y acima (verde), Z sem referência VRPO (cinza)",
+        "Tabela com colunas: Código, Procedimento, Especialidade, Meu Preço, VRPO Ref., Diferença R$, Diferença %",
+        "Linhas com preço abaixo da VRPO destacadas em vermelho claro, acima em verde claro",
+        "Filtro por situação: 'Todos' | 'Abaixo da VRPO' | 'Acima da VRPO' | 'Sem referência'",
+        "Filtro por especialidade (select com as 11 especialidades)",
+        "Ordenação padrão: maior diferença negativa percentual primeiro (mais abaixo da VRPO)",
+        "Tooltip/popover no cabeçalho 'O que é VRPO?' explicando o conceito em 2-3 frases",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 18,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-019",
+      "title": "Server actions para Snapshots (CRUD)",
+      "description": "Como desenvolvedor, preciso das server actions de snapshots para salvar e recuperar versões da precificação do dentista.",
+      "acceptanceCriteria": [
+        "Use case GerarSnapshot em src/application/usecases/GerarSnapshot.ts que coleta todos os preços calculados do usuário e persiste como JSON imutável",
+        "Server action createSnapshot(userId, nome, descricao?) — coleta custoFixoPorMinuto, config atual e todos os { procedimentoId, codigo, nome, precoCalculado } e salva em Snapshot.dados; retorna erro se usuário já tem 10 snapshots",
+        "Server action listSnapshots(userId) retorna lista de snapshots: id, nome, descricao, custoFixoPorMinuto, createdAt",
+        "Server action getSnapshot(id, userId) retorna snapshot completo com dados JSON",
+        "Server action deleteSnapshot(id, userId) — remove o snapshot (o snapshot é imutável mas pode ser deletado)",
+        "Server action compareSnapshotWithCurrent(snapshotId, userId) retorna array de { codigo, nome, precoSnapshot, precoAtual, diferenca, diferencaPerc }",
+        "Typecheck passes"
+      ],
+      "priority": 19,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-020",
+      "title": "Página de Histórico de Snapshots (/historico)",
+      "description": "Como dentista, quero salvar e visualizar versões da minha precificação para acompanhar sua evolução ao longo do tempo.",
+      "acceptanceCriteria": [
+        "Página em app/(dashboard)/historico/page.tsx",
+        "Lista de snapshots salvos com: nome, data de criação, custo fixo/min na versão, botões 'Ver' e 'Excluir'",
+        "Mensagem de estado vazio quando não há snapshots ('Nenhum snapshot salvo. Salve o estado atual da sua precificação.')",
+        "Aviso que o limite é de 10 snapshots (mostrar contador: ex: '3/10 snapshots')",
+        "Botão 'Salvar Snapshot Atual' no topo: abre modal com campos nome (obrigatório) e descrição (opcional), salva via server action",
+        "Ao clicar 'Ver' em um snapshot: exibe tabela somente leitura com os preços daquela versão",
+        "Botão 'Comparar com Atual' na visualização do snapshot: mostra tabela lado a lado com colunas: Procedimento | Preço na Versão | Preço Atual | Diferença R$ | Diferença %",
+        "Botão 'Excluir' com confirmação via dialog",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-021",
+      "title": "Serviço e API route para exportação em PDF",
+      "description": "Como desenvolvedor, preciso de um serviço de geração de PDF e uma API route para que o dentista possa baixar sua tabela de preços.",
+      "acceptanceCriteria": [
+        "Serviço PdfExportService em src/infrastructure/services/PdfExportService.ts usando @react-pdf/renderer",
+        "PDF contém: cabeçalho com 'Precifica' e nome do dentista, data de geração, tabela com colunas Código, Procedimento, Tempo (min), Custo Variável, Preço Calculado, VRPO Ref.",
+        "Parâmetros de filtro suportados: especialidade (all | slug-da-especialidade) e tipo (all | custom)",
+        "API route em app/api/export/pdf/route.ts que: verifica autenticação, busca dados do usuário, gera PDF via PdfExportService, retorna Response com Content-Type application/pdf",
+        "Nome do arquivo no header Content-Disposition: precifica-[nome-slug]-[YYYY-MM-DD].pdf",
+        "Typecheck passes"
+      ],
+      "priority": 21,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-022",
+      "title": "Serviço e API route para exportação em Excel (XLSX)",
+      "description": "Como desenvolvedor, preciso de um serviço de geração de Excel para que o dentista possa baixar sua tabela em formato planilha.",
+      "acceptanceCriteria": [
+        "Serviço ExcelExportService em src/infrastructure/services/ExcelExportService.ts usando a biblioteca xlsx (SheetJS)",
+        "Planilha Excel contém as mesmas colunas do PDF: Código, Procedimento, Especialidade, Tempo (min), Custo Variável, Preço Calculado, VRPO Ref., Diferença %",
+        "Cabeçalho da planilha em negrito, colunas com largura automática (wch)",
+        "Mesmos parâmetros de filtro do PDF: especialidade e tipo",
+        "API route em app/api/export/excel/route.ts retorna Response com Content-Type application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Nome do arquivo: precifica-[nome-slug]-[YYYY-MM-DD].xlsx",
+        "Typecheck passes"
+      ],
+      "priority": 22,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-023",
+      "title": "Página de Exportação com UI de filtros (/exportar)",
+      "description": "Como dentista, quero exportar minha tabela de preços em PDF ou Excel com filtros para apresentar a convênios.",
+      "acceptanceCriteria": [
+        "Página em app/(dashboard)/exportar/page.tsx",
+        "Select 'Especialidade': 'Todas' + cada uma das 11 especialidades",
+        "Select 'Tipo': 'Todos' | 'Apenas Padrão VRPO' | 'Apenas Customizados'",
+        "Preview da tabela na página mostrando os procedimentos que serão exportados com os filtros selecionados (máximo 20 linhas com paginação)",
+        "Botão 'Baixar PDF' chama GET /api/export/pdf com os filtros como query params e inicia download",
+        "Botão 'Baixar Excel' chama GET /api/export/excel com os filtros como query params e inicia download",
+        "Indicador de loading nos botões durante geração do arquivo",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 23,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-024",
+      "title": "Wizard de Onboarding para novos usuários",
+      "description": "Como dentista recém-cadastrado, quero ser guiado pelos passos iniciais de configuração para não me perder no sistema.",
+      "acceptanceCriteria": [
+        "Componente OnboardingWizard em src/presentation/components/layout/OnboardingWizard.tsx",
+        "Wizard exibido no dashboard apenas quando user.onboardingCompleted === false",
+        "3 passos: (1) 'Configure seus custos fixos' com botão 'Ir para Custos Fixos', (2) 'Atualize os preços dos materiais' com botão 'Ir para Materiais', (3) 'Veja seus procedimentos calculados' com botão 'Ver Procedimentos'",
+        "Progress bar mostrando etapa atual (Passo 1/3, 2/3, 3/3)",
+        "Botão 'Pular configuração' em todos os passos",
+        "Ao concluir o passo 3 ou clicar em 'Pular', server action updateOnboardingCompleted(userId) seta user.onboardingCompleted = true",
+        "Wizard não aparece mais após onboardingCompleted = true",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 24,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

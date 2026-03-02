@@ -1,0 +1,37 @@
+## Codebase Patterns
+- Next.js 15.5.12 with App Router, TypeScript strict mode
+- shadcn/ui configured manually via components.json (create-next-app won't work in existing directory with files)
+- UI components live in src/presentation/components/ui/ (aliased as @/presentation/components/ui)
+- All utilities in src/lib/utils.ts (cn helper)
+- Hooks in src/presentation/hooks/
+- Prisma schema at prisma/schema.prisma with postgresql provider
+- Domain structure: src/domain/entities, src/domain/value-objects, src/application/usecases, src/application/interfaces, src/infrastructure/repositories, src/infrastructure/services
+- Run typecheck with: npx tsc --noEmit
+- next-auth@4 stable used (not v5 beta)
+- bcrypt for password hashing (@types/bcrypt in devDependencies)
+
+---
+
+## 2026-03-02 - US-001
+- What was implemented: Setup do projeto Next.js com stack completa
+- Files changed:
+  - package.json (Next.js 15.5.12, Tailwind, Prisma, NextAuth, Zod, @react-pdf/renderer, xlsx, shadcn/ui deps)
+  - tsconfig.json, tailwind.config.ts, postcss.config.mjs, eslint.config.mjs, next.config.ts
+  - components.json (shadcn/ui config)
+  - .env.example, .gitignore
+  - prisma/schema.prisma (all models defined)
+  - src/app/globals.css (Tailwind + CSS variables)
+  - src/app/layout.tsx, src/app/page.tsx
+  - src/lib/utils.ts (cn helper)
+  - src/presentation/components/ui/ (button, card, input, label, toast, toaster)
+  - src/presentation/hooks/use-toast.ts
+  - Created folder structure: src/domain/entities, src/domain/value-objects, src/application/usecases, src/application/interfaces, src/infrastructure/repositories, src/infrastructure/services, src/presentation/components, src/presentation/hooks, src/lib
+- **Learnings for future iterations:**
+  - create-next-app@latest fails when directory has existing files — must create project manually
+  - Prisma schema already has all models for the full PRD (US-002 schema is already done!)
+  - shadcn/ui must be initialized manually via components.json + creating UI components directly
+  - tailwindcss-animate must be installed separately as devDependency
+  - Next.js 15.5.12 is the minimum secure version (15.1.6 has critical vulnerability CVE-2025-66478)
+  - next-auth@4 stable works; use "next-auth": "^4.24.11"
+  - The prisma/schema.prisma already covers US-002 acceptance criteria
+---
