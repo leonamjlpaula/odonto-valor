@@ -1,4 +1,8 @@
 ## Codebase Patterns
+- next-auth@4 stable: authOptions in src/lib/auth.ts, API route at app/api/auth/[...nextauth]/route.ts, session JWT strategy
+- next-auth type augmentation in src/types/next-auth.d.ts (extends Session.user with id: string, JWT with userId)
+- Middleware at src/middleware.ts uses withAuth from next-auth/middleware — protect /dashboard/:path*
+- session.user.id is populated via jwt callback (token.userId) → session callback (session.user.id = token.userId)
 - Next.js 15.5.12 with App Router, TypeScript strict mode
 - shadcn/ui configured manually via components.json (create-next-app won't work in existing directory with files)
 - UI components live in src/presentation/components/ui/ (aliased as @/presentation/components/ui)
@@ -74,4 +78,19 @@
   - `npx prisma validate` confirms schema syntax is valid without DB connection
   - Migration SQL files should be committed to version control so devs can apply them when they have a DB
   - When a real DB is available: run `npx prisma migrate dev` to apply migrations, then `npx prisma db seed` to populate data
+---
+
+## 2026-03-02 - US-004
+- What was implemented: NextAuth configurado com provider Credentials (email/senha)
+- Files changed:
+  - src/lib/auth.ts (new — NextAuth authOptions with CredentialsProvider, JWT session, bcrypt password validation)
+  - src/app/api/auth/[...nextauth]/route.ts (new — App Router handler exporting GET and POST)
+  - src/middleware.ts (new — withAuth protecting /dashboard/:path*)
+  - src/types/next-auth.d.ts (new — type augmentation for Session.user.id and JWT.userId)
+- **Learnings for future iterations:**
+  - next-auth v4 App Router API route: export handler as GET and POST (not default export)
+  - next-auth type augmentation MUST be in a .d.ts file inside src/ so TypeScript picks it up
+  - withAuth in middleware handles redirect to signIn page (configured in authOptions.pages.signIn)
+  - session.user.id sourced from JWT token.userId set in jwt() callback when user object is present (login only)
+  - NEXTAUTH_SECRET and NEXTAUTH_URL were already documented in .env.example from US-001
 ---
