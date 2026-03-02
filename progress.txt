@@ -1,3 +1,18 @@
+## 2026-03-02 - US-013
+- What was implemented: Página de Listagem de Procedimentos (/procedimentos/[especialidade]) com navegação por especialidades, tabela com cálculo de preço e comparativo VRPO
+- Files changed:
+  - src/app/(dashboard)/procedimentos/[especialidade]/page.tsx (new — server component; fetches all 11 especialidades with groupBy counts, resolves current especialidade, routes to /diagnostico if slug invalid, supports ?q= search param)
+  - src/presentation/components/procedimentos/ProcedimentosPage.tsx (new — client component with: desktop sidebar nav with counts, mobile dropdown select, global search with router.push URL navigation, table with 7 columns, color-coded Diferença, Customizado badge, row click to detail page, Add dialog)
+  - src/application/usecases/procedimentoActions.ts (updated — added createProcedimentoCustomizado server action + CreateProcedimentoResult type; handles P2002 unique constraint for duplicate code)
+  - prd.json (US-013 marked passes: true)
+- **Learnings for future iterations:**
+  - Next.js 15 dynamic params: `params` and `searchParams` are Promises — always `await params` and `await searchParams` in server components
+  - prisma.procedimento.groupBy({ by: ['especialidadeId'], where: { userId }, _count: { id: true } }) for efficient count-per-specialty in one query
+  - URL-based search: server component reads `searchParams.q`, calls searchProcedimentos (all specialties) vs getProcedimentosByEspecialidade — cleaner than client-side filtering for cross-specialty search
+  - P2002 unique constraint error: check `typeof e === 'object' && e !== null && 'code' in e && (e as { code: string }).code === 'P2002'` without needing Prisma import
+  - router.refresh() after createProcedimentoCustomizado to re-fetch server data with the new procedure
+---
+
 ## 2026-03-02 - US-012
 - What was implemented: Interface, repositório e server actions para listagem e cálculo de preço de Procedimentos
 - Files changed:

@@ -247,8 +247,8 @@
         "Verify in browser using dev-browser skill"
       ],
       "priority": 13,
-      "passes": false,
-      "notes": ""
+      "passes": true,
+      "notes": "Server component page.tsx fetches all 11 especialidades + groupBy counts, current especialidade, and procedures (via getProcedimentosByEspecialidade or searchProcedimentos if ?q= param). ProcedimentosPage client component: desktop sidebar (all 11 especialidades with counts, active highlighted), mobile dropdown select, global search with URL-based navigation (?q= param), table with Código/Nome/Tempo/Custo Variável/Preço Calculado/VRPO Ref./Diferença(%) columns, color-coded Diferença (green≥VRPO, red<VRPO, gray=N/A), 'Customizado' badge, row click navigates to /procedimentos/[especialidade]/[id], 'Adicionar Procedimento' dialog (createProcedimentoCustomizado added to procedimentoActions.ts). Typecheck passes."
     },
     {
       "id": "US-014",
