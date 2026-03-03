@@ -38,3 +38,10 @@ next-env.d.ts
 
 # prisma
 prisma/*.db
+
+# claude code
+.claude/
+
+# project files
+custos_consultorio.numbers
+tasks/
