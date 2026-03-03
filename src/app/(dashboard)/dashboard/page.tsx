@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/db'
 import {
   getDashboardStats,
   getTopProcedimentos,
@@ -15,11 +16,12 @@ export default async function DashboardRoute() {
 
   const userId = session.user.id
 
-  const [stats, topProcedimentos, bottomVRPO, lastUpdate] = await Promise.all([
+  const [stats, topProcedimentos, bottomVRPO, lastUpdate, user] = await Promise.all([
     getDashboardStats(userId),
     getTopProcedimentos(userId, 5),
     getBottomProcedimentosVRPO(userId, 5),
     getLastUpdateInfo(userId),
+    prisma.user.findUnique({ where: { id: userId }, select: { onboardingCompleted: true } }),
   ])
 
   return (
@@ -29,6 +31,7 @@ export default async function DashboardRoute() {
       topProcedimentos={topProcedimentos}
       bottomVRPO={bottomVRPO}
       lastUpdate={lastUpdate}
+      onboardingCompleted={user?.onboardingCompleted ?? true}
     />
   )
 }

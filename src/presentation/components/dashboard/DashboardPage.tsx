@@ -23,6 +23,7 @@ import { Input } from '@/presentation/components/ui/input'
 import { Label } from '@/presentation/components/ui/label'
 import { useToast } from '@/presentation/hooks/use-toast'
 import { createSnapshot } from '@/application/usecases/snapshotActions'
+import { OnboardingWizard } from '@/presentation/components/layout/OnboardingWizard'
 import type { DashboardStats, TopProcedimento, BottomVRPOProcedimento } from '@/application/usecases/dashboardActions'
 
 type Props = {
@@ -31,6 +32,7 @@ type Props = {
   topProcedimentos: TopProcedimento[]
   bottomVRPO: BottomVRPOProcedimento[]
   lastUpdate: Date | null
+  onboardingCompleted: boolean
 }
 
 function formatBRL(value: number) {
@@ -44,7 +46,7 @@ function formatPerc(value: number) {
   return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
 }
 
-export function DashboardPage({ userId, stats, topProcedimentos, bottomVRPO, lastUpdate }: Props) {
+export function DashboardPage({ userId, stats, topProcedimentos, bottomVRPO, lastUpdate, onboardingCompleted }: Props) {
   const router = useRouter()
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
@@ -83,6 +85,8 @@ export function DashboardPage({ userId, stats, topProcedimentos, bottomVRPO, las
 
   return (
     <div className="space-y-6">
+      {!onboardingCompleted && <OnboardingWizard userId={userId} />}
+
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <Button variant="outline" onClick={handleSnapshotOpen} disabled={isPending}>
