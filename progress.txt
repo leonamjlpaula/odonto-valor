@@ -1,3 +1,33 @@
+## 2026-03-02 - US-022
+- What was implemented: ExcelExportService + API route GET /api/export/excel para exportação em XLSX
+- Files changed:
+  - src/infrastructure/services/ExcelExportService.ts (new — xlsx SheetJS; ProcedimentoExportExcel type with especialidade; generate() creates workbook with 'Precificação' + 'Informações' sheets, bold headers, auto-width wch cols, Diferença % computed column)
+  - src/app/api/export/excel/route.ts (new — GET handler: auth check, same filter/fetch pattern as PDF route, calls ExcelExportService, returns Response with XLSX Content-Type + Content-Disposition filename)
+  - prd.json (US-022 marked passes: true)
+- **Learnings for future iterations:**
+  - xlsx SheetJS v0.18.5: `XLSX.utils.aoa_to_sheet(worksheetData)` for array-of-arrays to sheet; `XLSX.utils.book_new()` + `XLSX.utils.book_append_sheet()` for workbook; `XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' })` returns Buffer
+  - Column widths via `worksheet['!cols'] = [{wch: N}, ...]` — calculate from max cell string length across all rows
+  - Bold headers: set `worksheet[cellAddr].s = { font: { bold: true } }` for row 0 cells (requires xlsx with style support)
+  - Excel has Especialidade + Diferença % columns vs PDF — ProcedimentoExportExcel type extends the PDF type with especialidade field
+  - XLSX Content-Type: `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+  - Excel API route is identical to PDF route except: calls ExcelExportService, returns .xlsx MIME type, filename ends with .xlsx
+---
+
+## 2026-03-02 - US-021
+- What was implemented: PdfExportService + API route GET /api/export/pdf para exportação em PDF
+- Files changed:
+  - src/infrastructure/services/PdfExportService.tsx (new — @react-pdf/renderer v4; PrecificaDocument component renders A4 landscape; PdfExportService class with generate() returning Buffer)
+  - src/app/api/export/pdf/route.ts (new — GET handler: auth check, query params especialidade/tipo, parallel data fetch, price calculation, PDF generation, Response with Content-Type+Content-Disposition headers)
+  - next.config.ts (updated — serverExternalPackages: ['@react-pdf/renderer'] to prevent webpack bundling issues)
+  - prd.json (US-021 marked passes: true)
+- **Learnings for future iterations:**
+  - @react-pdf/renderer v4 renderToBuffer returns Buffer — must wrap in `new Uint8Array(buffer)` when passing to `new Response()` (TypeScript strict: Buffer is not BodyInit)
+  - Add `serverExternalPackages: ['@react-pdf/renderer']` to next.config.ts to prevent Next.js webpack from bundling it (avoids native module resolution errors)
+  - Use `fontFamily: 'Helvetica-Bold'` directly in StyleSheet for bold text — don't rely on `fontWeight: 'bold'` with built-in fonts
+  - API routes use `request.nextUrl.searchParams` (from NextRequest) to parse query params
+  - Parallel data fetching pattern: `Promise.all([prisma.procedimento.findMany(...), calcularCustoFixoPorMinuto(userId)])` for efficiency
+---
+
 ## 2026-03-02 - US-020
 - What was implemented: Página de Histórico de Snapshots (/historico) com lista, visualização, comparativo e criação de snapshots
 - Files changed:
