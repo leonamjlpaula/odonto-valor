@@ -89,9 +89,9 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-4 text-center">
-            <Button variant="link" className="text-xs text-muted-foreground p-0 h-auto" disabled>
+            <Link href="/esqueci-senha" className="text-xs text-muted-foreground hover:underline underline-offset-4">
               Esqueci minha senha
-            </Button>
+            </Link>
           </div>
 
           <div className="mt-2 text-center text-sm text-muted-foreground">

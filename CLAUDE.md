@@ -85,13 +85,27 @@ Implementado em `src/domain/value-objects/CustoFixoPorMinuto.ts` e `src/applicat
 - `Especialidade` e `VRPOReferencia` são dados globais (sem userId).
 - Seed em `prisma/seed.ts`: 11 especialidades, 75 VRPOReferencias, 30 materiais padrão, 40 procedimentos padrão.
 
-## Variáveis de ambiente
+## Ambientes
 
-```env
-DATABASE_URL=       # PostgreSQL connection string
-NEXTAUTH_SECRET=    # segredo JWT do NextAuth
-NEXTAUTH_URL=       # URL base da aplicação (ex: http://localhost:3000)
+| Variável | Dev (Docker) | Prod (Supabase) |
+|---|---|---|
+| `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/precifica` | connection string do Supabase |
+| `SMTP_HOST` | `localhost` (Mailhog) | `smtp.resend.com` |
+| `SMTP_PORT` | `1025` | `465` |
+| `SMTP_SECURE` | `false` | `true` |
+| `SMTP_USER` | _(vazio)_ | `resend` |
+| `SMTP_PASS` | _(vazio)_ | API key do Resend |
+
+**Setup dev local:**
+```bash
+cp .env.local.example .env.local
+docker compose up -d          # PostgreSQL na :5432, Mailhog na :8025
+npx prisma migrate dev
+npx prisma db seed
+npm run dev
 ```
+
+Emails em dev são capturados pelo Mailhog em **http://localhost:8025**.
 
 ## Limites e regras de negócio
 
