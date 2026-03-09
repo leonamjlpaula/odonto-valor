@@ -15,11 +15,11 @@ SaaS de precificação para consultórios odontológicos baseado na metodologia 
 ## Comandos principais
 
 ```bash
-npm run dev          # inicia servidor de desenvolvimento
-npm run typecheck    # tsc --noEmit (rodar antes de commitar)
-npm run lint         # eslint
-npx prisma migrate dev   # aplica migrations
-npx prisma db seed       # popula dados padrão VRPO
+npm run dev              # inicia servidor de desenvolvimento
+npm run typecheck        # tsc --noEmit (rodar antes de commitar)
+npm run lint             # eslint
+npm run prisma:migrate   # aplica migrations usando .env.local
+npm run prisma:seed      # popula dados padrão VRPO usando .env.local
 ```
 
 ## Arquitetura (Clean Architecture)

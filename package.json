@@ -9,11 +9,11 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "ts-node --project tsconfig.seed.json prisma/seed.ts"
+    "prisma:migrate": "dotenv -e .env.local -- prisma migrate dev",
+    "prisma:seed": "dotenv -e .env.local -- ts-node --project tsconfig.seed.json prisma/seed.ts"
   },
   "prisma": {
-    "seed": "ts-node --project tsconfig.seed.json prisma/seed.ts"
+    "seed": "dotenv -e .env.local -- ts-node --project tsconfig.seed.json prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.3.1",
@@ -51,6 +51,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.0.1",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.12",
     "postcss": "^8",
