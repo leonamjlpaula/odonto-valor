@@ -1,6 +1,19 @@
 # Precifica — CLAUDE.md
 
-SaaS de precificação para consultórios odontológicos baseado na metodologia VRPO.
+SaaS de precificação para consultórios odontológicos brasileiros. Posicionamento central: **"Configure em 10 minutos e saiba se está no lucro ou no prejuízo em cada procedimento."**
+
+---
+
+## Documentação essencial
+
+Antes de qualquer tarefa de produto, leia:
+
+- `PRD.md` — visão do produto, perfis de usuário, funcionalidades, fórmulas completas
+- `ARCHITECTURE.md` — stack, estrutura de diretórios, modelo de dados, padrões de código
+- `ROADMAP.md` — 6 fases priorizadas, esforço, critérios de "feito" e dependências
+- `references/analise-fase1.md` a `analise-fase5.md` — análise profunda das duas metodologias (CNCC e live da mentora Aline Silva), diagnóstico do MVP e raciocínio por trás de cada decisão do roadmap
+
+---
 
 ## Stack
 
@@ -12,6 +25,8 @@ SaaS de precificação para consultórios odontológicos baseado na metodologia 
 - **Validação**: Zod
 - **Exportação**: @react-pdf/renderer (PDF) + xlsx/SheetJS (Excel)
 
+---
+
 ## Comandos principais
 
 ```bash
@@ -21,6 +36,35 @@ npm run lint             # eslint
 npm run prisma:migrate   # aplica migrations usando .env.local
 npm run prisma:seed      # popula dados padrão VRPO usando .env.local
 ```
+
+---
+
+## Metodologia de precificação (contexto crítico)
+
+O produto implementa metodologia híbrida de duas fontes:
+
+**CNCC/VRPO:** Metodologia oficial da Comissão Nacional de Convênios e Credenciamentos. Define 14 itens de custo fixo padrão, depreciação de equipamentos (sobre **11 meses** — 1 mês de férias), remuneração profissional com encargos (fundo de reserva 11% + insalubridade 40% + imprevistos 20% + férias + 13º), e taxa de retorno de 3% do investimento em 3 anos. Resultado final da planilha original: R$ 2,475/min com os dados de exemplo.
+
+**Gestão financeira moderna (mentora Aline Silva):** Itens ausentes na CNCC que distorcem o cálculo para a realidade atual:
+- **Número de cadeiras:** o custo fixo é dividido pelas cadeiras ativas da clínica
+- **Taxa de ociosidade:** minutos úteis reais = teóricos × (1 − ociosidade%). Padrão sugerido: 20%
+- **Impostos sobre faturamento como % do preço** (não custo fixo): ISS/Simples varia entre 6–16%
+- **Taxa de cartão como % do preço:** ~3–5% no Brasil atual
+- **Margem de lucro alvo: 30%** — benchmark explícito da mentora. Procedimento abaixo disso está no "amarelo" ou "vermelho"
+
+**Fórmula completa (ver PRD.md para detalhes):**
+```
+minutosUteis = diasUteis × horasTrabalho × 60 × (1 − ociosidade/100)
+custoBase = totalItens / (minutosUteis × numeroCadeiras)
+depreciacao = investimento / (anosDepreciacao × 11 × minutosUteis)
+remuneracao = salarioBase × (1 + encargos%) / minutosUteis
+custoFixoPorMinuto = custoBase + depreciacao + remuneracao + taxaRetorno
+
+margemLucro = (precoVenda − custoBreakEven − precoVenda × (impostos + cartao) / 100) / precoVenda
+precoMinimo30% = custoBreakEven / (1 − (impostos + cartao)/100 − 0.30)
+```
+
+---
 
 ## Arquitetura (Clean Architecture)
 
@@ -34,7 +78,7 @@ src/
 │   ├── interfaces/               # contratos dos repositórios (I*Repository.ts)
 │   └── usecases/                 # server actions e use cases de aplicação
 ├── domain/
-│   └── value-objects/            # lógica de domínio pura (ex: CustoFixoPorMinuto)
+│   └── value-objects/            # lógica de domínio pura (CustoFixoPorMinuto.ts)
 ├── infrastructure/
 │   ├── repositories/             # implementações Prisma dos repositórios
 │   └── services/                 # serviços externos (PdfExportService, ExcelExportService)
@@ -44,6 +88,8 @@ src/
 ├── lib/                          # utilitários compartilhados (db.ts, auth.ts, utils.ts)
 └── types/                        # augmentações de tipos globais
 ```
+
+---
 
 ## Padrões de código
 
@@ -68,22 +114,49 @@ src/
 - Middleware em `src/middleware.ts` protege `/dashboard/:path*`.
 - Sessão JWT contém `userId` e `name`.
 
-### Fórmula VRPO (núcleo do negócio)
-O cálculo de preço de procedimento é:
-```
-precoFinal = (tempoMinutos × custoFixoPorMinuto) + custoVariavel
-custoVariavel = Σ (material.preco / divisor) × consumoNumerico
-custoFixoPorMinuto = custoFixoBase + depreciacao + remuneracao + taxaRetorno
-```
-Implementado em `src/domain/value-objects/CustoFixoPorMinuto.ts` e `src/application/usecases/calcularPrecoProcedimento.ts`.
+---
 
 ## Banco de dados
 
 - Prisma schema em `prisma/schema.prisma`.
 - Todos os modelos usam `cuid()` como PK.
-- Multi-tenancy por `userId` em todos os modelos (User → CustoFixoConfig, Material, Procedimento, Snapshot).
+- Multi-tenancy por `userId` em todos os modelos.
 - `Especialidade` e `VRPOReferencia` são dados globais (sem userId).
-- Seed em `prisma/seed.ts`: 11 especialidades, 75 VRPOReferencias, 30 materiais padrão, 40 procedimentos padrão.
+- Seed global em `prisma/seed.ts`: especialidades e VRPOReferencias.
+- Seed por usuário em `src/lib/vrpo-seed-data.ts`: materiais, procedimentos e itens de custo fixo padrão — chamado no `createUser`.
+
+**Campos planejados (Roadmap Fase 1)** ainda não existem no schema:
+- `CustoFixoConfig.numeroCadeiras` (Int, default 1)
+- `CustoFixoConfig.percOciosidade` (Float, default 0)
+- `CustoFixoConfig.percImpostos` (Float, default 8)
+- `CustoFixoConfig.percTaxaCartao` (Float, default 4)
+- `ProcedimentoMaterial.custoLaboratorio` (Float?, default 0)
+
+---
+
+## Estado atual do produto (diagnóstico)
+
+**Fundação técnica:** sólida. Arquitetura limpa, autenticação completa (incluindo recuperação de senha), CRUD de materiais/procedimentos/custos fixos, comparativo VRPO, snapshots, exportação PDF/Excel, onboarding wizard.
+
+**Problemas críticos de cálculo (Roadmap Fase 1):**
+- Depreciação usa 12 meses em vez de 11 (diverge da CNCC)
+- Falta número de cadeiras (dentista com sócio calcula com custo dobrado)
+- Falta taxa de ociosidade (assume 100% de ocupação)
+- Falta % de impostos e cartão como variáveis do preço
+
+**Problemas de conteúdo (Roadmap Fase 3):**
+- Seed tem ~40 procedimentos estimados, não os 200+ da planilha VRPO
+- Seed tem 30 materiais, não os ~130 da planilha CNCC
+- Valores VRPO de referência são estimativas, não os oficiais da CNCC
+
+**Features de produto ausentes (Roadmap Fases 2–5):**
+- Margem de lucro % visível por procedimento
+- Alertas automáticos pós-save
+- Onboarding adaptativo por perfil (solo vs. clínica)
+- Simulador de cenários
+- PDF de credenciamento com metodologia CNCC explícita
+
+---
 
 ## Ambientes
 
@@ -107,9 +180,23 @@ npm run dev
 
 Emails em dev são capturados pelo Mailhog em **http://localhost:8025**.
 
+---
+
 ## Limites e regras de negócio
 
 - Máximo 10 snapshots por usuário.
 - Apenas itens `isCustom: true` podem ser excluídos (custos fixos, materiais, procedimentos).
 - `deleteMaterial` bloqueia se o material está em uso em algum `ProcedimentoMaterial`.
 - Números decimais brasileiros (vírgula) são tratados em `parseConsumoNumerico` no use case de procedimentos.
+- A depreciação e a taxa de retorno usam 11 meses por ano (CNCC), não 12.
+- Margem de lucro alvo: 30% (verde ≥30%, amarelo 10–29%, vermelho <10%).
+
+---
+
+## O que evitar
+
+- Não implementar features do roadmap sem ler o `ROADMAP.md` primeiro — a ordem das fases tem dependências explícitas.
+- Não alterar a fórmula de `CustoFixoPorMinuto.ts` sem confirmar que o resultado com os dados padrão da CNCC ainda é R$ 2,475/min.
+- Não usar 12 meses na depreciação — a metodologia CNCC usa 11 (1 mês de férias).
+- Não tratar impostos (ISS/Simples) como custo fixo — eles são percentuais variáveis sobre o preço de venda.
+- Não "melhorar" código adjacente sem necessidade — as tarefas são focadas e incrementais.
