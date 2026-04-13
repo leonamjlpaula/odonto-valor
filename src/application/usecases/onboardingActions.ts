@@ -8,3 +8,13 @@ export async function updateOnboardingCompleted(userId: string): Promise<void> {
     data: { onboardingCompleted: true },
   })
 }
+
+export async function savePerfilConsultorio(
+  userId: string,
+  perfil: 'solo' | 'clinica'
+): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { perfilConsultorio: perfil },
+  })
+}

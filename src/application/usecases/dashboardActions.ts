@@ -20,6 +20,7 @@ export type DashboardStats = {
     proLaboreMensal: number
   }
   ociosidadeNaoConfigurada: boolean
+  custosDesatualizados: boolean
   lastUpdate: Date | null
 }
 
@@ -97,6 +98,9 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     }
   }
 
+  const sixMonthsAgo = new Date()
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+
   return {
     custoFixoPorMinuto,
     totalCustosFixosMensais,
@@ -104,6 +108,7 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     totalMateriais,
     breakEven,
     ociosidadeNaoConfigurada: config?.percOciosidade === 0,
+    custosDesatualizados: config !== null && new Date(config.updatedAt) < sixMonthsAgo,
     lastUpdate: config?.updatedAt ?? null,
   }
 }
