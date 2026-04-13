@@ -2,58 +2,87 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
+
+// Width milestones (%) and the delay (ms) after click to reach each one.
+// Asymptotic: fast at first, slowing down — never reaches 100% on its own.
+const MILESTONES: [number, number][] = [
+  [25,    0],
+  [50,  250],
+  [70,  600],
+  [82, 1500],
+  [88, 4000],
+]
 
 export function NavigationProgress() {
   const pathname = usePathname()
-  const [phase, setPhase] = useState<'idle' | 'loading' | 'done'>('idle')
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([])
+  const [width, setWidth]     = useState(0)
+  const [opacity, setOpacity] = useState(1)
+  const [visible, setVisible] = useState(false)
+  const timers  = useRef<ReturnType<typeof setTimeout>[]>([])
+  const pending = useRef(false)
 
   function clearTimers() {
     timers.current.forEach(clearTimeout)
     timers.current = []
   }
 
-  // Navigation completed — finish bar and fade out
+  function start() {
+    clearTimers()
+    pending.current = true
+    setOpacity(1)
+    setWidth(0)
+    setVisible(true)
+    MILESTONES.forEach(([target, delay]) => {
+      timers.current.push(setTimeout(() => setWidth(target), delay))
+    })
+  }
+
+  function finish() {
+    clearTimers()
+    pending.current = false
+    setWidth(100)
+    // brief pause at 100%, then fade out
+    timers.current.push(setTimeout(() => setOpacity(0), 150))
+    timers.current.push(setTimeout(() => { setVisible(false); setWidth(0); setOpacity(1) }, 500))
+  }
+
+  // pathname change = navigation committed → complete the bar
   useEffect(() => {
-    if (phase === 'idle') return
-    setPhase('done')
-    const t = setTimeout(() => setPhase('idle'), 400)
-    timers.current.push(t)
-    return clearTimers
+    if (!pending.current) return
+    finish()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
-  // Intercept link clicks to detect navigation start
+  // intercept link clicks to detect navigation start
   useEffect(() => {
     function onLinkClick(e: MouseEvent) {
       const anchor = (e.target as Element).closest('a[href]')
       if (!anchor) return
       const href = anchor.getAttribute('href') ?? ''
-      // Skip external links, hash-only, download, and current page
       if (
         href.startsWith('http') ||
-        href.startsWith('#') ||
+        href.startsWith('#')    ||
         anchor.hasAttribute('download') ||
         href === pathname
       ) return
-      clearTimers()
-      setPhase('loading')
+      start()
     }
     document.addEventListener('click', onLinkClick)
     return () => document.removeEventListener('click', onLinkClick)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
-  if (phase === 'idle') return null
+  if (!visible) return null
 
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] h-[2px] bg-primary/20">
       <div
-        className={cn(
-          'h-full bg-primary transition-all',
-          phase === 'loading' && 'animate-nav-progress',
-          phase === 'done' && 'w-full duration-200 ease-out opacity-0',
-        )}
+        className="h-full bg-primary"
+        style={{
+          width: `${width}%`,
+          opacity,
+          transition: 'width 350ms ease-out, opacity 300ms ease',
+        }}
       />
     </div>
   )
