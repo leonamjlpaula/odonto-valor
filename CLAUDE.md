@@ -143,12 +143,13 @@ src/
 - **Fase 1 ✅** — Correções de cálculo: depreciação/retorno com 11 meses (CNCC), número de cadeiras, taxa de ociosidade, percImpostos e percTaxaCartao no config.
 - **Fase 2 ✅** — Margem de lucro visível: campo `precoVenda` no Procedimento, badge verde/amarelo/vermelho na listagem, cards de margem e preço mínimo para 30% no detalhe, dashboard com "Procedimentos no Vermelho", alerta pós-save com contagem de procedimentos afetados.
 - **Fase 3 ✅** — Seed completo: 200 procedimentos, 134 materiais, composições pré-configuradas, `custoLaboratorio` em prótese/endo/ortod, 200 valores VRPO atualizados. Performance: `contarProcedimentosNoVermelho` reescrito com select mínimo; query serial de config em `getProcedimentosNoVermelho` movida para `Promise.all`.
+- **Fase 4 ✅** — Onboarding adaptativo: wizard com passo 0 de perfil (solo/clínica), passo explicativo de rateio por cadeiras para clínicas. Dashboard: seção "Atenção necessária" (procedimentos no vermelho, custos desatualizados, ociosidade não configurada), card de faturamento mínimo semanal (break-even ÷ 4), framing do comparativo VRPO como margem de negociação.
+- **Fase 5 ✅** — Simulador de cenários (`/simulador`): ajuste client-side de custo fixo total, cadeiras, ociosidade, impostos e taxa de cartão com impacto em tempo real no custo/min e margem por procedimento. PDF de credenciamento com memória completa de cálculo (itens, depreciação, remuneração, retorno) e metodologia CNCC referenciada. Histórico: diff estruturado dos itens de custo fixo entre snapshots. Correção: query duplicada em `compareSnapshotWithCurrent` eliminada (usava `currentData.custoFixoItems` retornado por `gerarSnapshot`).
 
-**Features de produto ausentes (Roadmap Fases 4–5):**
-- Onboarding adaptativo por perfil solo vs. clínica (Fase 4)
-- Seção "Atenção necessária" no dashboard com alertas ativos (Fase 4)
-- Simulador de cenários client-side (Fase 5)
-- PDF de credenciamento com metodologia CNCC explícita (Fase 5)
+**Próximo passo (Pré-lançamento):**
+- Confirmar índices no banco para `procedimento.userId`, `material.userId` e `procedimento.especialidadeId`
+- Consolidar query redundante de config no dashboard (`getLastUpdateInfo`)
+- Extrair `getPercConfig` para módulo compartilhado
 
 ---
 

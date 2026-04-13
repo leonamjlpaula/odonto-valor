@@ -11,13 +11,20 @@ export type SnapshotItem = {
   precoCalculado: number
 }
 
+export type SnapshotCustoFixoItem = {
+  nome: string
+  valor: number
+}
+
 export type SnapshotDados = {
   custoFixoPorMinuto: number
+  /** Items de custo fixo no momento do snapshot (Fase 5+). Ausente em snapshots antigos. */
+  custoFixoItems?: SnapshotCustoFixoItem[]
   procedimentos: SnapshotItem[]
 }
 
 export async function gerarSnapshot(userId: string): Promise<SnapshotDados> {
-  const [procedimentos, custoFixoPorMinuto] = await Promise.all([
+  const [procedimentos, configComItems, custoFixoPorMinuto] = await Promise.all([
     prisma.procedimento.findMany({
       where: { userId },
       include: {
@@ -28,6 +35,10 @@ export async function gerarSnapshot(userId: string): Promise<SnapshotDados> {
         },
       },
     }) as Promise<ProcedimentoWithMateriais[]>,
+    prisma.custoFixoConfig.findUnique({
+      where: { userId },
+      include: { items: { orderBy: { ordem: 'asc' } } },
+    }),
     calcularCustoFixoPorMinuto(userId),
   ])
 
@@ -39,8 +50,13 @@ export async function gerarSnapshot(userId: string): Promise<SnapshotDados> {
     precoCalculado: calcularPrecoProcedimento(p, custoFixoPorMinuto).precoFinal,
   }))
 
+  const custoFixoItems: SnapshotCustoFixoItem[] | undefined = configComItems
+    ? configComItems.items.map((item) => ({ nome: item.nome, valor: item.valor }))
+    : undefined
+
   return {
     custoFixoPorMinuto,
+    custoFixoItems,
     procedimentos: snapshotProcedimentos,
   }
 }

@@ -31,6 +31,7 @@ export function ExportarPage({ data }: Props) {
   const [currentPage, setCurrentPage] = useState(1)
   const [downloadingPdf, startPdfTransition] = useTransition()
   const [downloadingExcel, startExcelTransition] = useTransition()
+  const [downloadingCredenciamento, startCredenciamentoTransition] = useTransition()
 
   // Filter items based on selected filters
   const filteredItems = useMemo(() => {
@@ -65,6 +66,28 @@ export function ExportarPage({ data }: Props) {
     params.set('especialidade', especialidade)
     params.set('tipo', tipo)
     return params.toString()
+  }
+
+  // Download credenciamento PDF (no filters — always full export)
+  function handleDownloadCredenciamento() {
+    startCredenciamentoTransition(async () => {
+      const response = await fetch('/api/export/pdf-credenciamento')
+      if (!response.ok) return
+
+      const blob = await response.blob()
+      const objectUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = objectUrl
+
+      const disposition = response.headers.get('Content-Disposition') ?? ''
+      const match = disposition.match(/filename="([^"]+)"/)
+      a.download = match ? match[1] : 'credenciamento.pdf'
+
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(objectUrl)
+    })
   }
 
   // Download via fetch + blob
@@ -196,6 +219,36 @@ export function ExportarPage({ data }: Props) {
             ? 'Nenhum procedimento encontrado com os filtros selecionados.'
             : `${filteredItems.length} procedimento${filteredItems.length !== 1 ? 's' : ''} serão exportados`}
         </p>
+      </div>
+
+      {/* PDF de Credenciamento */}
+      <div className="rounded-lg border bg-card p-4 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold">PDF de Credenciamento</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground max-w-prose">
+              Exporta todos os procedimentos com memória completa de cálculo (cada item de custo,
+              depreciação, remuneração, taxa de retorno) e a metodologia CNCC referenciada.
+              Indicado para negociações com operadoras e processos de credenciamento.
+            </p>
+          </div>
+          <button
+            onClick={handleDownloadCredenciamento}
+            disabled={downloadingCredenciamento}
+            className={cn(
+              'inline-flex shrink-0 items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+              'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+              'disabled:pointer-events-none disabled:opacity-50'
+            )}
+          >
+            {downloadingCredenciamento ? (
+              <Download className="h-4 w-4 animate-bounce" />
+            ) : (
+              <FileText className="h-4 w-4" />
+            )}
+            {downloadingCredenciamento ? 'Gerando PDF...' : 'Baixar PDF de Credenciamento'}
+          </button>
+        </div>
       </div>
 
       {/* Preview table */}

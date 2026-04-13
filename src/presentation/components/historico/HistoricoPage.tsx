@@ -23,7 +23,8 @@ import {
   compareSnapshotWithCurrent,
   type SnapshotListItem,
   type SnapshotFull,
-  type ComparisonItem,
+  type ComparisonResult,
+  type CustoItemDiff,
 } from '@/application/usecases/snapshotActions'
 
 const SNAPSHOT_LIMIT = 10
@@ -67,7 +68,7 @@ export function HistoricoPage({ userId, initialSnapshots }: Props) {
   const [snapshots, setSnapshots] = useState<SnapshotListItem[]>(initialSnapshots)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [selectedSnapshot, setSelectedSnapshot] = useState<SnapshotFull | null>(null)
-  const [comparisonData, setComparisonData] = useState<ComparisonItem[] | null>(null)
+  const [comparisonData, setComparisonData] = useState<ComparisonResult | null>(null)
 
   // Create snapshot modal
   const [createOpen, setCreateOpen] = useState(false)
@@ -221,7 +222,7 @@ export function HistoricoPage({ userId, initialSnapshots }: Props) {
       {viewMode === 'comparison' && selectedSnapshot && comparisonData && (
         <ComparisonView
           snapshot={selectedSnapshot}
-          comparison={comparisonData}
+          result={comparisonData}
           onBack={handleBackToList}
         />
       )}
@@ -479,11 +480,13 @@ function SnapshotView({ snapshot, isPending, onBack, onCompare, onDelete }: Snap
 
 type ComparisonViewProps = {
   snapshot: SnapshotFull
-  comparison: ComparisonItem[]
+  result: ComparisonResult
   onBack: () => void
 }
 
-function ComparisonView({ snapshot, comparison, onBack }: ComparisonViewProps) {
+function ComparisonView({ snapshot, result, onBack }: ComparisonViewProps) {
+  const { procedimentos: comparison, custoItemsDiff } = result
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -505,6 +508,12 @@ function ComparisonView({ snapshot, comparison, onBack }: ComparisonViewProps) {
         </p>
       </div>
 
+      {/* ── Variações nos custos fixos ─────────────────────────────────── */}
+      {custoItemsDiff.length > 0 && (
+        <CustoItemsDiffSection items={custoItemsDiff} />
+      )}
+
+      {/* ── Tabela de procedimentos ────────────────────────────────────── */}
       <div className="rounded-md border">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -577,6 +586,59 @@ function ComparisonView({ snapshot, comparison, onBack }: ComparisonViewProps) {
         </div>
       </div>
       <p className="text-xs text-muted-foreground">{comparison.length} procedimentos comparados</p>
+    </div>
+  )
+}
+
+// ─── CustoItemsDiffSection ────────────────────────────────────────────────────
+
+function CustoItemsDiffSection({ items }: { items: CustoItemDiff[] }) {
+  return (
+    <div className="rounded-md border">
+      <div className="px-4 py-3 border-b bg-muted/30">
+        <h3 className="text-sm font-semibold">Variações nos custos fixos</h3>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Itens que mudaram de valor entre o snapshot e o estado atual
+        </p>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b text-xs text-muted-foreground">
+              <th className="px-4 py-2 text-left font-medium">Item</th>
+              <th className="px-4 py-2 text-right font-medium">Valor no snapshot</th>
+              <th className="px-4 py-2 text-right font-medium">Valor atual</th>
+              <th className="px-4 py-2 text-right font-medium">Variação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.nome} className="border-b last:border-0 hover:bg-muted/30">
+                <td className="px-4 py-2 font-medium">{item.nome}</td>
+                <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                  {item.valorSnapshot > 0 ? formatBRL(item.valorSnapshot) : '—'}
+                </td>
+                <td className="px-4 py-2 text-right tabular-nums">
+                  {item.valorAtual > 0 ? formatBRL(item.valorAtual) : (
+                    <span className="text-muted-foreground">Removido</span>
+                  )}
+                </td>
+                <td
+                  className={cn(
+                    'px-4 py-2 text-right tabular-nums font-medium',
+                    item.delta > 0 ? 'text-red-600' : 'text-green-600',
+                  )}
+                >
+                  {item.delta > 0 ? '+' : ''}{formatBRL(item.delta)}
+                  <span className="ml-1 text-xs font-normal">
+                    ({item.deltaPerc > 0 ? '+' : ''}{item.deltaPerc.toFixed(1)}%)
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }

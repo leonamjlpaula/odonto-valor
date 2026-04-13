@@ -27,6 +27,19 @@ export type ComparisonItem = {
   diferencaPerc: number
 }
 
+export type CustoItemDiff = {
+  nome: string
+  valorSnapshot: number
+  valorAtual: number
+  delta: number
+  deltaPerc: number
+}
+
+export type ComparisonResult = {
+  procedimentos: ComparisonItem[]
+  custoItemsDiff: CustoItemDiff[]
+}
+
 export type SnapshotActionResult = { success: boolean; error?: string }
 
 // ─── createSnapshot ────────────────────────────────────────────────────────────
@@ -111,17 +124,18 @@ export async function deleteSnapshot(id: string, userId: string): Promise<Snapsh
 export async function compareSnapshotWithCurrent(
   snapshotId: string,
   userId: string
-): Promise<ComparisonItem[]> {
+): Promise<ComparisonResult> {
   const [snapshot, currentData] = await Promise.all([
     getSnapshot(snapshotId, userId),
     gerarSnapshot(userId),
   ])
 
-  if (!snapshot) return []
+  if (!snapshot) return { procedimentos: [], custoItemsDiff: [] }
 
+  // ── Procedimentos diff ─────────────────────────────────────────────────────
   const currentMap = new Map(currentData.procedimentos.map((p) => [p.codigo, p]))
 
-  return snapshot.dados.procedimentos.map((snapshotItem) => {
+  const procedimentos: ComparisonItem[] = snapshot.dados.procedimentos.map((snapshotItem) => {
     const current = currentMap.get(snapshotItem.codigo)
     const precoAtual = current?.precoCalculado ?? 0
     const diferenca = precoAtual - snapshotItem.precoCalculado
@@ -138,4 +152,39 @@ export async function compareSnapshotWithCurrent(
       diferencaPerc,
     }
   })
+
+  // ── Custo fixo items diff ──────────────────────────────────────────────────
+  // currentData.custoFixoItems already contains the current items (fetched inside gerarSnapshot)
+  const custoItemsDiff: CustoItemDiff[] = []
+
+  if (snapshot.dados.custoFixoItems && currentData.custoFixoItems) {
+    const snapshotItemMap = new Map(
+      snapshot.dados.custoFixoItems.map((item) => [item.nome, item.valor])
+    )
+    const currentItemMap = new Map(
+      currentData.custoFixoItems.map((item) => [item.nome, item.valor])
+    )
+
+    // Items present in the snapshot (changed or removed)
+    for (const [nome, valorSnapshot] of snapshotItemMap) {
+      const valorAtual = currentItemMap.get(nome) ?? 0
+      const delta = valorAtual - valorSnapshot
+      if (delta !== 0 || !currentItemMap.has(nome)) {
+        const deltaPerc = valorSnapshot > 0 ? (delta / valorSnapshot) * 100 : 0
+        custoItemsDiff.push({ nome, valorSnapshot, valorAtual, delta, deltaPerc })
+      }
+    }
+
+    // New items added since the snapshot
+    for (const [nome, valorAtual] of currentItemMap) {
+      if (!snapshotItemMap.has(nome)) {
+        custoItemsDiff.push({ nome, valorSnapshot: 0, valorAtual, delta: valorAtual, deltaPerc: 100 })
+      }
+    }
+
+    // Sort by absolute delta descending (biggest changes first)
+    custoItemsDiff.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))
+  }
+
+  return { procedimentos, custoItemsDiff }
 }

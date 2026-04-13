@@ -89,7 +89,7 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 ---
 
-## Fase 5 — Simulador de Cenários e Exportação Profissional
+## Fase 5 — Simulador de Cenários e Exportação Profissional ✅
 
 **Objetivo:** Transformar o produto em ferramenta de decisão e de negociação — as features que justificam a assinatura para dentistas que já têm suas planilhas funcionando.
 
@@ -97,13 +97,13 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 **Entregáveis:**
 
-1. Simulador de cenários: painel lateral em `/simulador` que permite ajustar variáveis de custo (custo fixo total, cadeiras, ociosidade, % impostos) sem salvar, exibindo impacto em tempo real no custo/min e na margem dos procedimentos. Inteiramente client-side.
-2. PDF de credenciamento: novo template de exportação com memória de cálculo do custo fixo por minuto (cada item, depreciação, remuneração, retorno) e metodologia CNCC referenciada.
-3. Narrativa no histórico: diff estruturado dos itens de custo que mudaram entre snapshots ("aluguel: R$ 2.500 → R$ 3.200").
+1. ✅ Simulador de cenários: painel lateral em `/simulador` que permite ajustar variáveis de custo (custo fixo total, cadeiras, ociosidade, % impostos) sem salvar, exibindo impacto em tempo real no custo/min e na margem dos procedimentos. Inteiramente client-side.
+2. ✅ PDF de credenciamento: novo template de exportação com memória de cálculo do custo fixo por minuto (cada item, depreciação, remuneração, retorno) e metodologia CNCC referenciada.
+3. ✅ Narrativa no histórico: diff estruturado dos itens de custo que mudaram entre snapshots ("aluguel: R$ 2.500 → R$ 3.200").
 
 **Dependências:** Fase 4.
 
-**Critério de "feito":** Dentista ajusta aluguel no simulador e vê imediatamente quantos procedimentos cruzam para o vermelho, sem salvar. PDF de credenciamento aprovado em revisão por dentista que negocia com convênios.
+**Critério de "feito":** ✅ Dentista ajusta aluguel no simulador e vê imediatamente quantos procedimentos cruzam para o vermelho, sem salvar. PDF de credenciamento com metodologia CNCC completa disponível na página de exportação.
 
 ---
 
@@ -149,5 +149,5 @@ Sem data comprometida. Ordem de execução determinada pela demanda dos usuário
 | 2 | Margem visível + alertas | 3–4 dias | Alto | Após Fase 1 |
 | 3 | Seed completo | 5–8 dias | Crítico ✅ | Fase 1 (paralelo) |
 | 4 | Onboarding + dashboard | 3–4 dias | Alto | Após Fases 1+2+3 |
-| 5 | Simulador + PDF profissional | 4–6 dias | Diferencial | Após Fase 4 |
+| 5 | Simulador + PDF profissional | 4–6 dias | Diferencial ✅ | Após Fase 4 |
 | 6 | Nice-to-haves | Variável | Incremental | Qualquer ordem |
