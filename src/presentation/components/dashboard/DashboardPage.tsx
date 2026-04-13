@@ -33,6 +33,8 @@ type Props = {
   procedimentosNoVermelho: ProcedimentoNoVermelho[]
   lastUpdate: Date | null
   onboardingCompleted: boolean
+  perfilConsultorio: string | null
+  totalProcedimentosNoVermelho: number
 }
 
 function formatBRL(value: number) {
@@ -43,7 +45,16 @@ function formatBRL(value: number) {
 }
 
 
-export function DashboardPage({ userId, stats, topProcedimentos, procedimentosNoVermelho, lastUpdate, onboardingCompleted }: Props) {
+export function DashboardPage({
+  userId,
+  stats,
+  topProcedimentos,
+  procedimentosNoVermelho,
+  lastUpdate,
+  onboardingCompleted,
+  perfilConsultorio,
+  totalProcedimentosNoVermelho,
+}: Props) {
   const router = useRouter()
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
@@ -52,9 +63,11 @@ export function DashboardPage({ userId, stats, topProcedimentos, procedimentosNo
   const [snapDesc, setSnapDesc] = useState('')
   const [snapError, setSnapError] = useState<string | null>(null)
 
-  const sixMonthsAgo = new Date()
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
-  const isStale = lastUpdate !== null && new Date(lastUpdate) < sixMonthsAgo
+  // custosDesatualizados e ociosidadeNaoConfigurada vêm do servidor via stats
+  const hasAlertas =
+    totalProcedimentosNoVermelho > 0 ||
+    stats.custosDesatualizados ||
+    stats.ociosidadeNaoConfigurada
 
   function handleSnapshotOpen() {
     setSnapNome('')
@@ -82,7 +95,9 @@ export function DashboardPage({ userId, stats, topProcedimentos, procedimentosNo
 
   return (
     <div className="space-y-6">
-      {!onboardingCompleted && <OnboardingWizard userId={userId} />}
+      {!onboardingCompleted && (
+        <OnboardingWizard userId={userId} perfilConsultorio={perfilConsultorio} />
+      )}
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -130,25 +145,37 @@ export function DashboardPage({ userId, stats, topProcedimentos, procedimentosNo
         </DialogContent>
       </Dialog>
 
-      {/* Stale warning */}
-      {isStale && (
-        <div className="rounded-md border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
-          ⚠️ Os custos fixos não são atualizados há mais de 6 meses. Revise os valores para manter
-          sua precificação precisa.{' '}
-          <Link href="/custos-fixos" className="font-medium underline underline-offset-2">
-            Atualizar agora
-          </Link>
-        </div>
-      )}
-
-      {/* Ociosidade nudge */}
-      {stats.ociosidadeNaoConfigurada && (
-        <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-          💡 Sua taxa de ociosidade está em 0%. Clínicas típicas ficam com 20% do tempo ocioso — configurar
-          esse valor torna o custo por minuto mais realista.{' '}
-          <Link href="/custos-fixos" className="font-medium underline underline-offset-2">
-            Configurar agora
-          </Link>
+      {/* Atenção necessária */}
+      {hasAlertas && (
+        <div className="space-y-2">
+          <h2 className="text-sm font-semibold text-foreground">Atenção necessária</h2>
+          {totalProcedimentosNoVermelho > 0 && (
+            <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+              🔴 {totalProcedimentosNoVermelho} procedimento
+              {totalProcedimentosNoVermelho > 1 ? 's' : ''} com margem abaixo de 10%.{' '}
+              <Link href="/procedimentos/diagnostico" className="font-medium underline underline-offset-2">
+                Ver procedimentos
+              </Link>
+            </div>
+          )}
+          {stats.custosDesatualizados && (
+            <div className="rounded-md border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
+              ⚠️ Os custos fixos não são atualizados há mais de 6 meses. Revise os valores para manter
+              sua precificação precisa.{' '}
+              <Link href="/custos-fixos" className="font-medium underline underline-offset-2">
+                Atualizar agora
+              </Link>
+            </div>
+          )}
+          {stats.ociosidadeNaoConfigurada && (
+            <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+              💡 Sua taxa de ociosidade está em 0%. Clínicas típicas ficam com 20% do tempo ocioso —
+              configurar esse valor torna o custo por minuto mais realista.{' '}
+              <Link href="/custos-fixos" className="font-medium underline underline-offset-2">
+                Configurar agora
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
@@ -228,6 +255,16 @@ export function DashboardPage({ userId, stats, topProcedimentos, procedimentosNo
               </div>
               <span className="text-lg font-bold tabular-nums text-green-900 ml-4 shrink-0">
                 {formatBRL(stats.breakEven.comProLabore)}<span className="text-sm font-normal">/mês</span>
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-purple-200 bg-purple-50 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-purple-900">Faturamento mínimo semanal</p>
+                <p className="text-xs text-purple-700 mt-0.5">Break-even mensal (sem pró-labore) ÷ 4 semanas</p>
+              </div>
+              <span className="text-lg font-bold tabular-nums text-purple-900 ml-4 shrink-0">
+                {formatBRL(stats.breakEven.semProLabore / 4)}<span className="text-sm font-normal">/sem</span>
               </span>
             </div>
           </CardContent>
