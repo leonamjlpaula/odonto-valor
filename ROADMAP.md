@@ -6,7 +6,7 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 ---
 
-## Fase 1 — Correções de Cálculo (Fundação Metodológica)
+## Fase 1 — Correções de Cálculo (Fundação Metodológica) ✅
 
 **Objetivo:** Garantir que os números produzidos são matematicamente corretos para todos os perfis de usuário, conforme a metodologia CNCC e os conceitos da gestão financeira moderna.
 
@@ -14,20 +14,20 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 **Entregáveis:**
 
-1. Corrigir depreciação e taxa de retorno para usar 11 meses em `CustoFixoPorMinuto.ts` (hoje usa 12 — bug silencioso vs. metodologia CNCC).
-2. Adicionar campo `numeroCadeiras` (Int, default 1) em `CustoFixoConfig`. Custo base dividido por esse valor.
-3. Adicionar campo `percOciosidade` (Float, default 0) em `CustoFixoConfig`. Minutos úteis = `diasUteis × horasTrabalho × 60 × (1 − ociosidade/100)`. Default 0 preserva comportamento atual; nudge no dashboard sugere configurar para 20%.
-4. Adicionar campos `percImpostos` (Float, default 8) e `percTaxaCartao` (Float, default 4) em `CustoFixoConfig`. Usados no cálculo de margem (não no custo/min).
-5. Migration Prisma com os novos campos e defaults.
-6. Atualizar formulário de Custos Fixos para expor os novos campos com tooltips explicativos.
+1. ✅ Corrigir depreciação e taxa de retorno para usar 11 meses em `CustoFixoPorMinuto.ts` (hoje usa 12 — bug silencioso vs. metodologia CNCC).
+2. ✅ Adicionar campo `numeroCadeiras` (Int, default 1) em `CustoFixoConfig`. Custo base dividido por esse valor.
+3. ✅ Adicionar campo `percOciosidade` (Float, default 0) em `CustoFixoConfig`. Minutos úteis = `diasUteis × horasTrabalho × 60 × (1 − ociosidade/100)`. Default 0 preserva comportamento atual; nudge no dashboard sugere configurar para 20%.
+4. ✅ Adicionar campos `percImpostos` (Float, default 8) e `percTaxaCartao` (Float, default 4) em `CustoFixoConfig`. Usados no cálculo de margem (não no custo/min).
+5. ✅ Migration Prisma com os novos campos e defaults.
+6. ✅ Atualizar formulário de Custos Fixos para expor os novos campos com tooltips explicativos.
 
 **Dependências:** Nenhuma.
 
-**Critério de "feito":** Com os dados da planilha CNCC (R$ 13.528,36 de custos, R$ 35.980,32 de equipamentos, salário R$ 6.000 com encargos originais, 1 cadeira, 0% ociosidade), o sistema produz R$ 2,475/min — idêntico à planilha.
+**Critério de "feito":** ✅ Com os dados da planilha CNCC (R$ 13.528,36 de custos, R$ 35.980,32 de equipamentos, salário R$ 6.000 com encargos originais, 1 cadeira, 0% ociosidade), o sistema produz R$ 2,475/min — idêntico à planilha.
 
 ---
 
-## Fase 2 — Margem de Lucro Visível
+## Fase 2 — Margem de Lucro Visível ✅
 
 **Objetivo:** Cada procedimento exibe sua margem percentual com indicador visual. O sistema sugere preço mínimo para 30% de margem. Esta é a feature que muda a proposta de valor central de "calculadora de custo" para "ferramenta de decisão".
 
@@ -35,15 +35,15 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 **Entregáveis:**
 
-1. Expandir `calcularPrecoProcedimento` com `margemLucro` e `precoMinimoParaMargem30`.
-2. Coluna "Margem" na listagem de procedimentos por especialidade: badge verde (≥30%), amarelo (10–29%), vermelho (<10%).
-3. Margem e preço mínimo no detalhe do procedimento.
-4. Dashboard: substituir "5 procedimentos com menor margem vs. VRPO" por "procedimentos no vermelho" (baseado em margem real).
-5. Alerta pós-save: ao salvar custos fixos ou preço de material, exibir toast "X procedimentos ficaram abaixo de 30% de margem" com link.
+1. ✅ Expandir `calcularPrecoProcedimento` com `margemLucro` e `precoMinimoParaMargem30`.
+2. ✅ Coluna "Margem" na listagem de procedimentos por especialidade: badge verde (≥30%), amarelo (10–29%), vermelho (<10%).
+3. ✅ Margem e preço mínimo no detalhe do procedimento.
+4. ✅ Dashboard: substituir "5 procedimentos com menor margem vs. VRPO" por "procedimentos no vermelho" (baseado em margem real).
+5. ✅ Alerta pós-save: ao salvar custos fixos ou preço de material, exibir toast "X procedimentos ficaram abaixo de 30% de margem" com link.
 
 **Dependências:** Fase 1 (campos `percImpostos` e `percTaxaCartao` precisam existir).
 
-**Critério de "feito":** Procedimento com preço R$ 280, custos R$ 243, impostos 8%, cartão 4% → margem exibida ≈ 8,4% (vermelho). Preço mínimo para 30% exibido = R$ 415.
+**Critério de "feito":** ✅ Procedimento com preço R$ 280, custos R$ 243, impostos 8%, cartão 4% → margem exibida ≈ 8,4% (vermelho). Preço mínimo para 30% exibido = R$ 415.
 
 ---
 
@@ -69,7 +69,7 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 ---
 
-## Fase 4 — Onboarding Adaptativo e Dashboard de Diagnóstico
+## Fase 4 — Onboarding Adaptativo e Dashboard de Diagnóstico ✅
 
 **Objetivo:** O primeiro login entrega valor em menos de 10 minutos. O dashboard responde "o que precisa de atenção agora?" sem que o dentista precise navegar.
 
@@ -77,15 +77,15 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 **Entregáveis:**
 
-1. Wizard reformulado com pergunta inicial de perfil: "Atende sozinho(a) ou divide o espaço com outros dentistas?" — dois fluxos distintos.
-2. Para perfil clínica: step explicativo sobre divisão de cadeiras com exemplo numérico antes do formulário.
-3. Seção "Atenção necessária" no dashboard (aparece somente com alertas ativos): procedimentos no vermelho, custos desatualizados há mais de 6 meses, taxa de ociosidade não configurada.
-4. Card "Faturamento mínimo semanal" (break-even ÷ 4) no dashboard.
-5. Refatorar framing do comparativo VRPO: "margem para negociação" em vez de julgamento puro; texto explicativo sobre uso em credenciamento.
+1. ✅ Wizard reformulado com pergunta inicial de perfil: "Atende sozinho(a) ou divide o espaço com outros dentistas?" — dois fluxos distintos.
+2. ✅ Para perfil clínica: step explicativo sobre divisão de cadeiras com exemplo numérico antes do formulário.
+3. ✅ Seção "Atenção necessária" no dashboard (aparece somente com alertas ativos): procedimentos no vermelho, custos desatualizados há mais de 6 meses, taxa de ociosidade não configurada.
+4. ✅ Card "Faturamento mínimo semanal" (break-even ÷ 4) no dashboard.
+5. ✅ Refatorar framing do comparativo VRPO: "margem para negociação" em vez de julgamento puro; texto explicativo sobre uso em credenciamento.
 
 **Dependências:** Fases 1, 2 e 3.
 
-**Critério de "feito":** Dentista solo cria conta, completa o wizard e vê a margem dos seus procedimentos em menos de 10 minutos — medido em teste com usuário real.
+**Critério de "feito":** ✅ Dentista solo cria conta, completa o wizard e vê a margem dos seus procedimentos em menos de 10 minutos — medido em teste com usuário real.
 
 ---
 
@@ -145,9 +145,9 @@ Sem data comprometida. Ordem de execução determinada pela demanda dos usuário
 
 | Fase | Foco | Esforço | Valor | Pode rodar com |
 |---|---|---|---|---|
-| 1 | Correções de cálculo | 1–2 dias | Crítico | Fase 3 (paralelo) |
-| 2 | Margem visível + alertas | 3–4 dias | Alto | Após Fase 1 |
+| 1 | Correções de cálculo | 1–2 dias | Crítico ✅ | Fase 3 (paralelo) |
+| 2 | Margem visível + alertas | 3–4 dias | Alto ✅ | Após Fase 1 |
 | 3 | Seed completo | 5–8 dias | Crítico ✅ | Fase 1 (paralelo) |
-| 4 | Onboarding + dashboard | 3–4 dias | Alto | Após Fases 1+2+3 |
+| 4 | Onboarding + dashboard | 3–4 dias | Alto ✅ | Após Fases 1+2+3 |
 | 5 | Simulador + PDF profissional | 4–6 dias | Diferencial ✅ | Após Fase 4 |
 | 6 | Nice-to-haves | Variável | Incremental | Qualquer ordem |
