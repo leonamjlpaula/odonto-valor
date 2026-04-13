@@ -116,6 +116,9 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 1. Confirmar índices no banco para `procedimento.userId`, `material.userId` e `procedimento.especialidadeId` — são os filtros presentes em todas as queries principais e precisam de índice explícito no schema Prisma para não degradar com crescimento de dados.
 2. Consolidar query redundante no dashboard: `getLastUpdateInfo` faz uma query separada em `custoFixoConfig` que poderia ser eliminada reutilizando o resultado já buscado em `getDashboardStats`.
+3. **Otimizar `contarProcedimentosNoVermelho`** (identificado na revisão da Fase 2): a função é chamada após cada save de custo fixo e atualização de preço de material, e traz todos os procedimentos do usuário em memória para contar os em vermelho. Com o seed completo da Fase 3 (200+ procedimentos), isso ficará perceptível. Substituir por uma query enxuta que traga apenas `id`, `precoVenda`, `tempoMinutos` e os materiais necessários para o cálculo, descartando campos irrelevantes.
+4. **Eliminar query duplicada de config em `getProcedimentosNoVermelho`** (`dashboardActions.ts`): a função busca `percImpostos`/`percTaxaCartao` em query separada, mas `calcularCustoFixoPorMinuto` já busca o mesmo registro internamente. Consolidar em um único `Promise.all` usando o helper `getPercConfig` já existente em `procedimentoActions.ts` — ou extraí-lo para módulo compartilhado.
+5. **Extrair `getPercConfig` para módulo compartilhado**: o helper que lê `percImpostos`/`percTaxaCartao` do config está definido inline em `procedimentoActions.ts` e replicado manualmente em `dashboardActions.ts`. Mover para `src/lib/` ou `src/application/usecases/calcularCustoFixoPorMinuto.ts`.
 
 **Dependências:** Feito antes do deploy de produção, após desenvolvimento estável.
 
