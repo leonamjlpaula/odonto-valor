@@ -125,11 +125,14 @@ src/
 - Seed global em `prisma/seed.ts`: especialidades e VRPOReferencias.
 - Seed por usuário em `src/lib/vrpo-seed-data.ts`: materiais, procedimentos e itens de custo fixo padrão — chamado no `createUser`.
 
-**Campos planejados (Roadmap Fase 1)** ainda não existem no schema:
-- `CustoFixoConfig.numeroCadeiras` (Int, default 1)
-- `CustoFixoConfig.percOciosidade` (Float, default 0)
-- `CustoFixoConfig.percImpostos` (Float, default 8)
-- `CustoFixoConfig.percTaxaCartao` (Float, default 4)
+**Campos adicionados nas Fases 1 e 2** (já existem no schema):
+- `CustoFixoConfig.numeroCadeiras` (Int, default 1) — Fase 1
+- `CustoFixoConfig.percOciosidade` (Float, default 0) — Fase 1
+- `CustoFixoConfig.percImpostos` (Float, default 8) — Fase 1
+- `CustoFixoConfig.percTaxaCartao` (Float, default 4) — Fase 1
+- `Procedimento.precoVenda` (Float?, nullable) — Fase 2: preço de venda configurado pelo dentista; quando null, margem não é calculável
+
+**Campo planejado (Roadmap Fase 3)** ainda não existe no schema:
 - `ProcedimentoMaterial.custoLaboratorio` (Float?, default 0)
 
 ---
@@ -138,23 +141,20 @@ src/
 
 **Fundação técnica:** sólida. Arquitetura limpa, autenticação completa (incluindo recuperação de senha), CRUD de materiais/procedimentos/custos fixos, comparativo VRPO, snapshots, exportação PDF/Excel, onboarding wizard.
 
-**Problemas críticos de cálculo (Roadmap Fase 1):**
-- Depreciação usa 12 meses em vez de 11 (diverge da CNCC)
-- Falta número de cadeiras (dentista com sócio calcula com custo dobrado)
-- Falta taxa de ociosidade (assume 100% de ocupação)
-- Falta % de impostos e cartão como variáveis do preço
+**Fases concluídas:**
+- **Fase 1 ✅** — Correções de cálculo: depreciação/retorno com 11 meses (CNCC), número de cadeiras, taxa de ociosidade, percImpostos e percTaxaCartao no config.
+- **Fase 2 ✅** — Margem de lucro visível: campo `precoVenda` no Procedimento, badge verde/amarelo/vermelho na listagem, cards de margem e preço mínimo para 30% no detalhe, dashboard com "Procedimentos no Vermelho", alerta pós-save com contagem de procedimentos afetados.
 
 **Problemas de conteúdo (Roadmap Fase 3):**
 - Seed tem ~40 procedimentos estimados, não os 200+ da planilha VRPO
 - Seed tem 30 materiais, não os ~130 da planilha CNCC
 - Valores VRPO de referência são estimativas, não os oficiais da CNCC
 
-**Features de produto ausentes (Roadmap Fases 2–5):**
-- Margem de lucro % visível por procedimento
-- Alertas automáticos pós-save
-- Onboarding adaptativo por perfil (solo vs. clínica)
-- Simulador de cenários
-- PDF de credenciamento com metodologia CNCC explícita
+**Features de produto ausentes (Roadmap Fases 3–5):**
+- Seed completo com 200+ procedimentos e 130+ materiais (Fase 3)
+- Onboarding adaptativo por perfil solo vs. clínica (Fase 4)
+- Simulador de cenários (Fase 5)
+- PDF de credenciamento com metodologia CNCC explícita (Fase 5)
 
 ---
 
