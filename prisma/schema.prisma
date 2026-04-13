@@ -88,9 +88,10 @@ model Procedimento {
   nome            String
   especialidadeId String
   especialidade   Especialidade          @relation(fields: [especialidadeId], references: [id])
-  tempoMinutos    Float
-  precoVenda      Float?
-  isCustom        Boolean                @default(false)
+  tempoMinutos     Float
+  precoVenda       Float?
+  custoLaboratorio Float?               @default(0)
+  isCustom         Boolean              @default(false)
   createdAt       DateTime               @default(now())
   updatedAt       DateTime               @updatedAt
   materiais       ProcedimentoMaterial[]

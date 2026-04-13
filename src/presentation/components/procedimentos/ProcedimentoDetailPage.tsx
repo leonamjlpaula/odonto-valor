@@ -9,6 +9,7 @@ import type { ProcedimentoComPreco } from '@/application/usecases/procedimentoAc
 import {
   updateProcedimentoTempo,
   updatePrecoVenda,
+  updateCustoLaboratorio,
   addMaterialToProcedimento,
   removeMaterialFromProcedimento,
   updateProcedimentoMaterial,
@@ -75,6 +76,33 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
       if (result.success) {
         setEditingPreco(false)
         toast({ title: 'Preço de venda atualizado!' })
+        router.refresh()
+      } else {
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
+      }
+    })
+  }
+
+  // ─── custoLaboratorio editing ─────────────────────────────────────────────
+  const [editingLab, setEditingLab] = useState(false)
+  const [labValue, setLabValue] = useState(
+    procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0
+      ? String(procedimento.custoLaboratorio).replace('.', ',')
+      : ''
+  )
+
+  function handleSaveLab() {
+    const raw = labValue.replace(',', '.').trim()
+    const valor = raw === '' ? null : parseFloat(raw)
+    if (valor !== null && (isNaN(valor) || valor < 0)) {
+      toast({ title: 'Valor inválido', description: 'Informe um valor positivo.', variant: 'destructive' })
+      return
+    }
+    startTransition(async () => {
+      const result = await updateCustoLaboratorio(procedimento.id, userId, valor)
+      if (result.success) {
+        setEditingLab(false)
+        toast({ title: 'Custo de laboratório atualizado!' })
         router.refresh()
       } else {
         toast({ title: 'Erro', description: result.error, variant: 'destructive' })
@@ -268,7 +296,11 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
             <p className="text-xl font-bold tabular-nums">
               {formatBRL(precoCalculado.custoVariavel)}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">materiais utilizados</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0
+                ? 'materiais + laboratório'
+                : 'materiais utilizados'}
+            </p>
           </CardContent>
         </Card>
 
@@ -508,6 +540,73 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
             <Button variant="outline" size="sm" onClick={() => setEditingPreco(true)}>
               <Edit2 className="h-4 w-4 mr-2" />
               {procedimento.precoVenda != null ? 'Editar Preço' : 'Definir Preço'}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Custo de laboratório */}
+      <div className="border rounded-lg p-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="font-semibold">Custo de Laboratório</h2>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              {editingLab ? (
+                'Valor cobrado pelo laboratório (próteses, facetas, ortodontia)'
+              ) : procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0 ? (
+                <span className="text-foreground font-medium">{formatBRL(procedimento.custoLaboratorio)}</span>
+              ) : (
+                'Não configurado — deixe em branco se não aplicável'
+              )}
+            </p>
+          </div>
+          {editingLab ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">R$</span>
+              <Input
+                type="text"
+                inputMode="decimal"
+                value={labValue}
+                onChange={(e) => setLabValue(e.target.value)}
+                className="w-28"
+                placeholder="ex: 350,00"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveLab()
+                  if (e.key === 'Escape') {
+                    setEditingLab(false)
+                    setLabValue(
+                      procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0
+                        ? String(procedimento.custoLaboratorio).replace('.', ',')
+                        : ''
+                    )
+                  }
+                }}
+                autoFocus
+              />
+              <Button size="icon" variant="ghost" onClick={handleSaveLab} disabled={isPending}>
+                <Check className="h-4 w-4 text-green-600" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => {
+                  setEditingLab(false)
+                  setLabValue(
+                    procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0
+                      ? String(procedimento.custoLaboratorio).replace('.', ',')
+                      : ''
+                  )
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button variant="outline" size="sm" onClick={() => setEditingLab(true)}>
+              <Edit2 className="h-4 w-4 mr-2" />
+              {procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0
+                ? 'Editar'
+                : 'Definir'}
             </Button>
           )}
         </div>

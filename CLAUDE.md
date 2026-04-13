@@ -125,15 +125,13 @@ src/
 - Seed global em `prisma/seed.ts`: especialidades e VRPOReferencias.
 - Seed por usuário em `src/lib/vrpo-seed-data.ts`: materiais, procedimentos e itens de custo fixo padrão — chamado no `createUser`.
 
-**Campos adicionados nas Fases 1 e 2** (já existem no schema):
+**Campos adicionados nas Fases 1, 2 e 3** (já existem no schema):
 - `CustoFixoConfig.numeroCadeiras` (Int, default 1) — Fase 1
 - `CustoFixoConfig.percOciosidade` (Float, default 0) — Fase 1
 - `CustoFixoConfig.percImpostos` (Float, default 8) — Fase 1
 - `CustoFixoConfig.percTaxaCartao` (Float, default 4) — Fase 1
 - `Procedimento.precoVenda` (Float?, nullable) — Fase 2: preço de venda configurado pelo dentista; quando null, margem não é calculável
-
-**Campo planejado (Roadmap Fase 3)** ainda não existe no schema:
-- `ProcedimentoMaterial.custoLaboratorio` (Float?, default 0)
+- `Procedimento.custoLaboratorio` (Float?, default 0) — Fase 3: custo de laboratório (coroas, próteses, facetas, aparelhos ortodônticos)
 
 ---
 
@@ -144,16 +142,12 @@ src/
 **Fases concluídas:**
 - **Fase 1 ✅** — Correções de cálculo: depreciação/retorno com 11 meses (CNCC), número de cadeiras, taxa de ociosidade, percImpostos e percTaxaCartao no config.
 - **Fase 2 ✅** — Margem de lucro visível: campo `precoVenda` no Procedimento, badge verde/amarelo/vermelho na listagem, cards de margem e preço mínimo para 30% no detalhe, dashboard com "Procedimentos no Vermelho", alerta pós-save com contagem de procedimentos afetados.
+- **Fase 3 ✅** — Seed completo: 200 procedimentos, 134 materiais, composições pré-configuradas, `custoLaboratorio` em prótese/endo/ortod, 200 valores VRPO atualizados. Performance: `contarProcedimentosNoVermelho` reescrito com select mínimo; query serial de config em `getProcedimentosNoVermelho` movida para `Promise.all`.
 
-**Problemas de conteúdo (Roadmap Fase 3):**
-- Seed tem ~40 procedimentos estimados, não os 200+ da planilha VRPO
-- Seed tem 30 materiais, não os ~130 da planilha CNCC
-- Valores VRPO de referência são estimativas, não os oficiais da CNCC
-
-**Features de produto ausentes (Roadmap Fases 3–5):**
-- Seed completo com 200+ procedimentos e 130+ materiais (Fase 3)
+**Features de produto ausentes (Roadmap Fases 4–5):**
 - Onboarding adaptativo por perfil solo vs. clínica (Fase 4)
-- Simulador de cenários (Fase 5)
+- Seção "Atenção necessária" no dashboard com alertas ativos (Fase 4)
+- Simulador de cenários client-side (Fase 5)
 - PDF de credenciamento com metodologia CNCC explícita (Fase 5)
 
 ---

@@ -192,15 +192,15 @@ export async function getProcedimentosNoVermelho(
   userId: string,
   limit: number = 5
 ): Promise<ProcedimentoNoVermelho[]> {
-  const [procedimentos, custoFixoPorMinuto] = await Promise.all([
+  const [procedimentos, custoFixoPorMinuto, config] = await Promise.all([
     getAllProcedimentos(userId),
     calcularCustoFixoPorMinuto(userId),
+    prisma.custoFixoConfig.findUnique({
+      where: { userId },
+      select: { percImpostos: true, percTaxaCartao: true },
+    }),
   ])
 
-  const config = await prisma.custoFixoConfig.findUnique({
-    where: { userId },
-    select: { percImpostos: true, percTaxaCartao: true },
-  })
   const percImpostos = config?.percImpostos ?? 8
   const percTaxaCartao = config?.percTaxaCartao ?? 4
 
@@ -230,9 +230,47 @@ export async function getProcedimentosNoVermelho(
 /**
  * Counts all procedures with precoVenda set and margemLucro < 10%.
  * Used for the post-save alert.
+ *
+ * Uses a lean select (no especialidade join, only fields needed for margin calc)
+ * to avoid loading the full object graph for 200+ procedures on every save.
  */
 export async function contarProcedimentosNoVermelho(userId: string): Promise<number> {
-  const all = await getProcedimentosNoVermelho(userId, 9999)
-  return all.length
+  const [procedimentos, custoFixoPorMinuto, config] = await Promise.all([
+    prisma.procedimento.findMany({
+      where: { userId, precoVenda: { not: null } },
+      select: {
+        precoVenda: true,
+        tempoMinutos: true,
+        custoLaboratorio: true,
+        materiais: {
+          select: {
+            consumo: true,
+            divisor: true,
+            material: { select: { preco: true } },
+          },
+        },
+      },
+    }),
+    calcularCustoFixoPorMinuto(userId),
+    prisma.custoFixoConfig.findUnique({
+      where: { userId },
+      select: { percImpostos: true, percTaxaCartao: true },
+    }),
+  ])
+
+  const percImpostos = config?.percImpostos ?? 8
+  const percTaxaCartao = config?.percTaxaCartao ?? 4
+
+  let count = 0
+  for (const p of procedimentos) {
+    const calc = calcularPrecoProcedimento(
+      p as unknown as ProcedimentoWithMateriais,
+      custoFixoPorMinuto,
+      percImpostos,
+      percTaxaCartao,
+    )
+    if (calc.margemLucro !== null && calc.margemLucro < 0.10) count++
+  }
+  return count
 }
 

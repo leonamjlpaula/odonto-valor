@@ -35,6 +35,8 @@ export function ComparativoVRPOPage({ data }: Props) {
 
   const [situacaoFilter, setSituacaoFilter] = useState<SituacaoFilter>('todos')
   const [especialidadeFilter, setEspecialidadeFilter] = useState<string>('todas')
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 50
 
   const filtered = useMemo(() => {
     return items.filter((item) => {
@@ -44,6 +46,23 @@ export function ComparativoVRPOPage({ data }: Props) {
       return true
     })
   }, [items, situacaoFilter, especialidadeFilter])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paginated = useMemo(
+    () => filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [filtered, currentPage]
+  )
+
+  function handleSituacaoChange(value: string) {
+    setSituacaoFilter(value as SituacaoFilter)
+    setPage(1)
+  }
+
+  function handleEspecialidadeChange(value: string) {
+    setEspecialidadeFilter(value)
+    setPage(1)
+  }
 
   return (
     <div className="space-y-6">
@@ -58,7 +77,7 @@ export function ComparativoVRPOPage({ data }: Props) {
       {/* Summary stats */}
       <div className="flex flex-wrap gap-3">
         <button
-          onClick={() => setSituacaoFilter('abaixo')}
+          onClick={() => handleSituacaoChange('abaixo')}
           className={cn(
             'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
             situacaoFilter === 'abaixo'
@@ -69,7 +88,7 @@ export function ComparativoVRPOPage({ data }: Props) {
           {totalAbaixo} abaixo da VRPO
         </button>
         <button
-          onClick={() => setSituacaoFilter('acima')}
+          onClick={() => handleSituacaoChange('acima')}
           className={cn(
             'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
             situacaoFilter === 'acima'
@@ -80,7 +99,7 @@ export function ComparativoVRPOPage({ data }: Props) {
           {totalAcima} acima da VRPO
         </button>
         <button
-          onClick={() => setSituacaoFilter('sem_referencia')}
+          onClick={() => handleSituacaoChange('sem_referencia')}
           className={cn(
             'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
             situacaoFilter === 'sem_referencia'
@@ -92,7 +111,7 @@ export function ComparativoVRPOPage({ data }: Props) {
         </button>
         {situacaoFilter !== 'todos' && (
           <button
-            onClick={() => setSituacaoFilter('todos')}
+            onClick={() => handleSituacaoChange('todos')}
             className="rounded-full border border-muted px-4 py-1.5 text-sm text-muted-foreground hover:bg-muted/50"
           >
             Ver todos
@@ -109,7 +128,7 @@ export function ComparativoVRPOPage({ data }: Props) {
           <select
             id="filter-situacao"
             value={situacaoFilter}
-            onChange={(e) => setSituacaoFilter(e.target.value as SituacaoFilter)}
+            onChange={(e) => handleSituacaoChange(e.target.value)}
             className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="todos">Todos</option>
@@ -125,7 +144,7 @@ export function ComparativoVRPOPage({ data }: Props) {
           <select
             id="filter-especialidade"
             value={especialidadeFilter}
-            onChange={(e) => setEspecialidadeFilter(e.target.value)}
+            onChange={(e) => handleEspecialidadeChange(e.target.value)}
             className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="todas">Todas</option>
@@ -159,14 +178,14 @@ export function ComparativoVRPOPage({ data }: Props) {
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 ? (
+              {paginated.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                     Nenhum procedimento encontrado com os filtros selecionados.
                   </td>
                 </tr>
               ) : (
-                filtered.map((item) => {
+                paginated.map((item) => {
                   const rowClass =
                     item.situacao === 'abaixo'
                       ? 'bg-red-50/60 hover:bg-red-50'
@@ -229,11 +248,35 @@ export function ComparativoVRPOPage({ data }: Props) {
         </div>
       </div>
 
-      {/* Row count */}
+      {/* Row count + pagination */}
       {filtered.length > 0 && (
-        <p className="text-xs text-muted-foreground">
-          Exibindo {filtered.length} de {items.length} procedimentos
-        </p>
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>
+            Exibindo {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filtered.length)} de {filtered.length} procedimentos
+            {filtered.length !== items.length && ` (filtrado de ${items.length})`}
+          </span>
+          {totalPages > 1 && (
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded-md text-xs hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Anterior
+              </button>
+              <span className="px-3 py-1 border rounded-md bg-muted/30">
+                {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 border rounded-md text-xs hover:bg-muted/50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Próxima
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )

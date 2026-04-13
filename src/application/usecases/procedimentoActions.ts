@@ -294,6 +294,27 @@ export async function deleteProcedimento(
   return { success: true }
 }
 
+// ─── updateCustoLaboratorio ───────────────────────────────────────────────────
+
+export async function updateCustoLaboratorio(
+  id: string,
+  userId: string,
+  custoLaboratorio: number | null
+): Promise<ActionResult> {
+  if (custoLaboratorio !== null && custoLaboratorio < 0) {
+    return { success: false, error: 'Custo de laboratório não pode ser negativo' }
+  }
+
+  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } })
+  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' }
+
+  await prisma.procedimento.update({
+    where: { id },
+    data: { custoLaboratorio: custoLaboratorio === 0 ? null : custoLaboratorio },
+  })
+  return { success: true }
+}
+
 // ─── updatePrecoVenda ─────────────────────────────────────────────────────────
 
 export async function updatePrecoVenda(

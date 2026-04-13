@@ -61,11 +61,12 @@ export function calcularPrecoProcedimento(
   percImpostos: number = 8,
   percTaxaCartao: number = 4,
 ): PrecoCalculado {
-  const custoVariavel = procedimento.materiais.reduce((sum, pma) => {
+  const custoMateriais = procedimento.materiais.reduce((sum, pma) => {
     const consumoNumerico = parseConsumoNumerico(pma.consumo)
     const custoPorUnidade = pma.material.preco / pma.divisor
     return sum + custoPorUnidade * consumoNumerico
   }, 0)
+  const custoVariavel = custoMateriais + (procedimento.custoLaboratorio ?? 0)
 
   const custoFixoTotal = procedimento.tempoMinutos * custoFixoPorMinuto
   const precoFinal = custoFixoTotal + custoVariavel

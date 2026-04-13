@@ -37,6 +37,8 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
 
   const [materiais, setMateriais] = useState<Material[]>(initialMateriais)
   const [searchQuery, setSearchQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 50
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingPreco, setEditingPreco] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
@@ -46,10 +48,16 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
   const [addErrors, setAddErrors] = useState<Record<string, string>>({})
 
   const filtered = useMemo(() => {
-    if (!searchQuery.trim()) return materiais
-    const q = searchQuery.toLowerCase()
-    return materiais.filter((m) => m.nome.toLowerCase().includes(q))
+    const q = searchQuery.toLowerCase().trim()
+    return q ? materiais.filter((m) => m.nome.toLowerCase().includes(q)) : materiais
   }, [materiais, searchQuery])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const paginated = useMemo(
+    () => filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [filtered, currentPage]
+  )
 
   function startEdit(material: Material) {
     setEditingId(material.id)
@@ -172,7 +180,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
       <Input
         placeholder="Buscar material pelo nome..."
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        onChange={(e) => { setSearchQuery(e.target.value); setPage(1) }}
         className="max-w-sm"
       />
 
@@ -191,16 +199,18 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {filtered.length === 0 ? (
+              {paginated.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="text-center py-8 text-muted-foreground">
                     {searchQuery ? 'Nenhum material encontrado para a busca.' : 'Nenhum material cadastrado.'}
                   </td>
                 </tr>
               ) : (
-                filtered.map((material, index) => (
+                paginated.map((material, index) => {
+                  const globalIndex = (currentPage - 1) * PAGE_SIZE + index
+                  return (
                   <tr key={material.id} className="hover:bg-muted/30 transition-colors">
-                    <td className="px-4 py-3 text-muted-foreground">{index + 1}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{globalIndex + 1}</td>
                     <td className="px-4 py-3 font-medium">{material.nome}</td>
                     <td className="px-4 py-3 text-muted-foreground">{material.unidade}</td>
                     <td className="px-4 py-3">
@@ -277,12 +287,43 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
                       </div>
                     </td>
                   </tr>
-                ))
+                  )
+                })
               )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            Exibindo {(currentPage - 1) * PAGE_SIZE + 1}–{Math.min(currentPage * PAGE_SIZE, filtered.length)} de {filtered.length} materiais
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </Button>
+            <span className="px-3 py-1 border rounded-md bg-muted/30 text-xs">
+              {currentPage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Próxima
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Add Material Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={(open) => { setIsAddDialogOpen(open); if (!open) resetAddForm() }}>

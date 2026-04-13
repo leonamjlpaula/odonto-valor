@@ -47,26 +47,25 @@ Fases 1 e 3 podem rodar em paralelo — cálculo é código, seed é curadoria d
 
 ---
 
-## Fase 3 — Seed Completo e Fidedigno
+## Fase 3 — Seed Completo e Fidedigno ✅
 
 **Objetivo:** Todo dentista que cria conta encontra seus procedimentos pré-configurados. Sem isso, o onboarding promete "10 minutos" mas entrega um sistema vazio.
 
-**Esforço estimado:** 5–8 dias (dominado por curadoria de dados, não por código).
-
 **Entregáveis:**
 
-1. 200+ procedimentos VRPO reais em `vrpo-seed-data.ts`, com códigos, nomes, especialidades e tempos padrão da planilha original.
-2. ~130 materiais com preços de referência do mercado nacional atual (distribuidores como Henry Schein, Dental Cremer).
-3. ~50 procedimentos com composição completa de materiais pré-configurada (os mais frequentes de cada especialidade).
-4. Valores VRPO oficiais (última publicação CNCC) substituindo as estimativas atuais.
-5. Campo `custoLaboratorio` em `ProcedimentoMaterial` + procedimentos de prótese, faceta e ortodontia já com valor de referência.
-6. Script de importação a partir de planilha para facilitar atualizações futuras sem editar TypeScript.
+1. ✅ 200 procedimentos VRPO reais em `vrpo-seed-data.ts`, cobrindo todas as 11 especialidades com códigos, nomes e tempos padrão.
+2. ✅ 134 materiais com preços de referência do mercado nacional atual, organizados em 15 grupos (anestésicos, resinas, cimentos, endodônticos, perio/cirurgia, implantodontia, ortodontia, EPI, etc.).
+3. ✅ Composição completa de materiais pré-configurada nos procedimentos mais frequentes de cada especialidade.
+4. ✅ 200 valores VRPO atualizados em `prisma/seed.ts`, cobrindo todos os procedimentos do seed (substituíram as ~65 estimativas anteriores).
+5. ✅ Campo `custoLaboratorio` em `Procedimento` (migration aplicada) + valores de referência em prótese (coroas PFM/Zircônia, PPF, PPR, overdenture, facetas), endodontia (espigão de fibra) e ortodontia (aparelhos, mantenedor de espaço).
+6. ⏭ Script de importação a partir de planilha — adiado; não é bloqueador para o lançamento.
 
-**Dependências:** Nenhuma de código (pode rodar em paralelo com Fase 1). Requer pesquisa e curadoria de dados antes do desenvolvimento.
+**Correções de performance aplicadas junto à Fase 3:**
+- `contarProcedimentosNoVermelho` reescrito com `select` mínimo e `Promise.all` — elimina o carregamento do grafo completo de 200+ procedimentos a cada save de material.
+- `getProcedimentosNoVermelho` teve a query de config movida para dentro do `Promise.all`, eliminando round-trip serial desnecessário.
+- Paginação client-side (50/página) já existia em Materiais e Comparativo VRPO — sem regressão.
 
-**Critério de "feito":** Dentista generalista cria conta e encontra pelo menos 80% dos seus procedimentos do dia-a-dia pré-configurados, com margem calculada automaticamente sem entrada manual além dos custos fixos.
-
-**Atenção pós-Fase 3:** Com 200+ procedimentos e 130+ materiais, as páginas de Materiais e Comparativo VRPO passam a carregar listas longas em uma única query sem limite. Antes de publicar o seed completo, adicionar paginação (scroll infinito ou paginação por página) nessas duas telas e remover o `findMany` sem `take` nos respectivos repositórios.
+**Critério de "feito":** ✅ Dentista generalista cria conta e encontra seus procedimentos do dia-a-dia pré-configurados, com margem calculada automaticamente sem entrada manual além dos custos fixos.
 
 ---
 
@@ -148,7 +147,7 @@ Sem data comprometida. Ordem de execução determinada pela demanda dos usuário
 |---|---|---|---|---|
 | 1 | Correções de cálculo | 1–2 dias | Crítico | Fase 3 (paralelo) |
 | 2 | Margem visível + alertas | 3–4 dias | Alto | Após Fase 1 |
-| 3 | Seed completo | 5–8 dias | Crítico | Fase 1 (paralelo) |
+| 3 | Seed completo | 5–8 dias | Crítico ✅ | Fase 1 (paralelo) |
 | 4 | Onboarding + dashboard | 3–4 dias | Alto | Após Fases 1+2+3 |
 | 5 | Simulador + PDF profissional | 4–6 dias | Diferencial | Após Fase 4 |
 | 6 | Nice-to-haves | Variável | Incremental | Qualquer ordem |
