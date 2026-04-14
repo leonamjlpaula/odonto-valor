@@ -114,7 +114,7 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
         {/* Header */}
         <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b bg-card shrink-0">
           {/* Mobile: show logo */}
-          <h1 className="md:hidden text-lg font-bold text-primary">Precifica</h1>
+          <h1 className="md:hidden text-lg font-bold text-primary">OdontoValor</h1>
           {/* Desktop: spacer */}
           <div className="hidden md:block" />
 

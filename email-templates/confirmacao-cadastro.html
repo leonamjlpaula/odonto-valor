@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Bem-vindo ao OdontoValor</title>
+  <!--
+    TEMPLATE SUPABASE — Authentication > Email Templates > Confirm signup
+    Variáveis disponíveis (Go template syntax):
+      {{ .ConfirmationURL }} — link de confirmação gerado pelo Supabase (obrigatório)
+      {{ .Email }}           — e-mail do usuário cadastrado
+      {{ .SiteURL }}         — URL do site configurada no Supabase Dashboard
+
+    Imagem do banner:
+      Hospedar src/assets/odonto_valor_banner.png no Supabase Storage (bucket público)
+      e substituir a URL hardcoded abaixo pela URL pública gerada.
+  -->
+</head>
+<body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+
+  <!-- Wrapper externo -->
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f1f5f9;">
+    <tr>
+      <td align="center" style="padding: 32px 16px;">
+
+        <!-- Container principal (600px) -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+
+          <!-- Banner -->
+          <tr>
+            <td style="background-color: #ffffff; padding: 20px;">
+              <img
+                src="SUBSTITUIR_PELA_URL_PUBLICA_DO_SUPABASE_STORAGE"
+                alt="Odonto Valor — OdontoValor"
+                width="560"
+                style="display: block; width: 100%; max-width: 560px; height: auto; border: 0;"
+              />
+            </td>
+          </tr>
+
+          <!-- Cabeçalho com nome do produto -->
+          <tr>
+            <td style="background-color: #1e293b; padding: 24px 40px; text-align: center;">
+              <p style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 2px; color: #94a3b8; text-transform: uppercase;">
+                OdontoValor
+              </p>
+              <h1 style="margin: 8px 0 0; font-size: 22px; font-weight: 700; color: #f8fafc; line-height: 1.3;">
+                Confirme seu e-mail para começar
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Corpo -->
+          <tr>
+            <td style="padding: 40px 40px 32px;">
+
+              <!-- Saudação -->
+              <p style="margin: 0 0 20px; font-size: 16px; color: #1e293b; line-height: 1.6;">
+                Olá! Seja bem-vindo ao <strong>OdontoValor</strong>.
+              </p>
+
+              <p style="margin: 0 0 20px; font-size: 15px; color: #475569; line-height: 1.7;">
+                Clique no botão abaixo para confirmar seu e-mail e ativar sua conta. O link expira em <strong>24 horas</strong>.
+              </p>
+
+              <p style="margin: 0 0 32px; font-size: 15px; color: #475569; line-height: 1.7;">
+                Depois de confirmar, você terá acesso à plataforma que calcula o custo por minuto clínico, margem de lucro real e preço mínimo por procedimento — tudo baseado na metodologia CNCC.
+              </p>
+
+              <!-- Próximos passos -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 32px;">
+                <tr>
+                  <td style="padding: 24px 28px;">
+                    <p style="margin: 0 0 16px; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #64748b; text-transform: uppercase;">
+                      Por onde começar
+                    </p>
+
+                    <!-- Passo 1 -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 14px;">
+                      <tr>
+                        <td width="28" valign="top" style="padding-top: 1px;">
+                          <div style="width: 22px; height: 22px; background-color: #1e293b; border-radius: 50%; text-align: center; line-height: 22px;">
+                            <span style="font-size: 11px; font-weight: 700; color: #ffffff;">1</span>
+                          </div>
+                        </td>
+                        <td style="padding-left: 10px;">
+                          <p style="margin: 0; font-size: 14px; color: #1e293b; font-weight: 600;">Configure seus Custos Fixos</p>
+                          <p style="margin: 2px 0 0; font-size: 13px; color: #64748b; line-height: 1.5;">Aluguel, salários, equipamentos e número de cadeiras — o sistema calcula o custo exato por minuto.</p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Passo 2 -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 14px;">
+                      <tr>
+                        <td width="28" valign="top" style="padding-top: 1px;">
+                          <div style="width: 22px; height: 22px; background-color: #1e293b; border-radius: 50%; text-align: center; line-height: 22px;">
+                            <span style="font-size: 11px; font-weight: 700; color: #ffffff;">2</span>
+                          </div>
+                        </td>
+                        <td style="padding-left: 10px;">
+                          <p style="margin: 0; font-size: 14px; color: #1e293b; font-weight: 600;">Atualize os preços dos materiais</p>
+                          <p style="margin: 2px 0 0; font-size: 13px; color: #64748b; line-height: 1.5;">134 materiais já estão pré-cadastrados. Confirme os valores do seu consultório.</p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Passo 3 -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                      <tr>
+                        <td width="28" valign="top" style="padding-top: 1px;">
+                          <div style="width: 22px; height: 22px; background-color: #1e293b; border-radius: 50%; text-align: center; line-height: 22px;">
+                            <span style="font-size: 11px; font-weight: 700; color: #ffffff;">3</span>
+                          </div>
+                        </td>
+                        <td style="padding-left: 10px;">
+                          <p style="margin: 0; font-size: 14px; color: #1e293b; font-weight: 600;">Defina seu preço de venda</p>
+                          <p style="margin: 2px 0 0; font-size: 13px; color: #64748b; line-height: 1.5;">Veja a margem de lucro de cada procedimento e receba alerta quando estiver abaixo de 30%.</p>
+                        </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a
+                      href="{{ .ConfirmationURL }}"
+                      style="display: inline-block; background-color: #1e293b; color: #ffffff; font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 36px; border-radius: 6px; letter-spacing: 0.3px;"
+                    >
+                      Confirmar e-mail →
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+            </td>
+          </tr>
+
+          <!-- Divisor -->
+          <tr>
+            <td style="padding: 0 40px;">
+              <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 0;" />
+            </td>
+          </tr>
+
+          <!-- Rodapé -->
+          <tr>
+            <td style="padding: 24px 40px 32px;">
+              <p style="margin: 0 0 8px; font-size: 13px; color: #94a3b8; line-height: 1.6;">
+                Este e-mail foi enviado para <a href="mailto:{{ .Email }}" style="color: #64748b; text-decoration: none;">{{ .Email }}</a> porque você realizou um cadastro no OdontoValor.
+              </p>
+              <p style="margin: 0; font-size: 13px; color: #94a3b8; line-height: 1.6;">
+                Se não foi você, ignore este e-mail — sua conta não será ativada sem acesso.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Container principal -->
+
+        <!-- Assinatura abaixo do card -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width: 600px; width: 100%;">
+          <tr>
+            <td style="padding: 20px 40px 0; text-align: center;">
+              <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+                © 2025 OdontoValor · Todos os direitos reservados
+              </p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

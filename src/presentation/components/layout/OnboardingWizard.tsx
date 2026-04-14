@@ -122,7 +122,7 @@ export function OnboardingWizard({ userId, perfilConsultorio }: Props) {
 
         <div className="flex items-start justify-between gap-4">
           <div>
-            <CardTitle className="text-lg">Bem-vindo ao Precifica!</CardTitle>
+            <CardTitle className="text-lg">Bem-vindo ao OdontoValor!</CardTitle>
             <CardDescription className="mt-0.5">
               {currentStep === 'perfil'
                 ? 'Vamos configurar seu consultório do jeito certo para você.'

@@ -81,7 +81,7 @@ export class ExcelExportService {
 
     // Add a metadata row in a separate Info sheet
     const infoData = [
-      ['Gerado por', 'Precifica'],
+      ['Gerado por', 'OdontoValor'],
       ['Dentista', userName],
       ['Data de Geração', generatedAt],
     ]

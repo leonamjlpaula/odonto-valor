@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Precifica",
+  title: "OdontoValor",
   description: "SaaS de precificação para consultórios odontológicos",
 };
 

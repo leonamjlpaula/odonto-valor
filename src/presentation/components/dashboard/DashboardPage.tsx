@@ -27,7 +27,7 @@ import { createSnapshot } from '@/application/usecases/snapshotActions'
 import { OnboardingWizard } from '@/presentation/components/layout/OnboardingWizard'
 import type { DashboardStats, TopProcedimento, ProcedimentoNoVermelho } from '@/application/usecases/dashboardActions'
 
-const GUIA_BANNER_KEY = 'precifica_guia_dispensado'
+const GUIA_BANNER_KEY = 'odontovalor_guia_dispensado'
 
 type Props = {
   userId: string

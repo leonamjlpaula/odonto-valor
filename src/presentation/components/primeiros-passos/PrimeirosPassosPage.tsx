@@ -98,7 +98,7 @@ export function PrimeirosPassosPage() {
       <div className="space-y-3">
         <h1 className="text-2xl font-bold tracking-tight">Primeiros Passos</h1>
         <p className="text-muted-foreground leading-relaxed max-w-2xl">
-          Configure o Precifica em poucos passos e descubra se cada procedimento está gerando lucro
+          Configure o OdontoValor em poucos passos e descubra se cada procedimento está gerando lucro
           real — com base nos seus custos reais e na metodologia oficial da CNCC.
         </p>
       </div>

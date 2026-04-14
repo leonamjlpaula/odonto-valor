@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
   const service = new PdfExportService()
   const pdfBuffer = await service.generate(procedimentosExport, userName, generatedAt)
 
-  // Build filename: precifica-[nome-slug]-[YYYY-MM-DD].pdf
+  // Build filename: odontovalor-[nome-slug]-[YYYY-MM-DD].pdf
   const dateStr = new Date().toISOString().split('T')[0]
   const nameSlug = userName
     .toLowerCase()
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '')
-  const filename = `precifica-${nameSlug}-${dateStr}.pdf`
+  const filename = `odontovalor-${nameSlug}-${dateStr}.pdf`
 
   return new Response(new Uint8Array(pdfBuffer), {
     headers: {
