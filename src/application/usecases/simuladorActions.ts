@@ -46,10 +46,20 @@ export async function getSimuladorData(userId: string): Promise<SimuladorData | 
     }),
     prisma.procedimento.findMany({
       where: { userId },
-      include: {
-        especialidade: true,
+      select: {
+        id: true,
+        codigo: true,
+        nome: true,
+        tempoMinutos: true,
+        custoLaboratorio: true,
+        precoVenda: true,
+        especialidade: { select: { nome: true } },
         materiais: {
-          include: { material: true },
+          select: {
+            consumo: true,
+            divisor: true,
+            material: { select: { preco: true } },
+          },
           orderBy: { ordem: 'asc' },
         },
       },

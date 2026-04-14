@@ -2,22 +2,10 @@
 
 import { prisma } from '@/lib/db'
 import { PrismaProcedimentoRepository } from '@/infrastructure/repositories/PrismaProcedimentoRepository'
-import { calcularCustoFixoPorMinuto } from './calcularCustoFixoPorMinuto'
+import { calcularCustoFixoPorMinuto, getPercConfig } from './calcularCustoFixoPorMinuto'
 import { calcularPrecoProcedimento } from './calcularPrecoProcedimento'
 import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository'
 import type { PrecoCalculado } from './calcularPrecoProcedimento'
-
-/** Returns percImpostos and percTaxaCartao from the user's config (with defaults). */
-async function getPercConfig(userId: string): Promise<{ percImpostos: number; percTaxaCartao: number }> {
-  const config = await prisma.custoFixoConfig.findUnique({
-    where: { userId },
-    select: { percImpostos: true, percTaxaCartao: true },
-  })
-  return {
-    percImpostos: config?.percImpostos ?? 8,
-    percTaxaCartao: config?.percTaxaCartao ?? 4,
-  }
-}
 
 export type ActionResult = { success: boolean; error?: string }
 
