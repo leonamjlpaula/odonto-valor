@@ -1,4 +1,4 @@
-import { Skeleton } from '@/presentation/components/ui/skeleton'
+import { Skeleton } from '@/presentation/components/ui/skeleton';
 
 export default function ComparativoVRPOLoading() {
   return (
@@ -32,5 +32,5 @@ export default function ComparativoVRPOLoading() {
         ))}
       </div>
     </div>
-  )
+  );
 }

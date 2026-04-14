@@ -1,44 +1,44 @@
-'use server'
+'use server';
 
-import { prisma } from '@/lib/db'
-import { PrismaProcedimentoRepository } from '@/infrastructure/repositories/PrismaProcedimentoRepository'
-import { calcularCustoFixoPorMinuto, getPercConfig } from './calcularCustoFixoPorMinuto'
-import { getEspecialidades, getVrpoRefs } from '@/lib/referenceData'
-import { calcularPrecoProcedimento } from './calcularPrecoProcedimento'
-import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository'
-import type { PrecoCalculado } from './calcularPrecoProcedimento'
+import { prisma } from '@/lib/db';
+import { PrismaProcedimentoRepository } from '@/infrastructure/repositories/PrismaProcedimentoRepository';
+import { calcularCustoFixoPorMinuto, getPercConfig } from './calcularCustoFixoPorMinuto';
+import { getEspecialidades, getVrpoRefs } from '@/lib/referenceData';
+import { calcularPrecoProcedimento } from './calcularPrecoProcedimento';
+import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository';
+import type { PrecoCalculado } from './calcularPrecoProcedimento';
 
-export type ActionResult = { success: boolean; error?: string }
+export type ActionResult = { success: boolean; error?: string };
 
-const repository = new PrismaProcedimentoRepository()
+const repository = new PrismaProcedimentoRepository();
 
 export type ProcedimentoComPreco = {
-  procedimento: ProcedimentoWithMateriais
-  precoCalculado: PrecoCalculado
-  vrpoReferencia: number | null
-}
+  procedimento: ProcedimentoWithMateriais;
+  precoCalculado: PrecoCalculado;
+  vrpoReferencia: number | null;
+};
 
 /** Lean type for the list view — strips materiais to reduce RSC payload size. */
 export type ProcedimentoListItem = {
-  id: string
-  codigo: string
-  nome: string
-  tempoMinutos: number
-  isCustom: boolean
-  especialidade: { codigo: string }
-}
+  id: string;
+  codigo: string;
+  nome: string;
+  tempoMinutos: number;
+  isCustom: boolean;
+  especialidade: { codigo: string };
+};
 
 export type ProcedimentoComPrecoLista = {
-  procedimento: ProcedimentoListItem
-  precoCalculado: PrecoCalculado
-  vrpoReferencia: number | null
-}
+  procedimento: ProcedimentoListItem;
+  precoCalculado: PrecoCalculado;
+  vrpoReferencia: number | null;
+};
 
 export type CreateProcedimentoResult = {
-  success: boolean
-  procedimento?: ProcedimentoWithMateriais
-  errors?: Record<string, string[]>
-}
+  success: boolean;
+  procedimento?: ProcedimentoWithMateriais;
+  errors?: Record<string, string[]>;
+};
 
 // ─── getProcedimentosByEspecialidade ──────────────────────────────────────────
 
@@ -54,13 +54,13 @@ export async function getProcedimentosByEspecialidade(
       calcularCustoFixoPorMinuto(userId),
       getPercConfig(userId),
       getVrpoRefs(),
-    ])
+    ]);
 
-  const especialidade = especialidades.find((e) => e.codigo === especialidadeSlug)
-  if (!especialidade) return []
+  const especialidade = especialidades.find((e) => e.codigo === especialidadeSlug);
+  if (!especialidade) return [];
 
-  const procedimentosList = await repository.listByUserAndEspecialidade(userId, especialidade.id)
-  const vrpoMap = new Map(vrpoRefsRaw.map((v) => [v.codigo, v.valorReferencia]))
+  const procedimentosList = await repository.listByUserAndEspecialidade(userId, especialidade.id);
+  const vrpoMap = new Map(vrpoRefsRaw.map((v) => [v.codigo, v.valorReferencia]));
 
   return procedimentosList.map((procedimento) => ({
     // Strip materiais — used for calculation only; list view never renders them
@@ -72,9 +72,14 @@ export async function getProcedimentosByEspecialidade(
       isCustom: procedimento.isCustom,
       especialidade: { codigo: procedimento.especialidade.codigo },
     },
-    precoCalculado: calcularPrecoProcedimento(procedimento, custoFixoPorMinuto, percImpostos, percTaxaCartao),
+    precoCalculado: calcularPrecoProcedimento(
+      procedimento,
+      custoFixoPorMinuto,
+      percImpostos,
+      percTaxaCartao
+    ),
     vrpoReferencia: vrpoMap.get(procedimento.codigo) ?? null,
-  }))
+  }));
 }
 
 // ─── searchProcedimentos ───────────────────────────────────────────────────────
@@ -83,7 +88,7 @@ export async function searchProcedimentos(
   userId: string,
   query: string
 ): Promise<ProcedimentoComPrecoLista[]> {
-  if (!query.trim()) return []
+  if (!query.trim()) return [];
 
   const [procedimentos, custoFixoPorMinuto, { percImpostos, percTaxaCartao }] = await Promise.all([
     prisma.procedimento.findMany({
@@ -106,10 +111,10 @@ export async function searchProcedimentos(
     }) as Promise<ProcedimentoWithMateriais[]>,
     calcularCustoFixoPorMinuto(userId),
     getPercConfig(userId),
-  ])
+  ]);
 
-  const vrpoRefsRaw = await getVrpoRefs()
-  const vrpoMap = new Map(vrpoRefsRaw.map((v) => [v.codigo, v.valorReferencia]))
+  const vrpoRefsRaw = await getVrpoRefs();
+  const vrpoMap = new Map(vrpoRefsRaw.map((v) => [v.codigo, v.valorReferencia]));
 
   return procedimentos.map((procedimento) => ({
     procedimento: {
@@ -120,9 +125,14 @@ export async function searchProcedimentos(
       isCustom: procedimento.isCustom,
       especialidade: { codigo: procedimento.especialidade.codigo },
     },
-    precoCalculado: calcularPrecoProcedimento(procedimento, custoFixoPorMinuto, percImpostos, percTaxaCartao),
+    precoCalculado: calcularPrecoProcedimento(
+      procedimento,
+      custoFixoPorMinuto,
+      percImpostos,
+      percTaxaCartao
+    ),
     vrpoReferencia: vrpoMap.get(procedimento.codigo) ?? null,
-  }))
+  }));
 }
 
 // ─── createProcedimentoCustomizado ────────────────────────────────────────────
@@ -134,10 +144,10 @@ export async function createProcedimentoCustomizado(
   nome: string,
   tempoMinutos: number
 ): Promise<CreateProcedimentoResult> {
-  if (!codigo.trim()) return { success: false, errors: { codigo: ['Código é obrigatório'] } }
-  if (!nome.trim()) return { success: false, errors: { nome: ['Nome é obrigatório'] } }
+  if (!codigo.trim()) return { success: false, errors: { codigo: ['Código é obrigatório'] } };
+  if (!nome.trim()) return { success: false, errors: { nome: ['Nome é obrigatório'] } };
   if (tempoMinutos <= 0)
-    return { success: false, errors: { tempo: ['Tempo deve ser maior que zero'] } }
+    return { success: false, errors: { tempo: ['Tempo deve ser maior que zero'] } };
 
   try {
     const procedimento = (await prisma.procedimento.create({
@@ -156,9 +166,9 @@ export async function createProcedimentoCustomizado(
           orderBy: { ordem: 'asc' },
         },
       },
-    })) as ProcedimentoWithMateriais
+    })) as ProcedimentoWithMateriais;
 
-    return { success: true, procedimento }
+    return { success: true, procedimento };
   } catch (e: unknown) {
     if (
       typeof e === 'object' &&
@@ -166,12 +176,12 @@ export async function createProcedimentoCustomizado(
       'code' in e &&
       (e as { code: string }).code === 'P2002'
     ) {
-      return { success: false, errors: { codigo: ['Código já existe para este usuário'] } }
+      return { success: false, errors: { codigo: ['Código já existe para este usuário'] } };
     }
     return {
       success: false,
       errors: { general: ['Erro ao criar procedimento. Tente novamente.'] },
-    }
+    };
   }
 }
 
@@ -181,20 +191,25 @@ export async function getProcedimentoDetail(
   id: string,
   userId: string
 ): Promise<ProcedimentoComPreco | null> {
-  const procedimento = await repository.getDetail(id, userId)
-  if (!procedimento) return null
+  const procedimento = await repository.getDetail(id, userId);
+  if (!procedimento) return null;
 
   const [custoFixoPorMinuto, { percImpostos, percTaxaCartao }, vrpoRef] = await Promise.all([
     calcularCustoFixoPorMinuto(userId),
     getPercConfig(userId),
     prisma.vRPOReferencia.findUnique({ where: { codigo: procedimento.codigo } }),
-  ])
+  ]);
 
   return {
     procedimento,
-    precoCalculado: calcularPrecoProcedimento(procedimento, custoFixoPorMinuto, percImpostos, percTaxaCartao),
+    precoCalculado: calcularPrecoProcedimento(
+      procedimento,
+      custoFixoPorMinuto,
+      percImpostos,
+      percTaxaCartao
+    ),
     vrpoReferencia: vrpoRef?.valorReferencia ?? null,
-  }
+  };
 }
 
 // ─── updateProcedimentoTempo ──────────────────────────────────────────────────
@@ -204,16 +219,16 @@ export async function updateProcedimentoTempo(
   userId: string,
   tempoMinutos: number
 ): Promise<ActionResult> {
-  if (tempoMinutos <= 0) return { success: false, error: 'Tempo deve ser maior que zero' }
+  if (tempoMinutos <= 0) return { success: false, error: 'Tempo deve ser maior que zero' };
 
-  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } })
-  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' }
+  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } });
+  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' };
 
   await prisma.procedimento.update({
     where: { id },
     data: { tempoMinutos },
-  })
-  return { success: true }
+  });
+  return { success: true };
 }
 
 // ─── addMaterialToProcedimento ────────────────────────────────────────────────
@@ -225,16 +240,18 @@ export async function addMaterialToProcedimento(
   consumo: number,
   divisor: number
 ): Promise<ActionResult> {
-  if (consumo <= 0) return { success: false, error: 'Consumo deve ser maior que zero' }
-  if (divisor <= 0) return { success: false, error: 'Divisor deve ser maior que zero' }
+  if (consumo <= 0) return { success: false, error: 'Consumo deve ser maior que zero' };
+  if (divisor <= 0) return { success: false, error: 'Divisor deve ser maior que zero' };
 
-  const procedimento = await prisma.procedimento.findFirst({ where: { id: procedimentoId, userId } })
-  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' }
+  const procedimento = await prisma.procedimento.findFirst({
+    where: { id: procedimentoId, userId },
+  });
+  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' };
 
-  const material = await prisma.material.findFirst({ where: { id: materialId, userId } })
-  if (!material) return { success: false, error: 'Material não encontrado' }
+  const material = await prisma.material.findFirst({ where: { id: materialId, userId } });
+  if (!material) return { success: false, error: 'Material não encontrado' };
 
-  const count = await prisma.procedimentoMaterial.count({ where: { procedimentoId } })
+  const count = await prisma.procedimentoMaterial.count({ where: { procedimentoId } });
 
   await prisma.procedimentoMaterial.create({
     data: {
@@ -244,8 +261,8 @@ export async function addMaterialToProcedimento(
       divisor,
       ordem: count + 1,
     },
-  })
-  return { success: true }
+  });
+  return { success: true };
 }
 
 // ─── removeMaterialFromProcedimento ──────────────────────────────────────────
@@ -257,13 +274,13 @@ export async function removeMaterialFromProcedimento(
   const pma = await prisma.procedimentoMaterial.findFirst({
     where: { id: pmaId },
     include: { procedimento: true },
-  })
+  });
   if (!pma || pma.procedimento.userId !== userId) {
-    return { success: false, error: 'Item não encontrado' }
+    return { success: false, error: 'Item não encontrado' };
   }
 
-  await prisma.procedimentoMaterial.delete({ where: { id: pmaId } })
-  return { success: true }
+  await prisma.procedimentoMaterial.delete({ where: { id: pmaId } });
+  return { success: true };
 }
 
 // ─── updateProcedimentoMaterial ───────────────────────────────────────────────
@@ -274,38 +291,35 @@ export async function updateProcedimentoMaterial(
   consumo: number,
   divisor: number
 ): Promise<ActionResult> {
-  if (consumo <= 0) return { success: false, error: 'Consumo deve ser maior que zero' }
-  if (divisor <= 0) return { success: false, error: 'Divisor deve ser maior que zero' }
+  if (consumo <= 0) return { success: false, error: 'Consumo deve ser maior que zero' };
+  if (divisor <= 0) return { success: false, error: 'Divisor deve ser maior que zero' };
 
   const pma = await prisma.procedimentoMaterial.findFirst({
     where: { id: pmaId },
     include: { procedimento: true },
-  })
+  });
   if (!pma || pma.procedimento.userId !== userId) {
-    return { success: false, error: 'Item não encontrado' }
+    return { success: false, error: 'Item não encontrado' };
   }
 
   await prisma.procedimentoMaterial.update({
     where: { id: pmaId },
     data: { consumo, divisor },
-  })
-  return { success: true }
+  });
+  return { success: true };
 }
 
 // ─── deleteProcedimento ───────────────────────────────────────────────────────
 
-export async function deleteProcedimento(
-  id: string,
-  userId: string
-): Promise<ActionResult> {
-  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } })
-  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' }
+export async function deleteProcedimento(id: string, userId: string): Promise<ActionResult> {
+  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } });
+  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' };
   if (!procedimento.isCustom) {
-    return { success: false, error: 'Apenas procedimentos customizados podem ser excluídos' }
+    return { success: false, error: 'Apenas procedimentos customizados podem ser excluídos' };
   }
 
-  await prisma.procedimento.delete({ where: { id } })
-  return { success: true }
+  await prisma.procedimento.delete({ where: { id } });
+  return { success: true };
 }
 
 // ─── updateCustoLaboratorio ───────────────────────────────────────────────────
@@ -316,17 +330,17 @@ export async function updateCustoLaboratorio(
   custoLaboratorio: number | null
 ): Promise<ActionResult> {
   if (custoLaboratorio !== null && custoLaboratorio < 0) {
-    return { success: false, error: 'Custo de laboratório não pode ser negativo' }
+    return { success: false, error: 'Custo de laboratório não pode ser negativo' };
   }
 
-  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } })
-  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' }
+  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } });
+  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' };
 
   await prisma.procedimento.update({
     where: { id },
     data: { custoLaboratorio: custoLaboratorio === 0 ? null : custoLaboratorio },
-  })
-  return { success: true }
+  });
+  return { success: true };
 }
 
 // ─── updatePrecoVenda ─────────────────────────────────────────────────────────
@@ -337,15 +351,15 @@ export async function updatePrecoVenda(
   precoVenda: number | null
 ): Promise<ActionResult> {
   if (precoVenda !== null && precoVenda < 0) {
-    return { success: false, error: 'Preço de venda não pode ser negativo' }
+    return { success: false, error: 'Preço de venda não pode ser negativo' };
   }
 
-  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } })
-  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' }
+  const procedimento = await prisma.procedimento.findFirst({ where: { id, userId } });
+  if (!procedimento) return { success: false, error: 'Procedimento não encontrado' };
 
   await prisma.procedimento.update({
     where: { id },
     data: { precoVenda: precoVenda === 0 ? null : precoVenda },
-  })
-  return { success: true }
+  });
+  return { success: true };
 }

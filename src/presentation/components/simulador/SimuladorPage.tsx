@@ -1,24 +1,33 @@
-'use client'
+'use client';
 
-import { useState, useMemo } from 'react'
-import { RotateCcw, TrendingDown, TrendingUp } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/presentation/components/ui/button'
-import { Input } from '@/presentation/components/ui/input'
-import { Label } from '@/presentation/components/ui/label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/presentation/components/ui/card'
-import { Badge } from '@/presentation/components/ui/badge'
-import type { SimuladorConfig, SimuladorProcedimento } from '@/application/usecases/simuladorActions'
+import { useState, useMemo } from 'react';
+import { RotateCcw, TrendingDown, TrendingUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/presentation/components/ui/button';
+import { Input } from '@/presentation/components/ui/input';
+import { Label } from '@/presentation/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/presentation/components/ui/card';
+import { Badge } from '@/presentation/components/ui/badge';
+import type {
+  SimuladorConfig,
+  SimuladorProcedimento,
+} from '@/application/usecases/simuladorActions';
 
 // ─── Formatters ───────────────────────────────────────────────────────────────
 
 function formatBRL(value: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 function formatPerc(value: number) {
-  const sign = value > 0 ? '+' : ''
-  return `${sign}${value.toFixed(1)}%`
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${value.toFixed(1)}%`;
 }
 
 // ─── Client-side formula (mirrors CustoFixoPorMinuto.ts — CNCC, 11 meses/ano) ─
@@ -32,15 +41,15 @@ function calcMinuto(
   config: SimuladorConfig,
   totalItens: number,
   numeroCadeiras: number,
-  percOciosidade: number,
+  percOciosidade: number
 ): number {
-  const minutosUteis = config.diasUteis * config.horasTrabalho * 60 * (1 - percOciosidade / 100)
-  if (minutosUteis <= 0) return 0
-  const cadeiras = Math.max(1, numeroCadeiras)
-  const minutosAnuais = minutosUteis * 11
+  const minutosUteis = config.diasUteis * config.horasTrabalho * 60 * (1 - percOciosidade / 100);
+  if (minutosUteis <= 0) return 0;
+  const cadeiras = Math.max(1, numeroCadeiras);
+  const minutosAnuais = minutosUteis * 11;
 
-  const custoFixoBase = totalItens / (minutosUteis * cadeiras)
-  const depreciacao = config.investimentoEquipamentos / (config.anosDepreciacao * minutosAnuais)
+  const custoFixoBase = totalItens / (minutosUteis * cadeiras);
+  const depreciacao = config.investimentoEquipamentos / (config.anosDepreciacao * minutosAnuais);
   const proLaboreMensal =
     config.salarioBase *
     (1 +
@@ -48,75 +57,80 @@ function calcMinuto(
       config.percInsalubridade / 100 +
       config.percImprevistos / 100 +
       4 / 36 +
-      1 / 12)
-  const remuneracao = proLaboreMensal / minutosUteis
-  const taxaRetorno = config.investimentoEquipamentos / (config.anosRetorno * minutosAnuais)
+      1 / 12);
+  const remuneracao = proLaboreMensal / minutosUteis;
+  const taxaRetorno = config.investimentoEquipamentos / (config.anosRetorno * minutosAnuais);
 
-  return custoFixoBase + depreciacao + remuneracao + taxaRetorno
+  return custoFixoBase + depreciacao + remuneracao + taxaRetorno;
 }
 
 function calcMargem(
   precoVenda: number,
   custoBreakEven: number,
   percImpostos: number,
-  percTaxaCartao: number,
+  percTaxaCartao: number
 ): number {
-  const percTotal = percImpostos + percTaxaCartao
-  return (precoVenda - custoBreakEven - precoVenda * percTotal / 100) / precoVenda
+  const percTotal = percImpostos + percTaxaCartao;
+  return (precoVenda - custoBreakEven - (precoVenda * percTotal) / 100) / precoVenda;
 }
 
 function margemLabel(margem: number): string {
-  const pct = margem * 100
-  if (pct >= 30) return 'verde'
-  if (pct >= 10) return 'amarelo'
-  return 'vermelho'
+  const pct = margem * 100;
+  if (pct >= 30) return 'verde';
+  if (pct >= 10) return 'amarelo';
+  return 'vermelho';
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Params = {
-  totalItens: number
-  numeroCadeiras: number
-  percOciosidade: number
-  percImpostos: number
-  percTaxaCartao: number
-}
+  totalItens: number;
+  numeroCadeiras: number;
+  percOciosidade: number;
+  percImpostos: number;
+  percTaxaCartao: number;
+};
 
 type ProcResultado = {
-  id: string
-  codigo: string
-  nome: string
-  especialidadeNome: string
-  tempoMinutos: number
-  precoVenda: number | null
-  custoVariavel: number
+  id: string;
+  codigo: string;
+  nome: string;
+  especialidadeNome: string;
+  tempoMinutos: number;
+  precoVenda: number | null;
+  custoVariavel: number;
   // baseline (salvo)
-  breakEvenSalvo: number
-  margemSalva: number | null
+  breakEvenSalvo: number;
+  margemSalva: number | null;
   // simulado
-  breakEvenSim: number
-  margemSim: number | null
-  deltaBreakEven: number
-  deltaMargem: number | null
-}
+  breakEvenSim: number;
+  margemSim: number | null;
+  deltaBreakEven: number;
+  deltaMargem: number | null;
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 type Props = {
-  config: SimuladorConfig
-  totalItens: number
-  custoFixoPorMinutoAtual: number
-  procedimentos: SimuladorProcedimento[]
-}
+  config: SimuladorConfig;
+  totalItens: number;
+  custoFixoPorMinutoAtual: number;
+  procedimentos: SimuladorProcedimento[];
+};
 
-export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, procedimentos }: Props) {
+export function SimuladorPage({
+  config,
+  totalItens,
+  custoFixoPorMinutoAtual,
+  procedimentos,
+}: Props) {
   const [params, setParams] = useState<Params>({
     totalItens,
     numeroCadeiras: config.numeroCadeiras,
     percOciosidade: config.percOciosidade,
     percImpostos: config.percImpostos,
     percTaxaCartao: config.percTaxaCartao,
-  })
+  });
 
   // Track input strings separately to allow free-form editing
   const [inputValues, setInputValues] = useState({
@@ -125,14 +139,14 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
     percOciosidade: String(config.percOciosidade),
     percImpostos: String(config.percImpostos),
     percTaxaCartao: String(config.percTaxaCartao),
-  })
+  });
 
   const isDirty =
     params.totalItens !== totalItens ||
     params.numeroCadeiras !== config.numeroCadeiras ||
     params.percOciosidade !== config.percOciosidade ||
     params.percImpostos !== config.percImpostos ||
-    params.percTaxaCartao !== config.percTaxaCartao
+    params.percTaxaCartao !== config.percTaxaCartao;
 
   function restore() {
     setParams({
@@ -141,25 +155,25 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
       percOciosidade: config.percOciosidade,
       percImpostos: config.percImpostos,
       percTaxaCartao: config.percTaxaCartao,
-    })
+    });
     setInputValues({
       totalItens: totalItens.toFixed(2).replace('.', ','),
       numeroCadeiras: String(config.numeroCadeiras),
       percOciosidade: String(config.percOciosidade),
       percImpostos: String(config.percImpostos),
       percTaxaCartao: String(config.percTaxaCartao),
-    })
+    });
   }
 
   function handleNumericInput(
     field: keyof Params,
     inputField: keyof typeof inputValues,
-    raw: string,
+    raw: string
   ) {
-    setInputValues((prev) => ({ ...prev, [inputField]: raw }))
-    const parsed = parseFloat(raw.replace(',', '.'))
+    setInputValues((prev) => ({ ...prev, [inputField]: raw }));
+    const parsed = parseFloat(raw.replace(',', '.'));
     if (!isNaN(parsed) && parsed >= 0) {
-      setParams((prev) => ({ ...prev, [field]: parsed }))
+      setParams((prev) => ({ ...prev, [field]: parsed }));
     }
   }
 
@@ -167,23 +181,23 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
 
   const custoMinSim = useMemo(
     () => calcMinuto(config, params.totalItens, params.numeroCadeiras, params.percOciosidade),
-    [config, params.totalItens, params.numeroCadeiras, params.percOciosidade],
-  )
+    [config, params.totalItens, params.numeroCadeiras, params.percOciosidade]
+  );
 
   const resultados: ProcResultado[] = useMemo(() => {
     return procedimentos.map((p) => {
-      const breakEvenSalvo = p.tempoMinutos * custoFixoPorMinutoAtual + p.custoVariavel
-      const breakEvenSim = p.tempoMinutos * custoMinSim + p.custoVariavel
+      const breakEvenSalvo = p.tempoMinutos * custoFixoPorMinutoAtual + p.custoVariavel;
+      const breakEvenSim = p.tempoMinutos * custoMinSim + p.custoVariavel;
 
       const margemSalva =
         p.precoVenda !== null
           ? calcMargem(p.precoVenda, breakEvenSalvo, config.percImpostos, config.percTaxaCartao)
-          : null
+          : null;
 
       const margemSim =
         p.precoVenda !== null
           ? calcMargem(p.precoVenda, breakEvenSim, params.percImpostos, params.percTaxaCartao)
-          : null
+          : null;
 
       return {
         ...p,
@@ -193,20 +207,32 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
         margemSim,
         deltaBreakEven: breakEvenSim - breakEvenSalvo,
         deltaMargem: margemSim !== null && margemSalva !== null ? margemSim - margemSalva : null,
-      }
-    })
-  }, [procedimentos, custoMinSim, custoFixoPorMinutoAtual, config.percImpostos, config.percTaxaCartao, params.percImpostos, params.percTaxaCartao])
+      };
+    });
+  }, [
+    procedimentos,
+    custoMinSim,
+    custoFixoPorMinutoAtual,
+    config.percImpostos,
+    config.percTaxaCartao,
+    params.percImpostos,
+    params.percTaxaCartao,
+  ]);
 
-  const comPreco = resultados.filter((p) => p.precoVenda !== null)
-  const noVermelhoSalvo = comPreco.filter((p) => p.margemSalva !== null && p.margemSalva * 100 < 10).length
-  const noVermelhoSim = comPreco.filter((p) => p.margemSim !== null && p.margemSim * 100 < 10).length
-  const deltaVermelho = noVermelhoSim - noVermelhoSalvo
-  const deltaCustoMin = custoMinSim - custoFixoPorMinutoAtual
+  const comPreco = resultados.filter((p) => p.precoVenda !== null);
+  const noVermelhoSalvo = comPreco.filter(
+    (p) => p.margemSalva !== null && p.margemSalva * 100 < 10
+  ).length;
+  const noVermelhoSim = comPreco.filter(
+    (p) => p.margemSim !== null && p.margemSim * 100 < 10
+  ).length;
+  const deltaVermelho = noVermelhoSim - noVermelhoSalvo;
+  const deltaCustoMin = custoMinSim - custoFixoPorMinutoAtual;
 
   // Show procedures sorted by worst margin impact (biggest drops first)
   const sorted = [...resultados]
     .filter((p) => p.precoVenda !== null)
-    .sort((a, b) => (a.deltaMargem ?? 0) - (b.deltaMargem ?? 0))
+    .sort((a, b) => (a.deltaMargem ?? 0) - (b.deltaMargem ?? 0));
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -234,9 +260,7 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                 <Label htmlFor="sim-totalItens" className="text-sm">
                   Custo fixo mensal (R$)
                 </Label>
-                <p className="text-xs text-muted-foreground">
-                  Salvo: {formatBRL(totalItens)}
-                </p>
+                <p className="text-xs text-muted-foreground">Salvo: {formatBRL(totalItens)}</p>
                 <Input
                   id="sim-totalItens"
                   value={inputValues.totalItens}
@@ -248,16 +272,16 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                 <Label htmlFor="sim-cadeiras" className="text-sm">
                   Número de cadeiras
                 </Label>
-                <p className="text-xs text-muted-foreground">
-                  Salvo: {config.numeroCadeiras}
-                </p>
+                <p className="text-xs text-muted-foreground">Salvo: {config.numeroCadeiras}</p>
                 <Input
                   id="sim-cadeiras"
                   type="number"
                   min={1}
                   step={1}
                   value={inputValues.numeroCadeiras}
-                  onChange={(e) => handleNumericInput('numeroCadeiras', 'numeroCadeiras', e.target.value)}
+                  onChange={(e) =>
+                    handleNumericInput('numeroCadeiras', 'numeroCadeiras', e.target.value)
+                  }
                 />
               </div>
 
@@ -277,16 +301,18 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                     step={1}
                     value={params.percOciosidade}
                     onChange={(e) => {
-                      const v = Number(e.target.value)
-                      setParams((prev) => ({ ...prev, percOciosidade: v }))
-                      setInputValues((prev) => ({ ...prev, percOciosidade: String(v) }))
+                      const v = Number(e.target.value);
+                      setParams((prev) => ({ ...prev, percOciosidade: v }));
+                      setInputValues((prev) => ({ ...prev, percOciosidade: String(v) }));
                     }}
                     className="flex-1 accent-primary"
                   />
                   <Input
                     className="w-16 text-center"
                     value={inputValues.percOciosidade}
-                    onChange={(e) => handleNumericInput('percOciosidade', 'percOciosidade', e.target.value)}
+                    onChange={(e) =>
+                      handleNumericInput('percOciosidade', 'percOciosidade', e.target.value)
+                    }
                   />
                 </div>
               </div>
@@ -295,9 +321,7 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                 <Label htmlFor="sim-impostos" className="text-sm">
                   % Impostos (ISS / Simples)
                 </Label>
-                <p className="text-xs text-muted-foreground">
-                  Salvo: {config.percImpostos}%
-                </p>
+                <p className="text-xs text-muted-foreground">Salvo: {config.percImpostos}%</p>
                 <Input
                   id="sim-impostos"
                   type="number"
@@ -305,7 +329,9 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                   max={30}
                   step={0.1}
                   value={inputValues.percImpostos}
-                  onChange={(e) => handleNumericInput('percImpostos', 'percImpostos', e.target.value)}
+                  onChange={(e) =>
+                    handleNumericInput('percImpostos', 'percImpostos', e.target.value)
+                  }
                 />
               </div>
 
@@ -313,9 +339,7 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                 <Label htmlFor="sim-cartao" className="text-sm">
                   % Taxa de cartão
                 </Label>
-                <p className="text-xs text-muted-foreground">
-                  Salvo: {config.percTaxaCartao}%
-                </p>
+                <p className="text-xs text-muted-foreground">Salvo: {config.percTaxaCartao}%</p>
                 <Input
                   id="sim-cartao"
                   type="number"
@@ -323,7 +347,9 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                   max={10}
                   step={0.1}
                   value={inputValues.percTaxaCartao}
-                  onChange={(e) => handleNumericInput('percTaxaCartao', 'percTaxaCartao', e.target.value)}
+                  onChange={(e) =>
+                    handleNumericInput('percTaxaCartao', 'percTaxaCartao', e.target.value)
+                  }
                 />
               </div>
 
@@ -356,7 +382,8 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                 <p className="text-xs text-muted-foreground mb-1">Custo por minuto</p>
                 <div className="flex items-baseline gap-2 flex-wrap">
                   <span className="text-xl font-bold">
-                    {formatBRL(custoMinSim)}<span className="text-sm font-normal">/min</span>
+                    {formatBRL(custoMinSim)}
+                    <span className="text-sm font-normal">/min</span>
                   </span>
                   <DeltaChip
                     value={deltaCustoMin}
@@ -394,8 +421,8 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
           {sorted.length === 0 ? (
             <Card>
               <CardContent className="py-8 text-center text-muted-foreground text-sm">
-                Nenhum procedimento com preço de venda configurado.{' '}
-                Configure o preço de venda nos procedimentos para ver o impacto na margem.
+                Nenhum procedimento com preço de venda configurado. Configure o preço de venda nos
+                procedimentos para ver o impacto na margem.
               </CardContent>
             </Card>
           ) : (
@@ -415,7 +442,9 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                       <th className="text-left px-4 py-2 font-medium">Procedimento</th>
                       <th className="text-right px-4 py-2 font-medium">Margem</th>
                       <th className="text-right px-4 py-2 font-medium">Δ Margem</th>
-                      <th className="text-right px-4 py-2 font-medium hidden sm:table-cell">Break-even</th>
+                      <th className="text-right px-4 py-2 font-medium hidden sm:table-cell">
+                        Break-even
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -423,12 +452,12 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                       <tr key={p.id} className="border-b last:border-0 hover:bg-muted/30">
                         <td className="px-4 py-2">
                           <div className="font-medium leading-tight">{p.nome}</div>
-                          <div className="text-xs text-muted-foreground">{p.codigo} · {p.especialidadeNome}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {p.codigo} · {p.especialidadeNome}
+                          </div>
                         </td>
                         <td className="px-4 py-2 text-right">
-                          {p.margemSim !== null && (
-                            <MargemBadge margem={p.margemSim} />
-                          )}
+                          {p.margemSim !== null && <MargemBadge margem={p.margemSim} />}
                         </td>
                         <td className="px-4 py-2 text-right">
                           {p.deltaMargem !== null && (
@@ -442,8 +471,14 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
                         <td className="px-4 py-2 text-right hidden sm:table-cell text-muted-foreground text-xs">
                           {formatBRL(p.breakEvenSim)}
                           {p.deltaBreakEven !== 0 && (
-                            <span className={cn('ml-1', p.deltaBreakEven > 0 ? 'text-red-500' : 'text-green-600')}>
-                              ({p.deltaBreakEven > 0 ? '+' : ''}{formatBRL(p.deltaBreakEven)})
+                            <span
+                              className={cn(
+                                'ml-1',
+                                p.deltaBreakEven > 0 ? 'text-red-500' : 'text-green-600'
+                              )}
+                            >
+                              ({p.deltaBreakEven > 0 ? '+' : ''}
+                              {formatBRL(p.deltaBreakEven)})
                             </span>
                           )}
                         </td>
@@ -457,50 +492,50 @@ export function SimuladorPage({ config, totalItens, custoFixoPorMinutoAtual, pro
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function MargemBadge({ margem }: { margem: number }) {
-  const pct = margem * 100
-  const label = margemLabel(margem)
+  const pct = margem * 100;
+  const label = margemLabel(margem);
   return (
     <Badge
       className={cn(
         'text-white text-xs',
         label === 'verde' && 'bg-green-600',
         label === 'amarelo' && 'bg-yellow-500',
-        label === 'vermelho' && 'bg-red-600',
+        label === 'vermelho' && 'bg-red-600'
       )}
     >
       {pct.toFixed(1)}%
     </Badge>
-  )
+  );
 }
 
 type DeltaChipProps = {
-  value: number
-  label: string
-  higherIsBetter: boolean
-}
+  value: number;
+  label: string;
+  higherIsBetter: boolean;
+};
 
 function DeltaChip({ value, label, higherIsBetter }: DeltaChipProps) {
-  if (value === 0) return null
+  if (value === 0) return null;
 
-  const positive = value > 0
-  const isGood = higherIsBetter ? positive : !positive
-  const Icon = positive ? TrendingUp : TrendingDown
+  const positive = value > 0;
+  const isGood = higherIsBetter ? positive : !positive;
+  const Icon = positive ? TrendingUp : TrendingDown;
 
   return (
     <span
       className={cn(
         'inline-flex items-center gap-0.5 text-xs font-medium',
-        isGood ? 'text-green-600' : 'text-red-500',
+        isGood ? 'text-green-600' : 'text-red-500'
       )}
     >
       <Icon className="h-3 w-3" />
       {label}
     </span>
-  )
+  );
 }

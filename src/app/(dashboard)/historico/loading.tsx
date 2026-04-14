@@ -1,4 +1,4 @@
-import { Skeleton } from '@/presentation/components/ui/skeleton'
+import { Skeleton } from '@/presentation/components/ui/skeleton';
 
 export default function HistoricoLoading() {
   return (
@@ -34,5 +34,5 @@ export default function HistoricoLoading() {
         ))}
       </div>
     </div>
-  )
+  );
 }

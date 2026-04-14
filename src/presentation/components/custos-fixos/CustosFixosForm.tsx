@@ -1,70 +1,74 @@
-'use client'
+'use client';
 
-import { useState, useMemo, useTransition } from 'react'
-import { saveCustoFixoConfig } from '@/application/usecases/custoFixoActions'
-import { useToast } from '@/presentation/hooks/use-toast'
-import { Button } from '@/presentation/components/ui/button'
-import { Input } from '@/presentation/components/ui/input'
-import { Label } from '@/presentation/components/ui/label'
-import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/card'
-import type { CustoFixoConfig, CustoFixoItem } from '@prisma/client'
+import { useState, useMemo, useTransition } from 'react';
+import { saveCustoFixoConfig } from '@/application/usecases/custoFixoActions';
+import { useToast } from '@/presentation/hooks/use-toast';
+import { Button } from '@/presentation/components/ui/button';
+import { Input } from '@/presentation/components/ui/input';
+import { Label } from '@/presentation/components/ui/label';
+import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/card';
+import type { CustoFixoConfig, CustoFixoItem } from '@prisma/client';
 
 type ConfigState = {
-  diasUteis: number
-  horasTrabalho: number
-  investimentoEquipamentos: number
-  anosDepreciacao: number
-  salarioBase: number
-  percFundoReserva: number
-  percInsalubridade: number
-  percImprevistos: number
-  taxaRetornoPerc: number
-  anosRetorno: number
-  numeroCadeiras: number
-  percOciosidade: number
-  percImpostos: number
-  percTaxaCartao: number
-}
+  diasUteis: number;
+  horasTrabalho: number;
+  investimentoEquipamentos: number;
+  anosDepreciacao: number;
+  salarioBase: number;
+  percFundoReserva: number;
+  percInsalubridade: number;
+  percImprevistos: number;
+  taxaRetornoPerc: number;
+  anosRetorno: number;
+  numeroCadeiras: number;
+  percOciosidade: number;
+  percImpostos: number;
+  percTaxaCartao: number;
+};
 
 type ItemState = {
-  id?: string
-  nome: string
-  valor: number
-  ordem: number
-  isCustom: boolean
-}
+  id?: string;
+  nome: string;
+  valor: number;
+  ordem: number;
+  isCustom: boolean;
+};
 
 function calcCustoFixoPorMinuto(config: ConfigState, items: ItemState[]): number {
-  const minutosUteis = config.diasUteis * config.horasTrabalho * 60 * (1 - config.percOciosidade / 100)
-  if (minutosUteis <= 0) return 0
-  const cadeiras = Math.max(1, config.numeroCadeiras)
-  const totalItens = items.reduce((sum, item) => sum + item.valor, 0)
-  const custoFixoBase = totalItens / (minutosUteis * cadeiras)
-  const minutosAnuais = minutosUteis * 11
-  const depreciacao = config.investimentoEquipamentos / (config.anosDepreciacao * minutosAnuais)
+  const minutosUteis =
+    config.diasUteis * config.horasTrabalho * 60 * (1 - config.percOciosidade / 100);
+  if (minutosUteis <= 0) return 0;
+  const cadeiras = Math.max(1, config.numeroCadeiras);
+  const totalItens = items.reduce((sum, item) => sum + item.valor, 0);
+  const custoFixoBase = totalItens / (minutosUteis * cadeiras);
+  const minutosAnuais = minutosUteis * 11;
+  const depreciacao = config.investimentoEquipamentos / (config.anosDepreciacao * minutosAnuais);
   const remuneracaoMensal =
     config.salarioBase *
-    (1 + config.percFundoReserva / 100 + config.percInsalubridade / 100 + config.percImprevistos / 100)
-  const remuneracao = remuneracaoMensal / minutosUteis
+    (1 +
+      config.percFundoReserva / 100 +
+      config.percInsalubridade / 100 +
+      config.percImprevistos / 100);
+  const remuneracao = remuneracaoMensal / minutosUteis;
   const taxaRetorno =
     (config.investimentoEquipamentos * (config.taxaRetornoPerc / 100)) /
-    (config.anosRetorno * minutosAnuais)
-  return custoFixoBase + depreciacao + remuneracao + taxaRetorno
+    (config.anosRetorno * minutosAnuais);
+  return custoFixoBase + depreciacao + remuneracao + taxaRetorno;
 }
 
 function formatBRL(value: number): string {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 interface Props {
-  userId: string
-  initialConfig: CustoFixoConfig
-  initialItems: CustoFixoItem[]
+  userId: string;
+  initialConfig: CustoFixoConfig;
+  initialItems: CustoFixoItem[];
 }
 
 export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) {
-  const { toast } = useToast()
-  const [isPending, startTransition] = useTransition()
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
   const [config, setConfig] = useState<ConfigState>({
     diasUteis: initialConfig.diasUteis,
@@ -81,7 +85,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
     percOciosidade: initialConfig.percOciosidade,
     percImpostos: initialConfig.percImpostos,
     percTaxaCartao: initialConfig.percTaxaCartao,
-  })
+  });
 
   const [items, setItems] = useState<ItemState[]>(
     initialItems.map((item) => ({
@@ -91,37 +95,37 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
       ordem: item.ordem,
       isCustom: item.isCustom,
     }))
-  )
+  );
 
-  const [newItemNome, setNewItemNome] = useState('')
-  const [newItemValor, setNewItemValor] = useState('')
-  const [showAddForm, setShowAddForm] = useState(false)
+  const [newItemNome, setNewItemNome] = useState('');
+  const [newItemValor, setNewItemValor] = useState('');
+  const [showAddForm, setShowAddForm] = useState(false);
 
-  const custoFixoPorMinuto = useMemo(() => calcCustoFixoPorMinuto(config, items), [config, items])
+  const custoFixoPorMinuto = useMemo(() => calcCustoFixoPorMinuto(config, items), [config, items]);
 
   function updateConfig(key: keyof ConfigState, value: number) {
-    setConfig((prev) => ({ ...prev, [key]: value }))
+    setConfig((prev) => ({ ...prev, [key]: value }));
   }
 
   function updateItemValor(index: number, valor: number) {
-    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, valor } : item)))
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, valor } : item)));
   }
 
   function deleteItem(index: number) {
-    setItems((prev) => prev.filter((_, i) => i !== index))
+    setItems((prev) => prev.filter((_, i) => i !== index));
   }
 
   function addItem() {
-    const valor = parseFloat(newItemValor.replace(',', '.'))
-    if (!newItemNome.trim() || isNaN(valor) || valor < 0) return
-    const maxOrdem = Math.max(0, ...items.map((i) => i.ordem))
+    const valor = parseFloat(newItemValor.replace(',', '.'));
+    if (!newItemNome.trim() || isNaN(valor) || valor < 0) return;
+    const maxOrdem = Math.max(0, ...items.map((i) => i.ordem));
     setItems((prev) => [
       ...prev,
       { nome: newItemNome.trim(), valor, ordem: maxOrdem + 1, isCustom: true },
-    ])
-    setNewItemNome('')
-    setNewItemValor('')
-    setShowAddForm(false)
+    ]);
+    setNewItemNome('');
+    setNewItemValor('');
+    setShowAddForm(false);
   }
 
   function handleSave() {
@@ -135,24 +139,24 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
           ordem: item.ordem ?? index,
           isCustom: item.isCustom,
         })),
-      })
+      });
       if (result.success) {
-        const n = result.procedimentosNoVermelho ?? 0
+        const n = result.procedimentosNoVermelho ?? 0;
         toast({
           title: 'Configuração salva!',
           description:
             n > 0
               ? `${n} procedimento${n > 1 ? 's estão' : ' está'} abaixo de 10% de margem. Revise seus preços.`
               : 'Seus custos fixos foram atualizados.',
-        })
+        });
       } else {
         toast({
           title: 'Erro ao salvar',
           description: result.errors?.general?.join(', ') ?? 'Tente novamente.',
           variant: 'destructive',
-        })
+        });
       }
-    })
+    });
   }
 
   return (
@@ -171,9 +175,10 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
           <p className="text-4xl font-bold mt-1">{formatBRL(custoFixoPorMinuto)} / min</p>
           <p className="text-xs opacity-70 mt-2">
             Total mensal ÷ {config.diasUteis} dias × {config.horasTrabalho}h × 60min
-            {config.percOciosidade > 0 && ` × ${(100 - config.percOciosidade).toFixed(0)}% ocupação`}
-            {config.numeroCadeiras > 1 && ` ÷ ${config.numeroCadeiras} cadeiras`}
-            {' '}+ Depreciação (11 meses) + Remuneração + Retorno
+            {config.percOciosidade > 0 &&
+              ` × ${(100 - config.percOciosidade).toFixed(0)}% ocupação`}
+            {config.numeroCadeiras > 1 && ` ÷ ${config.numeroCadeiras} cadeiras`} + Depreciação (11
+            meses) + Remuneração + Retorno
           </p>
         </CardContent>
       </Card>
@@ -281,9 +286,9 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
                     size="sm"
                     variant="ghost"
                     onClick={() => {
-                      setShowAddForm(false)
-                      setNewItemNome('')
-                      setNewItemValor('')
+                      setShowAddForm(false);
+                      setNewItemNome('');
+                      setNewItemValor('');
                     }}
                   >
                     Cancelar
@@ -291,11 +296,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
                 </div>
               </div>
             ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowAddForm(true)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setShowAddForm(true)}>
                 + Adicionar item
               </Button>
             )}
@@ -485,5 +486,5 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
         </Button>
       </div>
     </div>
-  )
+  );
 }

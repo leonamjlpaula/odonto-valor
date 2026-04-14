@@ -20,16 +20,16 @@ Preço Final = (Tempo em minutos × Custo Fixo/min) + Custo Variável
 
 ## Funcionalidades
 
-| Módulo | Descrição |
-|---|---|
-| **Dashboard** | Visão geral com alertas de procedimentos abaixo do custo |
-| **Custos Fixos** | Configure aluguel, salários, equipamentos — o sistema calcula o custo/min |
-| **Materiais** | Catálogo de insumos com preços atualizáveis individualmente |
-| **Procedimentos** | Lista por especialidade com preço calculado em tempo real |
-| **Comparativo VRPO** | Identifica quais procedimentos estão abaixo da referência nacional |
-| **Histórico** | Snapshots da configuração para comparar precificação ao longo do tempo |
-| **Exportar** | Geração de tabela de preços em PDF ou Excel |
-| **Primeiros Passos** | Guia educativo integrado ao sistema |
+| Módulo               | Descrição                                                                 |
+| -------------------- | ------------------------------------------------------------------------- |
+| **Dashboard**        | Visão geral com alertas de procedimentos abaixo do custo                  |
+| **Custos Fixos**     | Configure aluguel, salários, equipamentos — o sistema calcula o custo/min |
+| **Materiais**        | Catálogo de insumos com preços atualizáveis individualmente               |
+| **Procedimentos**    | Lista por especialidade com preço calculado em tempo real                 |
+| **Comparativo VRPO** | Identifica quais procedimentos estão abaixo da referência nacional        |
+| **Histórico**        | Snapshots da configuração para comparar precificação ao longo do tempo    |
+| **Exportar**         | Geração de tabela de preços em PDF ou Excel                               |
+| **Primeiros Passos** | Guia educativo integrado ao sistema                                       |
 
 ---
 

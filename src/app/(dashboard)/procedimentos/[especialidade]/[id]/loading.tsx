@@ -1,4 +1,4 @@
-import { Skeleton } from '@/presentation/components/ui/skeleton'
+import { Skeleton } from '@/presentation/components/ui/skeleton';
 
 export default function ProcedimentoDetailLoading() {
   return (
@@ -40,5 +40,5 @@ export default function ProcedimentoDetailLoading() {
         ))}
       </div>
     </div>
-  )
+  );
 }

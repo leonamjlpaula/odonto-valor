@@ -6,23 +6,23 @@
 
 ### Variáveis de entrada — Custo Fixo (14 itens padrão)
 
-| # | Item | Valor mensal |
-|---|---|---|
-| 1 | Aluguel de sala | R$ 600 |
-| 2 | Condomínio | R$ 400 |
-| 3 | Impostos e Taxas (IPTU, ISS) | R$ 100 |
-| 4 | Anuidade ABO/CRO/Sindicato | R$ 1.600 (anual rateado) |
-| 5 | Despesas com telefone | R$ 100 |
-| 6 | Energia elétrica | R$ 2.000 |
-| 7 | Salário + encargos + VT + insalubridade | R$ 2.500 |
-| 8 | Faxineira + material de limpeza | R$ 100 |
-| 9 | Livros/revistas/congressos | R$ 5.000 (anual) |
-| 10 | Contador | R$ 300 |
-| 11 | Manutenção do consultório | R$ 400 |
-| 12 | Consumo geral mensal | R$ 178,36 |
-| 13 | Informática | R$ 250 |
-| 14 | Administração | R$ 2.500 |
-| **Total** | | **R$ 13.528,36** |
+| #         | Item                                    | Valor mensal             |
+| --------- | --------------------------------------- | ------------------------ |
+| 1         | Aluguel de sala                         | R$ 600                   |
+| 2         | Condomínio                              | R$ 400                   |
+| 3         | Impostos e Taxas (IPTU, ISS)            | R$ 100                   |
+| 4         | Anuidade ABO/CRO/Sindicato              | R$ 1.600 (anual rateado) |
+| 5         | Despesas com telefone                   | R$ 100                   |
+| 6         | Energia elétrica                        | R$ 2.000                 |
+| 7         | Salário + encargos + VT + insalubridade | R$ 2.500                 |
+| 8         | Faxineira + material de limpeza         | R$ 100                   |
+| 9         | Livros/revistas/congressos              | R$ 5.000 (anual)         |
+| 10        | Contador                                | R$ 300                   |
+| 11        | Manutenção do consultório               | R$ 400                   |
+| 12        | Consumo geral mensal                    | R$ 178,36                |
+| 13        | Informática                             | R$ 250                   |
+| 14        | Administração                           | R$ 2.500                 |
+| **Total** |                                         | **R$ 13.528,36**         |
 
 **Parâmetros de tempo:** 22 dias úteis/mês, 8 horas/dia, **11 meses** (1 mês de férias implícito).
 
@@ -80,18 +80,18 @@ Preço = Tempo (min) × R$ 2,475 + Custo Variável
 
 ### Estrutura do custo fixo (mais aberta)
 
-| Categoria | Valor |
-|---|---|
-| Aluguéis | R$ 4.000 |
-| Salários e Benefícios Funcionários | R$ 8.000 |
-| **Pró-labore e Benefícios Sócios** | **R$ 10.000** |
-| Despesas de Viagem | R$ 2.000 |
-| Contabilidade | R$ 1.800 |
-| Luz/Água/Gás/Telefone | R$ 800 |
-| Manutenção/Segurança/Limpeza | R$ 1.500 |
-| Despesas Financeiras | R$ 350 |
-| **Material no Geral (difícil de itemizar)** | **R$ 4.000** |
-| **Total** | **R$ 32.450** |
+| Categoria                                   | Valor         |
+| ------------------------------------------- | ------------- |
+| Aluguéis                                    | R$ 4.000      |
+| Salários e Benefícios Funcionários          | R$ 8.000      |
+| **Pró-labore e Benefícios Sócios**          | **R$ 10.000** |
+| Despesas de Viagem                          | R$ 2.000      |
+| Contabilidade                               | R$ 1.800      |
+| Luz/Água/Gás/Telefone                       | R$ 800        |
+| Manutenção/Segurança/Limpeza                | R$ 1.500      |
+| Despesas Financeiras                        | R$ 350        |
+| **Material no Geral (difícil de itemizar)** | **R$ 4.000**  |
+| **Total**                                   | **R$ 32.450** |
 
 **Custo hora calculado no exemplo:** R$ 32.450 / (3 cadeiras × 128h) = R$ 25,35/hora por cadeira.
 

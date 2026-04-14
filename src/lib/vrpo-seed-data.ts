@@ -1,4 +1,4 @@
-import { prisma } from './db'
+import { prisma } from './db';
 
 // ─── Default cost items (14 standard VRPO items) ─────────────────────────────
 
@@ -17,15 +17,30 @@ export const DEFAULT_CUSTO_FIXO_ITEMS = [
   { nome: 'Manutenção de Equipamentos', valor: 350, ordem: 12 },
   { nome: 'Seguros', valor: 150, ordem: 13 },
   { nome: 'Outros', valor: 500, ordem: 14 },
-] as const
+] as const;
 
 // ─── Default materials (134 materials — CNCC reference list) ─────────────────
 
 export const DEFAULT_MATERIAIS = [
   // Anestésicos e agulhas (5)
-  { nome: 'Anestésico Dental (Mepivacaína 2%)', unidade: 'caixa 50 tubetes', preco: 95.0, divisorPadrao: 50 },
-  { nome: 'Anestésico Dental (Articaína 4%)', unidade: 'caixa 50 tubetes', preco: 125.0, divisorPadrao: 50 },
-  { nome: 'Anestésico Tópico (Benzocaína 20%)', unidade: 'bisnaga 12g', preco: 28.0, divisorPadrao: 30 },
+  {
+    nome: 'Anestésico Dental (Mepivacaína 2%)',
+    unidade: 'caixa 50 tubetes',
+    preco: 95.0,
+    divisorPadrao: 50,
+  },
+  {
+    nome: 'Anestésico Dental (Articaína 4%)',
+    unidade: 'caixa 50 tubetes',
+    preco: 125.0,
+    divisorPadrao: 50,
+  },
+  {
+    nome: 'Anestésico Tópico (Benzocaína 20%)',
+    unidade: 'bisnaga 12g',
+    preco: 28.0,
+    divisorPadrao: 30,
+  },
   { nome: 'Agulha Gengival Curta', unidade: 'caixa 100 un', preco: 35.0, divisorPadrao: 100 },
   { nome: 'Agulha Gengival Longa', unidade: 'caixa 100 un', preco: 38.0, divisorPadrao: 100 },
   // Resinas compostas (12)
@@ -41,7 +56,12 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'Resina Flowável A1', unidade: 'seringa 2g', preco: 75.0, divisorPadrao: 5 },
   { nome: 'Resina Flowável A2', unidade: 'seringa 2g', preco: 75.0, divisorPadrao: 5 },
   { nome: 'Resina Flowável A3', unidade: 'seringa 2g', preco: 75.0, divisorPadrao: 5 },
-  { nome: 'Resina Bisacrílica Provisória', unidade: 'cartucho 76g', preco: 188.0, divisorPadrao: 10 },
+  {
+    nome: 'Resina Bisacrílica Provisória',
+    unidade: 'cartucho 76g',
+    preco: 188.0,
+    divisorPadrao: 10,
+  },
   // Adesivos e condicionadores (5)
   { nome: 'Ácido Fosfórico 37%', unidade: 'bisnaga 5g', preco: 8.0, divisorPadrao: 30 },
   { nome: 'Adesivo Universal', unidade: 'frasco 5ml', preco: 95.0, divisorPadrao: 30 },
@@ -50,22 +70,52 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'Microbrush Aplicador', unidade: 'pacote 100 un', preco: 15.0, divisorPadrao: 100 },
   // Cimentos (8)
   { nome: 'Cimento de Ionômero de Vidro', unidade: 'frasco 15g', preco: 65.0, divisorPadrao: 15 },
-  { nome: 'Cimento de Ionômero de Vidro Modificado por Resina', unidade: 'kit frasco', preco: 88.0, divisorPadrao: 10 },
-  { nome: 'Cimento de Fosfato de Zinco', unidade: 'kit pó/líquido', preco: 45.0, divisorPadrao: 10 },
+  {
+    nome: 'Cimento de Ionômero de Vidro Modificado por Resina',
+    unidade: 'kit frasco',
+    preco: 88.0,
+    divisorPadrao: 10,
+  },
+  {
+    nome: 'Cimento de Fosfato de Zinco',
+    unidade: 'kit pó/líquido',
+    preco: 45.0,
+    divisorPadrao: 10,
+  },
   { nome: 'Cimento Resinoso Dual', unidade: 'kit bisnaga', preco: 148.0, divisorPadrao: 10 },
-  { nome: 'Cimento de Ionômero para Cimentação', unidade: 'kit frasco', preco: 68.0, divisorPadrao: 10 },
-  { nome: 'Cimento Temporário (Óxido de Zinco e Eugenol)', unidade: 'kit', preco: 32.0, divisorPadrao: 20 },
+  {
+    nome: 'Cimento de Ionômero para Cimentação',
+    unidade: 'kit frasco',
+    preco: 68.0,
+    divisorPadrao: 10,
+  },
+  {
+    nome: 'Cimento Temporário (Óxido de Zinco e Eugenol)',
+    unidade: 'kit',
+    preco: 32.0,
+    divisorPadrao: 20,
+  },
   { nome: 'Cimento Endodôntico (AH Plus)', unidade: 'kit', preco: 140.0, divisorPadrao: 15 },
   { nome: 'MTA (Agregado Trióxido Mineral)', unidade: 'kit 0,5g', preco: 185.0, divisorPadrao: 5 },
   // Materiais de impressão e prótese (10)
   { nome: 'Alginato', unidade: 'pote 500g', preco: 35.0, divisorPadrao: 30 },
   { nome: 'Gesso Pedra Tipo III', unidade: 'saco 1kg', preco: 12.0, divisorPadrao: 20 },
   { nome: 'Gesso Tipo IV (extra-duro)', unidade: 'saco 1kg', preco: 28.0, divisorPadrao: 15 },
-  { nome: 'Silicona por Adição (kit pesado/leve)', unidade: 'kit 50+50ml', preco: 195.0, divisorPadrao: 5 },
+  {
+    nome: 'Silicona por Adição (kit pesado/leve)',
+    unidade: 'kit 50+50ml',
+    preco: 195.0,
+    divisorPadrao: 5,
+  },
   { nome: 'Silicona de Condensação', unidade: 'kit', preco: 98.0, divisorPadrao: 8 },
   { nome: 'Pasta de Óxido de Zinco (impressão)', unidade: 'kit', preco: 38.0, divisorPadrao: 8 },
   { nome: 'Dentes de Acrílico (kit)', unidade: 'caixa 32 peças', preco: 68.0, divisorPadrao: 32 },
-  { nome: 'Acrílico Autopolimerizável Rosa', unidade: 'kit 500g+500ml', preco: 88.0, divisorPadrao: 5 },
+  {
+    nome: 'Acrílico Autopolimerizável Rosa',
+    unidade: 'kit 500g+500ml',
+    preco: 88.0,
+    divisorPadrao: 5,
+  },
   { nome: 'Cera Utilidade', unidade: 'caixa 0,5kg', preco: 22.0, divisorPadrao: 50 },
   { nome: 'Cera para Rodetes Oclusais', unidade: 'pacote 500g', preco: 22.0, divisorPadrao: 20 },
   // Materiais endodônticos (12)
@@ -77,7 +127,12 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'EDTA Líquido 17%', unidade: 'frasco 120ml', preco: 26.0, divisorPadrao: 20 },
   { nome: 'EDTA em Gel 17%', unidade: 'seringa 5g', preco: 28.0, divisorPadrao: 15 },
   { nome: 'Hidróxido de Cálcio', unidade: 'seringa 2,5g', preco: 25.0, divisorPadrao: 8 },
-  { nome: 'Pasta de Hidróxido de Cálcio (Calen)', unidade: 'seringa 10g', preco: 35.0, divisorPadrao: 10 },
+  {
+    nome: 'Pasta de Hidróxido de Cálcio (Calen)',
+    unidade: 'seringa 10g',
+    preco: 35.0,
+    divisorPadrao: 10,
+  },
   { nome: 'Limas K Manuais (kit 6)', unidade: 'kit 6 limas', preco: 45.0, divisorPadrao: 6 },
   { nome: 'Limas Rotatórias NiTi (kit 6)', unidade: 'kit', preco: 185.0, divisorPadrao: 6 },
   { nome: 'Espigão de Fibra de Vidro', unidade: 'kit 5 un', preco: 88.0, divisorPadrao: 5 },
@@ -86,7 +141,12 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'Lâmina de Bisturi nº 12', unidade: 'caixa 100 un', preco: 45.0, divisorPadrao: 100 },
   { nome: 'Fio de Sutura 3-0', unidade: 'caixa 12 un', preco: 55.0, divisorPadrao: 12 },
   { nome: 'Fio de Sutura 4-0', unidade: 'caixa 12 un', preco: 58.0, divisorPadrao: 12 },
-  { nome: 'Fio de Sutura 4-0 Absorvível (Vicryl)', unidade: 'caixa 12 un', preco: 72.0, divisorPadrao: 12 },
+  {
+    nome: 'Fio de Sutura 4-0 Absorvível (Vicryl)',
+    unidade: 'caixa 12 un',
+    preco: 72.0,
+    divisorPadrao: 12,
+  },
   { nome: 'Fio de Sutura 5-0 Absorvível', unidade: 'caixa 12 un', preco: 78.0, divisorPadrao: 12 },
   { nome: 'Esponja de Colágeno Hemostática', unidade: 'un', preco: 28.0 },
   { nome: 'Cera para Osso (Bone Wax)', unidade: 'tubo 2,5g', preco: 38.0, divisorPadrao: 5 },
@@ -98,7 +158,12 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'Verniz Fluorado', unidade: 'frasco 10ml', preco: 65.0, divisorPadrao: 20 },
   { nome: 'Pasta Profilática com Flúor', unidade: 'pote 200g', preco: 28.0, divisorPadrao: 50 },
   { nome: 'Clorexidina 0,12%', unidade: 'frasco 250ml', preco: 18.0, divisorPadrao: 30 },
-  { nome: 'Selante Resinoso (fotoativado)', unidade: 'seringa 5ml', preco: 55.0, divisorPadrao: 15 },
+  {
+    nome: 'Selante Resinoso (fotoativado)',
+    unidade: 'seringa 5ml',
+    preco: 55.0,
+    divisorPadrao: 15,
+  },
   // Implantodontia (8) — todos de uso único
   { nome: 'Implante Dentário Cone Morse', unidade: 'un', preco: 480.0 },
   { nome: 'Cicatrizador de Implante 4mm', unidade: 'un', preco: 68.0 },
@@ -110,19 +175,39 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'Membrana PTFE Não Reabsorvível', unidade: 'un', preco: 188.0 },
   // Clareamento (4)
   // seringa 3ml ≈ 3 sessões (consultório) ou 5 aplicações (caseiro)
-  { nome: 'Gel Clareador 35% (consultório)', unidade: 'seringa 3ml', preco: 68.0, divisorPadrao: 3 },
+  {
+    nome: 'Gel Clareador 35% (consultório)',
+    unidade: 'seringa 3ml',
+    preco: 68.0,
+    divisorPadrao: 3,
+  },
   { nome: 'Gel Clareador 16% (caseiro)', unidade: 'seringa 3ml', preco: 38.0, divisorPadrao: 5 },
   { nome: 'Gel Clareador 10% (caseiro)', unidade: 'seringa 3ml', preco: 32.0, divisorPadrao: 5 },
-  { nome: 'Barreira Gengival Fotopolimerizável', unidade: 'seringa 2g', preco: 48.0, divisorPadrao: 5 },
+  {
+    nome: 'Barreira Gengival Fotopolimerizável',
+    unidade: 'seringa 2g',
+    preco: 48.0,
+    divisorPadrao: 5,
+  },
   // Ortodontia (10)
   { nome: 'Braquete Metálico (kit 20 peças)', unidade: 'kit', preco: 88.0, divisorPadrao: 20 },
-  { nome: 'Braquete Estético de Cerâmica (kit 20)', unidade: 'kit', preco: 188.0, divisorPadrao: 20 },
+  {
+    nome: 'Braquete Estético de Cerâmica (kit 20)',
+    unidade: 'kit',
+    preco: 188.0,
+    divisorPadrao: 20,
+  },
   { nome: 'Tubo Molar com Gancho (par)', unidade: 'par', preco: 18.0 },
   { nome: 'Fio Níquel-Titânio 0,014', unidade: 'un', preco: 14.0 },
   { nome: 'Fio Níquel-Titânio 0,016', unidade: 'un', preco: 14.0 },
   { nome: 'Fio Aço Retangular 0,016x0,022', unidade: 'un', preco: 10.0 },
   { nome: 'Fio Aço Retangular 0,019x0,025', unidade: 'un', preco: 10.0 },
-  { nome: 'Elástico Intermaxilar (pacote 100)', unidade: 'pacote', preco: 18.0, divisorPadrao: 100 },
+  {
+    nome: 'Elástico Intermaxilar (pacote 100)',
+    unidade: 'pacote',
+    preco: 18.0,
+    divisorPadrao: 100,
+  },
   { nome: 'Ligadura Elástica (rolo 1000 un)', unidade: 'rolo', preco: 14.0, divisorPadrao: 1000 },
   { nome: 'Adesivo para Braquete', unidade: 'seringa 5g', preco: 68.0, divisorPadrao: 20 },
   // Odontopediatria (6)
@@ -130,8 +215,18 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'Formocresol Diluído', unidade: 'frasco 10ml', preco: 28.0, divisorPadrao: 20 },
   { nome: 'Pasta Vitapex', unidade: 'seringa 2,2g', preco: 68.0, divisorPadrao: 8 },
   { nome: 'Tinta Detectora de Cárie', unidade: 'frasco 5ml', preco: 22.0, divisorPadrao: 30 },
-  { nome: 'Selante Ionomérico de Fossas e Fissuras', unidade: 'frasco 7g', preco: 48.0, divisorPadrao: 15 },
-  { nome: 'Coroa de Policarbonato Provisória', unidade: 'kit 6 tamanhos', preco: 22.0, divisorPadrao: 6 },
+  {
+    nome: 'Selante Ionomérico de Fossas e Fissuras',
+    unidade: 'frasco 7g',
+    preco: 48.0,
+    divisorPadrao: 15,
+  },
+  {
+    nome: 'Coroa de Policarbonato Provisória',
+    unidade: 'kit 6 tamanhos',
+    preco: 22.0,
+    divisorPadrao: 6,
+  },
   // EPI e biossegurança (7)
   { nome: 'Luvas de Procedimento M', unidade: 'caixa 100 un', preco: 28.0, divisorPadrao: 100 },
   { nome: 'Luvas de Procedimento P', unidade: 'caixa 100 un', preco: 28.0, divisorPadrao: 100 },
@@ -142,20 +237,50 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'Óculos de Proteção (descartável)', unidade: 'un', preco: 2.5 },
   // Consumíveis gerais (16)
   { nome: 'Sugador Descartável', unidade: 'pacote 40 un', preco: 12.0, divisorPadrao: 40 },
-  { nome: 'Película Radiográfica Periapical', unidade: 'pacote 150 un', preco: 85.0, divisorPadrao: 150 },
-  { nome: 'Isolante Absoluto (dique de borracha)', unidade: 'pacote 36 folhas', preco: 45.0, divisorPadrao: 36 },
+  {
+    nome: 'Película Radiográfica Periapical',
+    unidade: 'pacote 150 un',
+    preco: 85.0,
+    divisorPadrao: 150,
+  },
+  {
+    nome: 'Isolante Absoluto (dique de borracha)',
+    unidade: 'pacote 36 folhas',
+    preco: 45.0,
+    divisorPadrao: 36,
+  },
   { nome: 'Amálgama', unidade: 'pote 50 cápsulas', preco: 120.0, divisorPadrao: 50 },
-  { nome: 'Cunha Interdental de Plástico', unidade: 'caixa 100 un', preco: 18.0, divisorPadrao: 100 },
+  {
+    nome: 'Cunha Interdental de Plástico',
+    unidade: 'caixa 100 un',
+    preco: 18.0,
+    divisorPadrao: 100,
+  },
   { nome: 'Matriz Metálica Tofflemire', unidade: 'caixa 50 un', preco: 15.0, divisorPadrao: 50 },
   { nome: 'Fita Matriz Banda Stripes', unidade: 'rolo 10m', preco: 22.0, divisorPadrao: 20 },
   { nome: 'Moldeira de Estoque Superior', unidade: 'un', preco: 12.0 },
   { nome: 'Moldeira de Estoque Inferior', unidade: 'un', preco: 12.0 },
-  { nome: 'Compressa de Gaze 7,5x7,5cm', unidade: 'pacote 500 un', preco: 28.0, divisorPadrao: 500 },
+  {
+    nome: 'Compressa de Gaze 7,5x7,5cm',
+    unidade: 'pacote 500 un',
+    preco: 28.0,
+    divisorPadrao: 500,
+  },
   { nome: 'Algodão em Rolo', unidade: 'caixa 100 un', preco: 12.0, divisorPadrao: 100 },
-  { nome: 'Disco de Polimento Alumínio Óxido', unidade: 'caixa 50 un', preco: 35.0, divisorPadrao: 50 },
+  {
+    nome: 'Disco de Polimento Alumínio Óxido',
+    unidade: 'caixa 50 un',
+    preco: 35.0,
+    divisorPadrao: 50,
+  },
   { nome: 'Borracha de Polimento Sílicone', unidade: 'un', preco: 8.0 },
   { nome: 'Protetor Bucal Termoplástico', unidade: 'un', preco: 15.0 },
-  { nome: 'Espátula Plástica Descartável', unidade: 'pacote 100 un', preco: 8.0, divisorPadrao: 100 },
+  {
+    nome: 'Espátula Plástica Descartável',
+    unidade: 'pacote 100 un',
+    preco: 8.0,
+    divisorPadrao: 100,
+  },
   { nome: 'Espigão Metálico Pré-fabricado', unidade: 'un', preco: 18.0 },
   // Adicionais (15)
   { nome: 'Proteína de Matriz de Esmalte (Emdogain)', unidade: 'kit', preco: 685.0 },
@@ -171,25 +296,30 @@ export const DEFAULT_MATERIAIS = [
   { nome: 'Grampo para Dique de Borracha', unidade: 'un', preco: 22.0 },
   { nome: 'Mantenedor de Espaço Faixa-Alça (lab)', unidade: 'un (lab)', preco: 120.0 },
   { nome: 'Aparelho de Hawley Infantil (lab)', unidade: 'un (lab)', preco: 95.0 },
-  { nome: 'Cimento de Silicato (reconstituição)', unidade: 'kit frasco', preco: 55.0, divisorPadrao: 10 },
+  {
+    nome: 'Cimento de Silicato (reconstituição)',
+    unidade: 'kit frasco',
+    preco: 55.0,
+    divisorPadrao: 10,
+  },
   { nome: 'Pasta Profilática sem Flúor', unidade: 'pote 200g', preco: 25.0, divisorPadrao: 50 },
-] as const
+] as const;
 
 // ─── Procedure type ───────────────────────────────────────────────────────────
 
 type ProcedimentoData = {
-  codigo: string
-  nome: string
-  especialidadeCodigo: string
-  tempoMinutos: number
-  custoLaboratorio?: number
+  codigo: string;
+  nome: string;
+  especialidadeCodigo: string;
+  tempoMinutos: number;
+  custoLaboratorio?: number;
   materiais: Array<{
-    materialNome: string
-    consumo: number
-    divisor: number
-    ordem: number
-  }>
-}
+    materialNome: string;
+    consumo: number;
+    divisor: number;
+    ordem: number;
+  }>;
+};
 
 // ─── Default procedures (201 procedures — full VRPO coverage) ─────────────────
 
@@ -240,36 +370,28 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Orientação de Saúde Bucal',
     especialidadeCodigo: 'diagnostico',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '150',
     nome: 'Documentação Fotográfica Inicial',
     especialidadeCodigo: 'diagnostico',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '160',
     nome: 'Avaliação de Risco em Saúde Bucal',
     especialidadeCodigo: 'diagnostico',
     tempoMinutos: 30,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '170',
     nome: 'Segunda Opinião / Revisão de Caso Clínico',
     especialidadeCodigo: 'diagnostico',
     tempoMinutos: 45,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   // ── RADIOLOGIA (12) ──────────────────────────────────────────────────────────
   {
@@ -306,18 +428,14 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Radiografia Panorâmica (OPG) — interpretação',
     especialidadeCodigo: 'radiologia',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '240',
     nome: 'Telerradiografia Lateral de Crânio — interpretação',
     especialidadeCodigo: 'radiologia',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '250',
@@ -334,9 +452,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Tomografia Computadorizada Cone Beam (CBCT) — laudagem',
     especialidadeCodigo: 'radiologia',
     tempoMinutos: 30,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '270',
@@ -362,18 +478,14 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Montagem de Documentação Radiográfica',
     especialidadeCodigo: 'radiologia',
     tempoMinutos: 30,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '300',
     nome: 'Radiografia Carpal',
     especialidadeCodigo: 'radiologia',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '310',
@@ -401,9 +513,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Teste de Sensibilidade Dentinária',
     especialidadeCodigo: 'testes-exames',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '420',
@@ -420,18 +530,14 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Tomada de Cor / Biometria Dental',
     especialidadeCodigo: 'testes-exames',
     tempoMinutos: 15,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '440',
     nome: 'Fluorescência de Cárie (DIAGNOdent)',
     especialidadeCodigo: 'testes-exames',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '450',
@@ -449,9 +555,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Teste de Fluxo Salivar / Salivometria',
     especialidadeCodigo: 'testes-exames',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   // ── PREVENÇÃO (12) ────────────────────────────────────────────────────────────
   {
@@ -505,9 +609,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Orientação de Higiene Oral Individualizada',
     especialidadeCodigo: 'prevencao',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '550',
@@ -573,9 +675,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Instrução de Higiene Bucal para Paciente com Necessidades Especiais',
     especialidadeCodigo: 'prevencao',
     tempoMinutos: 30,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '598',
@@ -743,9 +843,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Controle e Remoção de Hábito de Sucção',
     especialidadeCodigo: 'odontopediatria',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '720',
@@ -780,7 +878,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
       { materialNome: 'Agulha Gengival Curta', consumo: 1, divisor: 100, ordem: 2 },
       { materialNome: 'Coroa de Policarbonato Provisória', consumo: 1, divisor: 6, ordem: 3 },
       { materialNome: 'Resina Bisacrílica Provisória', consumo: 3, divisor: 25, ordem: 4 },
-      { materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)', consumo: 0.5, divisor: 64, ordem: 5 },
+      {
+        materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)',
+        consumo: 0.5,
+        divisor: 64,
+        ordem: 5,
+      },
     ],
   },
   {
@@ -790,7 +893,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     tempoMinutos: 30,
     materiais: [
       { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-      { materialNome: 'Selante Ionomérico de Fossas e Fissuras', consumo: 0.5, divisor: 14, ordem: 2 },
+      {
+        materialNome: 'Selante Ionomérico de Fossas e Fissuras',
+        consumo: 0.5,
+        divisor: 14,
+        ordem: 2,
+      },
     ],
   },
   {
@@ -798,18 +906,14 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Controle de Bruxismo em Criança',
     especialidadeCodigo: 'odontopediatria',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '770',
     nome: 'Aconselhamento em Ortodontia Preventiva',
     especialidadeCodigo: 'odontopediatria',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '780',
@@ -1078,7 +1182,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     materiais: [
       { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
       { materialNome: 'Gel Clareador 35% (consultório)', consumo: 0.5, divisor: 2, ordem: 2 },
-      { materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)', consumo: 0.5, divisor: 64, ordem: 3 },
+      {
+        materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)',
+        consumo: 0.5,
+        divisor: 64,
+        ordem: 3,
+      },
     ],
   },
   {
@@ -1101,7 +1210,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     especialidadeCodigo: 'dentistica',
     tempoMinutos: 20,
     materiais: [
-      { materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)', consumo: 1, divisor: 32, ordem: 1 },
+      {
+        materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)',
+        consumo: 1,
+        divisor: 32,
+        ordem: 1,
+      },
       { materialNome: 'Algodão em Rolo', consumo: 2, divisor: 100, ordem: 2 },
     ],
   },
@@ -1113,7 +1227,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     materiais: [
       { materialNome: 'Anestésico Dental (Mepivacaína 2%)', consumo: 1, divisor: 50, ordem: 1 },
       { materialNome: 'Agulha Gengival Curta', consumo: 1, divisor: 100, ordem: 2 },
-      { materialNome: 'Cimento de Ionômero de Vidro Modificado por Resina', consumo: 1.5, divisor: 58, ordem: 3 },
+      {
+        materialNome: 'Cimento de Ionômero de Vidro Modificado por Resina',
+        consumo: 1.5,
+        divisor: 58,
+        ordem: 3,
+      },
     ],
   },
   {
@@ -1161,7 +1280,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     tempoMinutos: 45,
     materiais: [
       { materialNome: 'Gel Clareador 35% (consultório)', consumo: 1, divisor: 1, ordem: 1 },
-      { materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)', consumo: 0.5, divisor: 64, ordem: 2 },
+      {
+        materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)',
+        consumo: 0.5,
+        divisor: 64,
+        ordem: 2,
+      },
       { materialNome: 'Barreira Gengival Fotopolimerizável', consumo: 0.3, divisor: 6, ordem: 3 },
     ],
   },
@@ -1205,9 +1329,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Documentação Fotográfica Estética Pré/Pós',
     especialidadeCodigo: 'dentistica',
     tempoMinutos: 30,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '1210',
@@ -1398,7 +1520,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
       { materialNome: 'Anestésico Dental (Mepivacaína 2%)', consumo: 2, divisor: 50, ordem: 1 },
       { materialNome: 'Agulha Gengival Longa', consumo: 1, divisor: 100, ordem: 2 },
       { materialNome: 'Hipoclorito de Sódio 2,5%', consumo: 10, divisor: 100, ordem: 3 },
-      { materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)', consumo: 1, divisor: 32, ordem: 4 },
+      {
+        materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)',
+        consumo: 1,
+        divisor: 32,
+        ordem: 4,
+      },
     ],
   },
   {
@@ -1410,7 +1537,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
       { materialNome: 'Anestésico Dental (Mepivacaína 2%)', consumo: 1, divisor: 50, ordem: 1 },
       { materialNome: 'Agulha Gengival Longa', consumo: 1, divisor: 100, ordem: 2 },
       { materialNome: 'Pasta de Hidróxido de Cálcio (Calen)', consumo: 0.5, divisor: 70, ordem: 3 },
-      { materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)', consumo: 1, divisor: 32, ordem: 4 },
+      {
+        materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)',
+        consumo: 1,
+        divisor: 32,
+        ordem: 4,
+      },
     ],
   },
   {
@@ -1424,7 +1556,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
       { materialNome: 'Isolante Absoluto (dique de borracha)', consumo: 1, divisor: 36, ordem: 3 },
       { materialNome: 'Hipoclorito de Sódio 2,5%', consumo: 15, divisor: 66, ordem: 4 },
       { materialNome: 'Hidróxido de Cálcio', consumo: 0.5, divisor: 5, ordem: 5 },
-      { materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)', consumo: 1, divisor: 32, ordem: 6 },
+      {
+        materialNome: 'Cimento Temporário (Óxido de Zinco e Eugenol)',
+        consumo: 1,
+        divisor: 32,
+        ordem: 6,
+      },
     ],
   },
   {
@@ -1481,7 +1618,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
       { materialNome: 'Anestésico Dental (Mepivacaína 2%)', consumo: 1, divisor: 50, ordem: 1 },
       { materialNome: 'Agulha Gengival Longa', consumo: 1, divisor: 100, ordem: 2 },
       { materialNome: 'Hipoclorito de Sódio 2,5%', consumo: 10, divisor: 100, ordem: 3 },
-      { materialNome: 'Pasta de Hidróxido de Cálcio (Calen)', consumo: 0.3, divisor: 116, ordem: 4 },
+      {
+        materialNome: 'Pasta de Hidróxido de Cálcio (Calen)',
+        consumo: 0.3,
+        divisor: 116,
+        ordem: 4,
+      },
     ],
   },
   // ── PERIODONTIA (20) ──────────────────────────────────────────────────────────
@@ -1701,7 +1843,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     materiais: [
       { materialNome: 'Anestésico Dental (Articaína 4%)', consumo: 3, divisor: 50, ordem: 1 },
       { materialNome: 'Agulha Gengival Longa', consumo: 1, divisor: 100, ordem: 2 },
-      { materialNome: 'Proteína de Matriz de Esmalte (Emdogain)', consumo: 1, divisor: 1, ordem: 3 },
+      {
+        materialNome: 'Proteína de Matriz de Esmalte (Emdogain)',
+        consumo: 1,
+        divisor: 1,
+        ordem: 3,
+      },
       { materialNome: 'Fio de Sutura 4-0 Absorvível (Vicryl)', consumo: 2, divisor: 12, ordem: 4 },
     ],
   },
@@ -1860,7 +2007,12 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     tempoMinutos: 90,
     custoLaboratorio: 750.0,
     materiais: [
-      { materialNome: 'Pilar Protético Cone Morse (pré-fabricado)', consumo: 1, divisor: 1, ordem: 1 },
+      {
+        materialNome: 'Pilar Protético Cone Morse (pré-fabricado)',
+        consumo: 1,
+        divisor: 1,
+        ordem: 1,
+      },
       { materialNome: 'Transferente de Impressão de Implante', consumo: 1, divisor: 1, ordem: 2 },
       { materialNome: 'Análogo de Implante', consumo: 1, divisor: 1, ordem: 3 },
       { materialNome: 'Cimento de Ionômero para Cimentação', consumo: 1, divisor: 68, ordem: 4 },
@@ -2014,9 +2166,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Sobremoldagem / Liner de Prótese',
     especialidadeCodigo: 'protese',
     tempoMinutos: 60,
-    materiais: [
-      { materialNome: 'Reembasador de Prótese (kit)', consumo: 1, divisor: 1, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Reembasador de Prótese (kit)', consumo: 1, divisor: 1, ordem: 1 }],
   },
   {
     codigo: '4240',
@@ -2452,9 +2602,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Manutenção de Aparelho Removível',
     especialidadeCodigo: 'ortodontia',
     tempoMinutos: 20,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '6100',
@@ -2493,9 +2641,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Reativação / Dobra de Fio Ortodôntico',
     especialidadeCodigo: 'ortodontia',
     tempoMinutos: 15,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '6140',
@@ -2535,9 +2681,7 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Consulta de Ortopedia Funcional dos Maxilares',
     especialidadeCodigo: 'ortodontia',
     tempoMinutos: 30,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
   {
     codigo: '6180',
@@ -2554,11 +2698,9 @@ export const DEFAULT_PROCEDIMENTOS: ProcedimentoData[] = [
     nome: 'Controle / Consulta de Alinhadores Transparentes',
     especialidadeCodigo: 'ortodontia',
     tempoMinutos: 15,
-    materiais: [
-      { materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 },
-    ],
+    materiais: [{ materialNome: 'Luvas de Procedimento M', consumo: 1, divisor: 100, ordem: 1 }],
   },
-]
+];
 
 // ─── Create default data for a new user ──────────────────────────────────────
 
@@ -2586,9 +2728,9 @@ export async function createDefaultDataForUser(userId: string): Promise<void> {
         })),
       },
     },
-  })
+  });
 
-  if (!config) throw new Error('Failed to create CustoFixoConfig')
+  if (!config) throw new Error('Failed to create CustoFixoConfig');
 
   // 2. Create default materials (isDefault: true) — single query to avoid connection pool exhaustion
   const createdMateriais = await prisma.material.createManyAndReturn({
@@ -2600,36 +2742,36 @@ export async function createDefaultDataForUser(userId: string): Promise<void> {
       divisorPadrao: (mat as { divisorPadrao?: number }).divisorPadrao ?? 1,
       isDefault: true,
     })),
-  })
+  });
 
   // Build a name → id lookup for materials
-  const materialByNome = new Map(createdMateriais.map((m) => [m.nome, m.id]))
+  const materialByNome = new Map(createdMateriais.map((m) => [m.nome, m.id]));
 
   // 3. Fetch all specialties from the DB (seeded globally)
-  const especialidades = await prisma.especialidade.findMany()
-  const especialidadeByCodigo = new Map(especialidades.map((e) => [e.codigo, e.id]))
+  const especialidades = await prisma.especialidade.findMany();
+  const especialidadeByCodigo = new Map(especialidades.map((e) => [e.codigo, e.id]));
 
   // 4. Create all procedures in a single query
   const createdProcedimentos = await prisma.procedimento.createManyAndReturn({
-    data: DEFAULT_PROCEDIMENTOS
-      .filter((proc) => especialidadeByCodigo.has(proc.especialidadeCodigo))
-      .map((proc) => ({
-        userId,
-        codigo: proc.codigo,
-        nome: proc.nome,
-        especialidadeId: especialidadeByCodigo.get(proc.especialidadeCodigo)!,
-        tempoMinutos: proc.tempoMinutos,
-        custoLaboratorio: proc.custoLaboratorio ?? 0,
-        isCustom: false,
-      })),
-  })
+    data: DEFAULT_PROCEDIMENTOS.filter((proc) =>
+      especialidadeByCodigo.has(proc.especialidadeCodigo)
+    ).map((proc) => ({
+      userId,
+      codigo: proc.codigo,
+      nome: proc.nome,
+      especialidadeId: especialidadeByCodigo.get(proc.especialidadeCodigo)!,
+      tempoMinutos: proc.tempoMinutos,
+      custoLaboratorio: proc.custoLaboratorio ?? 0,
+      isCustom: false,
+    })),
+  });
 
   // 5. Create all procedure-material links in a single query
-  const procedimentoByCodigo = new Map(createdProcedimentos.map((p) => [p.codigo, p.id]))
+  const procedimentoByCodigo = new Map(createdProcedimentos.map((p) => [p.codigo, p.id]));
 
   const procedimentoMateriais = DEFAULT_PROCEDIMENTOS.flatMap((proc) => {
-    const procedimentoId = procedimentoByCodigo.get(proc.codigo)
-    if (!procedimentoId) return []
+    const procedimentoId = procedimentoByCodigo.get(proc.codigo);
+    if (!procedimentoId) return [];
     return proc.materiais
       .filter((m) => materialByNome.has(m.materialNome))
       .map((m) => ({
@@ -2638,10 +2780,10 @@ export async function createDefaultDataForUser(userId: string): Promise<void> {
         consumo: m.consumo,
         divisor: m.divisor,
         ordem: m.ordem,
-      }))
-  })
+      }));
+  });
 
   if (procedimentoMateriais.length > 0) {
-    await prisma.procedimentoMaterial.createMany({ data: procedimentoMateriais })
+    await prisma.procedimentoMaterial.createMany({ data: procedimentoMateriais });
   }
 }

@@ -1,64 +1,66 @@
-'use server'
+'use server';
 
-import { cache } from 'react'
-import { prisma } from '@/lib/db'
-import { CustoFixoPorMinuto } from '@/domain/value-objects/CustoFixoPorMinuto'
-import { calcularCustoFixoPorMinuto, getPercConfig } from './calcularCustoFixoPorMinuto'
-import { calcularPrecoProcedimento } from './calcularPrecoProcedimento'
-import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository'
+import { cache } from 'react';
+import { prisma } from '@/lib/db';
+import { CustoFixoPorMinuto } from '@/domain/value-objects/CustoFixoPorMinuto';
+import { calcularCustoFixoPorMinuto, getPercConfig } from './calcularCustoFixoPorMinuto';
+import { calcularPrecoProcedimento } from './calcularPrecoProcedimento';
+import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 export type DashboardStats = {
-  custoFixoPorMinuto: number
-  totalCustosFixosMensais: number
-  totalProcedimentos: number
-  totalMateriais: number
+  custoFixoPorMinuto: number;
+  totalCustosFixosMensais: number;
+  totalProcedimentos: number;
+  totalMateriais: number;
   breakEven: {
-    semProLabore: number
-    comProLabore: number
-    proLaboreMensal: number
-  }
-  ociosidadeNaoConfigurada: boolean
-  custosDesatualizados: boolean
-  lastUpdate: Date | null
-}
+    semProLabore: number;
+    comProLabore: number;
+    proLaboreMensal: number;
+  };
+  ociosidadeNaoConfigurada: boolean;
+  custosDesatualizados: boolean;
+  lastUpdate: Date | null;
+};
 
 export type TopProcedimento = {
-  id: string
-  codigo: string
-  nome: string
-  especialidadeNome: string
-  especialidadeSlug: string
-  precoFinal: number
-  tempoMinutos: number
-}
+  id: string;
+  codigo: string;
+  nome: string;
+  especialidadeNome: string;
+  especialidadeSlug: string;
+  precoFinal: number;
+  tempoMinutos: number;
+};
 
 export type BottomVRPOProcedimento = {
-  id: string
-  codigo: string
-  nome: string
-  especialidadeNome: string
-  especialidadeSlug: string
-  precoFinal: number
-  vrpoReferencia: number
-  diferencaPerc: number
-}
+  id: string;
+  codigo: string;
+  nome: string;
+  especialidadeNome: string;
+  especialidadeSlug: string;
+  precoFinal: number;
+  vrpoReferencia: number;
+  diferencaPerc: number;
+};
 
 export type ProcedimentoNoVermelho = {
-  id: string
-  nome: string
-  especialidadeNome: string
-  especialidadeSlug: string
-  precoFinal: number
-  precoVenda: number
-  margemLucro: number
-  precoMinimoParaMargem30: number
-}
+  id: string;
+  nome: string;
+  especialidadeNome: string;
+  especialidadeSlug: string;
+  precoFinal: number;
+  precoVenda: number;
+  margemLucro: number;
+  precoMinimoParaMargem30: number;
+};
 
 // ─── Helper ────────────────────────────────────────────────────────────────────
 
-const getAllProcedimentos = cache(async function getAllProcedimentos(userId: string): Promise<ProcedimentoWithMateriais[]> {
+const getAllProcedimentos = cache(async function getAllProcedimentos(
+  userId: string
+): Promise<ProcedimentoWithMateriais[]> {
   return prisma.procedimento.findMany({
     where: { userId },
     include: {
@@ -68,8 +70,8 @@ const getAllProcedimentos = cache(async function getAllProcedimentos(userId: str
         orderBy: { ordem: 'asc' },
       },
     },
-  }) as Promise<ProcedimentoWithMateriais[]>
-})
+  }) as Promise<ProcedimentoWithMateriais[]>;
+});
 
 // ─── getDashboardStats ─────────────────────────────────────────────────────────
 
@@ -81,25 +83,25 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     }),
     prisma.procedimento.count({ where: { userId } }),
     prisma.material.count({ where: { userId } }),
-  ])
+  ]);
 
-  let custoFixoPorMinuto = 0
-  let totalCustosFixosMensais = 0
-  let breakEven = { semProLabore: 0, comProLabore: 0, proLaboreMensal: 0 }
+  let custoFixoPorMinuto = 0;
+  let totalCustosFixosMensais = 0;
+  let breakEven = { semProLabore: 0, comProLabore: 0, proLaboreMensal: 0 };
 
   if (config) {
-    const breakdown = CustoFixoPorMinuto.calculateBreakdown(config, config.items)
-    custoFixoPorMinuto = breakdown.porMinuto
-    totalCustosFixosMensais = breakdown.comProLabore
+    const breakdown = CustoFixoPorMinuto.calculateBreakdown(config, config.items);
+    custoFixoPorMinuto = breakdown.porMinuto;
+    totalCustosFixosMensais = breakdown.comProLabore;
     breakEven = {
       semProLabore: breakdown.semProLabore,
       comProLabore: breakdown.comProLabore,
       proLaboreMensal: breakdown.proLaboreMensal,
-    }
+    };
   }
 
-  const sixMonthsAgo = new Date()
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6)
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
   return {
     custoFixoPorMinuto,
@@ -110,7 +112,7 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     ociosidadeNaoConfigurada: config?.percOciosidade === 0,
     custosDesatualizados: config !== null && new Date(config.updatedAt) < sixMonthsAgo,
     lastUpdate: config?.updatedAt ?? null,
-  }
+  };
 }
 
 // ─── getTopProcedimentos ───────────────────────────────────────────────────────
@@ -123,16 +125,16 @@ export async function getTopProcedimentos(
   const [procedimentos, custoFixoPorMinuto] = await Promise.all([
     getAllProcedimentos(userId),
     calcularCustoFixoPorMinuto(userId),
-  ])
+  ]);
 
   const comPreco = procedimentos.map((p) => ({
     ...p,
     precoFinal: calcularPrecoProcedimento(p, custoFixoPorMinuto).precoFinal,
-  }))
+  }));
 
   comPreco.sort((a, b) =>
     order === 'highest' ? b.precoFinal - a.precoFinal : a.precoFinal - b.precoFinal
-  )
+  );
 
   return comPreco.slice(0, limit).map((p) => ({
     id: p.id,
@@ -142,7 +144,7 @@ export async function getTopProcedimentos(
     especialidadeSlug: p.especialidade.codigo,
     precoFinal: p.precoFinal,
     tempoMinutos: p.tempoMinutos,
-  }))
+  }));
 }
 
 // ─── getBottomProcedimentosVRPO ────────────────────────────────────────────────
@@ -154,20 +156,20 @@ export async function getBottomProcedimentosVRPO(
   const [procedimentos, custoFixoPorMinuto] = await Promise.all([
     getAllProcedimentos(userId),
     calcularCustoFixoPorMinuto(userId),
-  ])
+  ]);
 
-  const codigos = procedimentos.map((p) => p.codigo)
+  const codigos = procedimentos.map((p) => p.codigo);
   const vrpoRefs = await prisma.vRPOReferencia.findMany({
     where: { codigo: { in: codigos } },
-  })
-  const vrpoMap = new Map(vrpoRefs.map((v) => [v.codigo, v.valorReferencia]))
+  });
+  const vrpoMap = new Map(vrpoRefs.map((v) => [v.codigo, v.valorReferencia]));
 
   const comDiferenca = procedimentos
     .map((p) => {
-      const vrpo = vrpoMap.get(p.codigo) ?? null
-      if (vrpo === null) return null
-      const { precoFinal } = calcularPrecoProcedimento(p, custoFixoPorMinuto)
-      const diferencaPerc = ((precoFinal - vrpo) / vrpo) * 100
+      const vrpo = vrpoMap.get(p.codigo) ?? null;
+      if (vrpo === null) return null;
+      const { precoFinal } = calcularPrecoProcedimento(p, custoFixoPorMinuto);
+      const diferencaPerc = ((precoFinal - vrpo) / vrpo) * 100;
       return {
         id: p.id,
         codigo: p.codigo,
@@ -177,14 +179,14 @@ export async function getBottomProcedimentosVRPO(
         precoFinal,
         vrpoReferencia: vrpo,
         diferencaPerc,
-      }
+      };
     })
-    .filter((p): p is BottomVRPOProcedimento => p !== null)
+    .filter((p): p is BottomVRPOProcedimento => p !== null);
 
   // Sort by most negative difference first (most below VRPO)
-  comDiferenca.sort((a, b) => a.diferencaPerc - b.diferencaPerc)
+  comDiferenca.sort((a, b) => a.diferencaPerc - b.diferencaPerc);
 
-  return comDiferenca.slice(0, limit)
+  return comDiferenca.slice(0, limit);
 }
 
 // ─── getProcedimentosNoVermelho ────────────────────────────────────────────────
@@ -201,14 +203,14 @@ export async function getProcedimentosNoVermelho(
     getAllProcedimentos(userId),
     calcularCustoFixoPorMinuto(userId),
     getPercConfig(userId),
-  ])
+  ]);
 
-  const noVermelho: ProcedimentoNoVermelho[] = []
+  const noVermelho: ProcedimentoNoVermelho[] = [];
 
   for (const p of procedimentos) {
-    if (p.precoVenda == null) continue
-    const calc = calcularPrecoProcedimento(p, custoFixoPorMinuto, percImpostos, percTaxaCartao)
-    if (calc.margemLucro !== null && calc.margemLucro < 0.10) {
+    if (p.precoVenda == null) continue;
+    const calc = calcularPrecoProcedimento(p, custoFixoPorMinuto, percImpostos, percTaxaCartao);
+    if (calc.margemLucro !== null && calc.margemLucro < 0.1) {
       noVermelho.push({
         id: p.id,
         nome: p.nome,
@@ -218,12 +220,12 @@ export async function getProcedimentosNoVermelho(
         precoVenda: p.precoVenda,
         margemLucro: calc.margemLucro,
         precoMinimoParaMargem30: calc.precoMinimoParaMargem30,
-      })
+      });
     }
   }
 
-  noVermelho.sort((a, b) => a.margemLucro - b.margemLucro)
-  return noVermelho.slice(0, limit)
+  noVermelho.sort((a, b) => a.margemLucro - b.margemLucro);
+  return noVermelho.slice(0, limit);
 }
 
 /**
@@ -255,21 +257,20 @@ export async function contarProcedimentosNoVermelho(userId: string): Promise<num
       where: { userId },
       select: { percImpostos: true, percTaxaCartao: true },
     }),
-  ])
+  ]);
 
-  const percImpostos = config?.percImpostos ?? 8
-  const percTaxaCartao = config?.percTaxaCartao ?? 4
+  const percImpostos = config?.percImpostos ?? 8;
+  const percTaxaCartao = config?.percTaxaCartao ?? 4;
 
-  let count = 0
+  let count = 0;
   for (const p of procedimentos) {
     const calc = calcularPrecoProcedimento(
       p as unknown as ProcedimentoWithMateriais,
       custoFixoPorMinuto,
       percImpostos,
-      percTaxaCartao,
-    )
-    if (calc.margemLucro !== null && calc.margemLucro < 0.10) count++
+      percTaxaCartao
+    );
+    if (calc.margemLucro !== null && calc.margemLucro < 0.1) count++;
   }
-  return count
+  return count;
 }
-

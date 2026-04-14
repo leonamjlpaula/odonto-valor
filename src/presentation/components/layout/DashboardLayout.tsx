@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 import {
   LayoutDashboard,
   DollarSign,
@@ -16,12 +16,12 @@ import {
   MoreHorizontal,
   BookOpen,
   Sliders,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/presentation/components/ui/button'
-import { NavigationProgress } from '@/presentation/components/ui/NavigationProgress'
-import Image from 'next/image'
-import banner from '@/assets/odonto_valor_banner.png'
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/presentation/components/ui/button';
+import { NavigationProgress } from '@/presentation/components/ui/NavigationProgress';
+import Image from 'next/image';
+import banner from '@/assets/odonto_valor_banner.png';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -33,13 +33,13 @@ const navItems = [
   { label: 'Simulador', href: '/simulador', icon: Sliders },
   { label: 'Histórico', href: '/historico', icon: Clock },
   { label: 'Exportar', href: '/exportar', icon: Download },
-]
+];
 
 const mobileMainItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Procedimentos', href: '/procedimentos', icon: ClipboardList },
   { label: 'Custos', href: '/custos-fixos', icon: DollarSign },
-]
+];
 
 const mobileMoreItems = [
   { label: 'Primeiros Passos', href: '/primeiros-passos', icon: BookOpen },
@@ -48,27 +48,27 @@ const mobileMoreItems = [
   { label: 'Simulador', href: '/simulador', icon: Sliders },
   { label: 'Histórico', href: '/historico', icon: Clock },
   { label: 'Exportar', href: '/exportar', icon: Download },
-]
+];
 
 interface DashboardLayoutProps {
-  children: React.ReactNode
-  userName: string
+  children: React.ReactNode;
+  userName: string;
 }
 
 export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
-  const pathname = usePathname()
-  const [moreOpen, setMoreOpen] = useState(false)
+  const pathname = usePathname();
+  const [moreOpen, setMoreOpen] = useState(false);
 
   function isActive(href: string) {
-    const baseHref = '/' + href.split('/')[1]
-    const basePathname = '/' + pathname.split('/')[1]
-    return baseHref === basePathname
+    const baseHref = '/' + href.split('/')[1];
+    const basePathname = '/' + pathname.split('/')[1];
+    return baseHref === basePathname;
   }
 
   async function handleLogout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    window.location.href = '/login'
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = '/login';
   }
 
   return (
@@ -84,12 +84,9 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
-            const Icon = item.icon
-            const active = isActive(item.href)
-            const href =
-              item.href === '/procedimentos'
-                ? '/procedimentos/diagnostico'
-                : item.href
+            const Icon = item.icon;
+            const active = isActive(item.href);
+            const href = item.href === '/procedimentos' ? '/procedimentos/diagnostico' : item.href;
             return (
               <Link
                 key={item.href}
@@ -104,7 +101,7 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
                 <Icon className="h-4 w-4 shrink-0" />
                 {item.label}
               </Link>
-            )
+            );
           })}
         </nav>
       </aside>
@@ -129,35 +126,28 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">{children}</main>
       </div>
 
       {/* Mobile Bottom Navigation */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t flex items-center z-50">
         {mobileMainItems.map((item) => {
-          const Icon = item.icon
-          const active = isActive(item.href)
-          const href =
-            item.href === '/procedimentos'
-              ? '/procedimentos/diagnostico'
-              : item.href
+          const Icon = item.icon;
+          const active = isActive(item.href);
+          const href = item.href === '/procedimentos' ? '/procedimentos/diagnostico' : item.href;
           return (
             <Link
               key={item.href}
               href={href}
               className={cn(
                 'flex-1 flex flex-col items-center gap-1 py-2 text-xs font-medium transition-colors',
-                active
-                  ? 'text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
+                active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Icon className="h-5 w-5" />
               {item.label}
             </Link>
-          )
+          );
         })}
 
         {/* More button */}
@@ -175,14 +165,11 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
         {/* More menu overlay */}
         {moreOpen && (
           <>
-            <div
-              className="fixed inset-0 bg-black/20 z-40"
-              onClick={() => setMoreOpen(false)}
-            />
+            <div className="fixed inset-0 bg-black/20 z-40" onClick={() => setMoreOpen(false)} />
             <div className="fixed bottom-14 left-0 right-0 bg-card border-t z-50 p-4 grid grid-cols-4 gap-2">
               {mobileMoreItems.map((item) => {
-                const Icon = item.icon
-                const active = isActive(item.href)
+                const Icon = item.icon;
+                const active = isActive(item.href);
                 return (
                   <Link
                     key={item.href}
@@ -198,12 +185,12 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
                     <Icon className="h-5 w-5" />
                     <span className="text-center leading-tight">{item.label}</span>
                   </Link>
-                )
+                );
               })}
             </div>
           </>
         )}
       </nav>
     </div>
-  )
+  );
 }

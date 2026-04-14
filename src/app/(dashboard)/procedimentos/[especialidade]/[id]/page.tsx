@@ -1,24 +1,23 @@
-import { redirect } from 'next/navigation'
-import { getAuthUserId } from '@/lib/supabase/server'
-import { getProcedimentoDetail } from '@/application/usecases/procedimentoActions'
-import { getMateriais } from '@/application/usecases/materialActions'
-import { ProcedimentoDetailPage } from '@/presentation/components/procedimentos/ProcedimentoDetailPage'
+import { redirect } from 'next/navigation';
+import { getAuthUserId } from '@/lib/supabase/server';
+import { getProcedimentoDetail } from '@/application/usecases/procedimentoActions';
+import { getMateriais } from '@/application/usecases/materialActions';
+import { ProcedimentoDetailPage } from '@/presentation/components/procedimentos/ProcedimentoDetailPage';
 
 export default async function Page({
   params,
 }: {
-  params: Promise<{ especialidade: string; id: string }>
+  params: Promise<{ especialidade: string; id: string }>;
 }) {
-  const userId = await getAuthUserId()
-  if (!userId) redirect('/login')
+  const userId = await getAuthUserId();
+  if (!userId) redirect('/login');
 
-  
-  const { especialidade: especialidadeSlug, id } = await params
+  const { especialidade: especialidadeSlug, id } = await params;
 
-  const detail = await getProcedimentoDetail(id, userId)
-  if (!detail) redirect(`/procedimentos/${especialidadeSlug}`)
+  const detail = await getProcedimentoDetail(id, userId);
+  if (!detail) redirect(`/procedimentos/${especialidadeSlug}`);
 
-  const materiais = await getMateriais(userId)
+  const materiais = await getMateriais(userId);
 
   return (
     <ProcedimentoDetailPage
@@ -27,5 +26,5 @@ export default async function Page({
       detail={detail}
       materiais={materiais}
     />
-  )
+  );
 }

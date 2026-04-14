@@ -1,28 +1,28 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react'
-import { X } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Input } from '@/presentation/components/ui/input'
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Input } from '@/presentation/components/ui/input';
 
 interface MaterialOption {
-  id: string
-  nome: string
-  unidade: string
-  preco: number
-  divisorPadrao: number
+  id: string;
+  nome: string;
+  unidade: string;
+  preco: number;
+  divisorPadrao: number;
 }
 
 interface MaterialComboboxProps {
-  options: MaterialOption[]
-  onSelect: (id: string, divisorPadrao: number, unidade: string) => void
-  onClear: () => void
-  placeholder?: string
-  disabled?: boolean
+  options: MaterialOption[];
+  onSelect: (id: string, divisorPadrao: number, unidade: string) => void;
+  onClear: () => void;
+  placeholder?: string;
+  disabled?: boolean;
 }
 
 function formatBRL(v: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
 }
 
 export function MaterialCombobox({
@@ -32,71 +32,71 @@ export function MaterialCombobox({
   placeholder = 'Buscar material...',
   disabled,
 }: MaterialComboboxProps) {
-  const [query, setQuery] = useState('')
-  const [open, setOpen] = useState(false)
-  const [activeIdx, setActiveIdx] = useState(-1)
-  const [selected, setSelected] = useState<MaterialOption | null>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const listRef = useRef<HTMLUListElement>(null)
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const [selected, setSelected] = useState<MaterialOption | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   const filtered = useMemo(() => {
-    if (!query.trim()) return options
-    const q = query.toLowerCase()
-    return options.filter((o) => o.nome.toLowerCase().includes(q))
-  }, [options, query])
+    if (!query.trim()) return options;
+    const q = query.toLowerCase();
+    return options.filter((o) => o.nome.toLowerCase().includes(q));
+  }, [options, query]);
 
   useEffect(() => {
     function handlePointerDown(e: PointerEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false)
-        setActiveIdx(-1)
-        if (!selected) setQuery('')
+        setOpen(false);
+        setActiveIdx(-1);
+        if (!selected) setQuery('');
       }
     }
-    document.addEventListener('pointerdown', handlePointerDown)
-    return () => document.removeEventListener('pointerdown', handlePointerDown)
-  }, [selected])
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, [selected]);
 
   useEffect(() => {
-    if (activeIdx < 0 || !listRef.current) return
-    const item = listRef.current.children[activeIdx] as HTMLElement
-    item?.scrollIntoView({ block: 'nearest' })
-  }, [activeIdx])
+    if (activeIdx < 0 || !listRef.current) return;
+    const item = listRef.current.children[activeIdx] as HTMLElement;
+    item?.scrollIntoView({ block: 'nearest' });
+  }, [activeIdx]);
 
   function selectItem(option: MaterialOption) {
-    setSelected(option)
-    setQuery(option.nome)
-    setOpen(false)
-    setActiveIdx(-1)
-    onSelect(option.id, option.divisorPadrao, option.unidade)
+    setSelected(option);
+    setQuery(option.nome);
+    setOpen(false);
+    setActiveIdx(-1);
+    onSelect(option.id, option.divisorPadrao, option.unidade);
   }
 
   function handleClear(e: React.MouseEvent) {
-    e.stopPropagation()
-    setSelected(null)
-    setQuery('')
-    setActiveIdx(-1)
-    setOpen(false)
-    onClear()
-    inputRef.current?.focus()
+    e.stopPropagation();
+    setSelected(null);
+    setQuery('');
+    setActiveIdx(-1);
+    setOpen(false);
+    onClear();
+    inputRef.current?.focus();
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setOpen(true)
-      setActiveIdx((i) => Math.min(i + 1, filtered.length - 1))
+      e.preventDefault();
+      setOpen(true);
+      setActiveIdx((i) => Math.min(i + 1, filtered.length - 1));
     } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setActiveIdx((i) => Math.max(i - 1, 0))
+      e.preventDefault();
+      setActiveIdx((i) => Math.max(i - 1, 0));
     } else if (e.key === 'Enter') {
-      e.preventDefault()
-      if (activeIdx >= 0 && filtered[activeIdx]) selectItem(filtered[activeIdx])
-      else if (filtered.length === 1) selectItem(filtered[0])
+      e.preventDefault();
+      if (activeIdx >= 0 && filtered[activeIdx]) selectItem(filtered[activeIdx]);
+      else if (filtered.length === 1) selectItem(filtered[0]);
     } else if (e.key === 'Escape') {
-      setOpen(false)
-      setActiveIdx(-1)
+      setOpen(false);
+      setActiveIdx(-1);
     }
   }
 
@@ -114,9 +114,9 @@ export function MaterialCombobox({
           aria-haspopup="listbox"
           aria-autocomplete="list"
           onChange={(e) => {
-            setQuery(e.target.value)
-            setOpen(true)
-            setActiveIdx(-1)
+            setQuery(e.target.value);
+            setOpen(true);
+            setActiveIdx(-1);
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
@@ -145,13 +145,13 @@ export function MaterialCombobox({
               role="option"
               aria-selected={selected?.id === option.id}
               onPointerDown={(e) => {
-                e.preventDefault()
-                selectItem(option)
+                e.preventDefault();
+                selectItem(option);
               }}
               className={cn(
                 'flex items-center justify-between px-3 py-2 cursor-pointer',
                 idx === activeIdx && 'bg-accent text-accent-foreground',
-                selected?.id === option.id && idx !== activeIdx && 'bg-accent/40',
+                selected?.id === option.id && idx !== activeIdx && 'bg-accent/40'
               )}
             >
               <span className="truncate">{option.nome}</span>
@@ -170,5 +170,5 @@ export function MaterialCombobox({
         </div>
       )}
     </div>
-  )
+  );
 }

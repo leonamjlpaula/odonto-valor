@@ -1,17 +1,26 @@
-import Link from 'next/link'
-import { Button } from '@/presentation/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/presentation/components/ui/card'
-import { getTopProcedimentos, getProcedimentosNoVermelho } from '@/application/usecases/dashboardActions'
+import Link from 'next/link';
+import { Button } from '@/presentation/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/presentation/components/ui/card';
+import {
+  getTopProcedimentos,
+  getProcedimentosNoVermelho,
+} from '@/application/usecases/dashboardActions';
 
 function formatBRL(value: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 export async function TablesSection({ userId }: { userId: string }) {
   const [topProcedimentos, procedimentosNoVermelho] = await Promise.all([
     getTopProcedimentos(userId, 5),
     getProcedimentosNoVermelho(userId, 5),
-  ])
+  ]);
 
   return (
     <>
@@ -64,7 +73,8 @@ export async function TablesSection({ userId }: { userId: string }) {
           <CardContent className="p-0">
             {procedimentosNoVermelho.length === 0 ? (
               <p className="px-6 pb-6 text-sm text-muted-foreground">
-                Nenhum procedimento com margem abaixo de 10%. Configure o preço de venda nos procedimentos para monitorar.
+                Nenhum procedimento com margem abaixo de 10%. Configure o preço de venda nos
+                procedimentos para monitorar.
               </p>
             ) : (
               <table className="w-full text-sm">
@@ -77,7 +87,10 @@ export async function TablesSection({ userId }: { userId: string }) {
                 </thead>
                 <tbody>
                   {procedimentosNoVermelho.map((p, i) => (
-                    <tr key={p.id} className={i < procedimentosNoVermelho.length - 1 ? 'border-b' : ''}>
+                    <tr
+                      key={p.id}
+                      className={i < procedimentosNoVermelho.length - 1 ? 'border-b' : ''}
+                    >
                       <td className="px-6 py-3">
                         <Link
                           href={`/procedimentos/${p.especialidadeSlug}/${p.id}`}
@@ -111,5 +124,5 @@ export async function TablesSection({ userId }: { userId: string }) {
         </Button>
       </div>
     </>
-  )
+  );
 }

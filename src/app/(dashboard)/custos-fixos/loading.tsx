@@ -1,4 +1,4 @@
-import { Skeleton } from '@/presentation/components/ui/skeleton'
+import { Skeleton } from '@/presentation/components/ui/skeleton';
 
 export default function CustosFixosLoading() {
   return (
@@ -40,5 +40,5 @@ export default function CustosFixosLoading() {
         <Skeleton className="h-9 w-28" />
       </div>
     </div>
-  )
+  );
 }

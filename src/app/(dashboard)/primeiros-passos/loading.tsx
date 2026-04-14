@@ -1,4 +1,4 @@
-import { Skeleton } from '@/presentation/components/ui/skeleton'
+import { Skeleton } from '@/presentation/components/ui/skeleton';
 
 export default function PrimeirosPassosLoading() {
   return (
@@ -42,5 +42,5 @@ export default function PrimeirosPassosLoading() {
         </div>
       </div>
     </div>
-  )
+  );
 }
