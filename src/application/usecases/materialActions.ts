@@ -41,6 +41,34 @@ export async function updateMaterialPrice(
   }
 }
 
+// ─── updateMaterial ────────────────────────────────────────────────────────────
+
+export type UpdateMaterialState = {
+  errors?: { general?: string[] }
+  success?: boolean
+  procedimentosNoVermelho?: number
+}
+
+export async function updateMaterial(
+  id: string,
+  userId: string,
+  preco: number,
+  divisorPadrao: number
+): Promise<UpdateMaterialState> {
+  if (preco <= 0) return { errors: { general: ['Preço deve ser maior que zero'] } }
+  if (!Number.isInteger(divisorPadrao) || divisorPadrao < 1) {
+    return { errors: { general: ['Usos por embalagem deve ser pelo menos 1'] } }
+  }
+
+  try {
+    await repository.updateFields(id, userId, { preco, divisorPadrao })
+    const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId)
+    return { success: true, procedimentosNoVermelho }
+  } catch {
+    return { errors: { general: ['Erro ao atualizar material. Tente novamente.'] } }
+  }
+}
+
 // ─── createMaterial ────────────────────────────────────────────────────────────
 
 const createMaterialSchema = z.object({

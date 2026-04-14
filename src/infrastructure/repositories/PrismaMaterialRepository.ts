@@ -17,6 +17,17 @@ export class PrismaMaterialRepository implements IMaterialRepository {
     })
   }
 
+  async updateFields(
+    id: string,
+    userId: string,
+    data: { preco: number; divisorPadrao: number }
+  ): Promise<Material> {
+    return prisma.material.update({
+      where: { id, userId },
+      data: { preco: data.preco, divisorPadrao: data.divisorPadrao },
+    })
+  }
+
   async create(userId: string, data: CreateMaterialData): Promise<Material> {
     return prisma.material.create({
       data: {

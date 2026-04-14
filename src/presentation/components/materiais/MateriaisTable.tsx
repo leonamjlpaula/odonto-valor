@@ -5,7 +5,7 @@ import { Pencil, X, Check } from 'lucide-react'
 import type { Material } from '@prisma/client'
 import {
   getMateriais,
-  updateMaterialPrice,
+  updateMaterial,
   createMaterial,
   deleteMaterial,
 } from '@/application/usecases/materialActions'
@@ -41,6 +41,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
   const PAGE_SIZE = 50
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingPreco, setEditingPreco] = useState('')
+  const [editingDivisorPadrao, setEditingDivisorPadrao] = useState('')
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [addNome, setAddNome] = useState('')
   const [addUnidade, setAddUnidade] = useState('')
@@ -63,28 +64,36 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
   function startEdit(material: Material) {
     setEditingId(material.id)
     setEditingPreco(material.preco.toString())
+    setEditingDivisorPadrao(material.divisorPadrao.toString())
   }
 
   function cancelEdit() {
     setEditingId(null)
     setEditingPreco('')
+    setEditingDivisorPadrao('')
   }
 
   function confirmEdit(material: Material) {
     const preco = parseFloat(editingPreco.replace(',', '.'))
+    const divisorPadrao = parseInt(editingDivisorPadrao, 10)
     if (isNaN(preco) || preco <= 0) {
       toast({ title: 'Preço inválido', description: 'O preço deve ser maior que zero.', variant: 'destructive' })
       return
     }
+    if (isNaN(divisorPadrao) || divisorPadrao < 1) {
+      toast({ title: 'Usos inválido', description: 'Usos por embalagem deve ser pelo menos 1.', variant: 'destructive' })
+      return
+    }
     startTransition(async () => {
-      const result = await updateMaterialPrice(material.id, userId, preco)
+      const result = await updateMaterial(material.id, userId, preco, divisorPadrao)
       if (result.success) {
-        setMateriais((prev) => prev.map((m) => m.id === material.id ? { ...m, preco } : m))
+        setMateriais((prev) => prev.map((m) => m.id === material.id ? { ...m, preco, divisorPadrao } : m))
         setEditingId(null)
         setEditingPreco('')
+        setEditingDivisorPadrao('')
         const n = result.procedimentosNoVermelho ?? 0
         toast({
-          title: 'Preço atualizado!',
+          title: 'Material atualizado!',
           description:
             n > 0
               ? `${n} procedimento${n > 1 ? 's estão' : ' está'} abaixo de 10% de margem. Revise seus preços.`
@@ -199,13 +208,14 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">Unidade</th>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">Tipo</th>
                 <th className="text-right px-4 py-3 font-medium text-muted-foreground">Preço (R$)</th>
+                <th className="text-right px-4 py-3 font-medium text-muted-foreground">Usos/emb.</th>
                 <th className="text-center px-4 py-3 font-medium text-muted-foreground">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <td colSpan={7} className="text-center py-8 text-muted-foreground">
                     {searchQuery ? 'Nenhum material encontrado para a busca.' : 'Nenhum material cadastrado.'}
                   </td>
                 </tr>
@@ -226,15 +236,33 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
                     </td>
                     <td className="px-4 py-3 text-right">
                       {editingId === material.id ? (
+                        <Input
+                          type="number"
+                          value={editingPreco}
+                          onChange={(e) => setEditingPreco(e.target.value)}
+                          className="w-28 h-8 text-right"
+                          min={0}
+                          step={0.01}
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') confirmEdit(material)
+                            if (e.key === 'Escape') cancelEdit()
+                          }}
+                        />
+                      ) : (
+                        <span>{formatBRL(material.preco)}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      {editingId === material.id ? (
                         <div className="flex items-center justify-end gap-1">
                           <Input
                             type="number"
-                            value={editingPreco}
-                            onChange={(e) => setEditingPreco(e.target.value)}
-                            className="w-28 h-8 text-right"
-                            min={0}
-                            step={0.01}
-                            autoFocus
+                            value={editingDivisorPadrao}
+                            onChange={(e) => setEditingDivisorPadrao(e.target.value)}
+                            className="w-20 h-8 text-right"
+                            min={1}
+                            step={1}
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') confirmEdit(material)
                               if (e.key === 'Escape') cancelEdit()
@@ -260,7 +288,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
                           </Button>
                         </div>
                       ) : (
-                        <span>{formatBRL(material.preco)}</span>
+                        <span className="text-muted-foreground">{material.divisorPadrao}</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
