@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db'
 import { PrismaProcedimentoRepository } from '@/infrastructure/repositories/PrismaProcedimentoRepository'
 import { calcularCustoFixoPorMinuto, getPercConfig } from './calcularCustoFixoPorMinuto'
+import { getEspecialidades, getVrpoRefs } from '@/lib/referenceData'
 import { calcularPrecoProcedimento } from './calcularPrecoProcedimento'
 import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository'
 import type { PrecoCalculado } from './calcularPrecoProcedimento'
@@ -45,26 +46,23 @@ export async function getProcedimentosByEspecialidade(
   userId: string,
   especialidadeSlug: string
 ): Promise<ProcedimentoComPrecoLista[]> {
-  const especialidade = await prisma.especialidade.findUnique({
-    where: { codigo: especialidadeSlug },
-  })
+  // All cached — no DB round-trip after warmup. listByUserAndEspecialidade needs
+  // especialidadeId so it runs after especialidades resolves (from cache: ~0ms).
+  const [especialidades, custoFixoPorMinuto, { percImpostos, percTaxaCartao }, vrpoRefsRaw] =
+    await Promise.all([
+      getEspecialidades(),
+      calcularCustoFixoPorMinuto(userId),
+      getPercConfig(userId),
+      getVrpoRefs(),
+    ])
+
+  const especialidade = especialidades.find((e) => e.codigo === especialidadeSlug)
   if (!especialidade) return []
 
-  // All three queries are independent — run in parallel
-  const [procedimentos, custoFixoPorMinuto, { percImpostos, percTaxaCartao }] = await Promise.all([
-    repository.listByUserAndEspecialidade(userId, especialidade.id),
-    calcularCustoFixoPorMinuto(userId),
-    getPercConfig(userId),
-  ])
+  const procedimentosList = await repository.listByUserAndEspecialidade(userId, especialidade.id)
+  const vrpoMap = new Map(vrpoRefsRaw.map((v) => [v.codigo, v.valorReferencia]))
 
-  // Fetch VRPO references for all procedure codes in a single query
-  const codigos = procedimentos.map((p) => p.codigo)
-  const vrpoRefs = await prisma.vRPOReferencia.findMany({
-    where: { codigo: { in: codigos } },
-  })
-  const vrpoMap = new Map(vrpoRefs.map((v) => [v.codigo, v.valorReferencia]))
-
-  return procedimentos.map((procedimento) => ({
+  return procedimentosList.map((procedimento) => ({
     // Strip materiais — used for calculation only; list view never renders them
     procedimento: {
       id: procedimento.id,
@@ -110,11 +108,8 @@ export async function searchProcedimentos(
     getPercConfig(userId),
   ])
 
-  const codigos = procedimentos.map((p) => p.codigo)
-  const vrpoRefs = await prisma.vRPOReferencia.findMany({
-    where: { codigo: { in: codigos } },
-  })
-  const vrpoMap = new Map(vrpoRefs.map((v) => [v.codigo, v.valorReferencia]))
+  const vrpoRefsRaw = await getVrpoRefs()
+  const vrpoMap = new Map(vrpoRefsRaw.map((v) => [v.codigo, v.valorReferencia]))
 
   return procedimentos.map((procedimento) => ({
     procedimento: {

@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { CustoFixoPorMinuto } from '@/domain/value-objects/CustoFixoPorMinuto'
 import { PrismaCustoFixoRepository } from '@/infrastructure/repositories/PrismaCustoFixoRepository'
@@ -75,6 +76,7 @@ export async function saveCustoFixoConfig(
 
   try {
     await repository.upsert(userId, result.data)
+    revalidateTag(`config-${userId}`)
     const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId)
     return { success: true, procedimentosNoVermelho }
   } catch {
@@ -124,6 +126,7 @@ export async function addCustoFixoItem(
       },
     })
 
+    revalidateTag(`config-${userId}`)
     return { success: true }
   } catch {
     return { errors: { general: ['Erro ao adicionar item. Tente novamente.'] } }
@@ -162,6 +165,7 @@ export async function deleteCustoFixoItem(
 
     await prisma.custoFixoItem.delete({ where: { id: itemId } })
 
+    revalidateTag(`config-${userId}`)
     return { success: true }
   } catch {
     return { errors: { general: ['Erro ao excluir item. Tente novamente.'] } }
