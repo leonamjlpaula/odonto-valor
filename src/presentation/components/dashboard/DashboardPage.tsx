@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/presentation/components/ui/button'
@@ -22,10 +22,12 @@ import {
 import { Input } from '@/presentation/components/ui/input'
 import { Label } from '@/presentation/components/ui/label'
 import { useToast } from '@/presentation/hooks/use-toast'
-import { Camera } from 'lucide-react'
+import { Camera, BookOpen, X, ArrowRight } from 'lucide-react'
 import { createSnapshot } from '@/application/usecases/snapshotActions'
 import { OnboardingWizard } from '@/presentation/components/layout/OnboardingWizard'
 import type { DashboardStats, TopProcedimento, ProcedimentoNoVermelho } from '@/application/usecases/dashboardActions'
+
+const GUIA_BANNER_KEY = 'precifica_guia_dispensado'
 
 type Props = {
   userId: string
@@ -63,6 +65,17 @@ export function DashboardPage({
   const [snapNome, setSnapNome] = useState('')
   const [snapDesc, setSnapDesc] = useState('')
   const [snapError, setSnapError] = useState<string | null>(null)
+  const [guiaBannerVisivel, setGuiaBannerVisivel] = useState(false)
+
+  useEffect(() => {
+    const dispensado = localStorage.getItem(GUIA_BANNER_KEY)
+    if (!dispensado) setGuiaBannerVisivel(true)
+  }, [])
+
+  function dispensarGuiaBanner() {
+    localStorage.setItem(GUIA_BANNER_KEY, '1')
+    setGuiaBannerVisivel(false)
+  }
 
   // custosDesatualizados e ociosidadeNaoConfigurada vêm do servidor via stats
   const hasAlertas =
@@ -98,6 +111,30 @@ export function DashboardPage({
     <div className="space-y-6">
       {!onboardingCompleted && (
         <OnboardingWizard userId={userId} perfilConsultorio={perfilConsultorio} />
+      )}
+
+      {guiaBannerVisivel && (
+        <div className="flex items-start gap-4 rounded-lg border border-primary/30 bg-primary/5 px-4 py-4">
+          <BookOpen className="h-5 w-5 shrink-0 text-primary mt-0.5" aria-hidden="true" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-foreground">Novo por aqui? Veja o guia de primeiros passos</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Configure seus custos, materiais e preços de venda em poucos minutos.
+            </p>
+            <Button asChild size="sm" variant="default" className="mt-3">
+              <Link href="/primeiros-passos" onClick={dispensarGuiaBanner}>
+                Ver guia <ArrowRight className="ml-1 h-3 w-3" aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
+          <button
+            onClick={dispensarGuiaBanner}
+            className="shrink-0 rounded-md p-1 text-muted-foreground hover:text-foreground hover:bg-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Dispensar guia"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       )}
 
       <div className="flex items-center justify-between">

@@ -25,6 +25,7 @@ import banner from '@/assets/odonto_valor_banner.png'
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Primeiros Passos', href: '/primeiros-passos', icon: BookOpen },
   { label: 'Custos Fixos', href: '/custos-fixos', icon: DollarSign },
   { label: 'Materiais', href: '/materiais', icon: Package },
   { label: 'Procedimentos', href: '/procedimentos', icon: ClipboardList },
@@ -32,7 +33,6 @@ const navItems = [
   { label: 'Simulador', href: '/simulador', icon: Sliders },
   { label: 'Histórico', href: '/historico', icon: Clock },
   { label: 'Exportar', href: '/exportar', icon: Download },
-  { label: 'Primeiros Passos', href: '/primeiros-passos', icon: BookOpen },
 ]
 
 const mobileMainItems = [
@@ -42,12 +42,12 @@ const mobileMainItems = [
 ]
 
 const mobileMoreItems = [
+  { label: 'Primeiros Passos', href: '/primeiros-passos', icon: BookOpen },
   { label: 'Materiais', href: '/materiais', icon: Package },
   { label: 'Comparativo VRPO', href: '/comparativo-vrpo', icon: BarChart2 },
   { label: 'Simulador', href: '/simulador', icon: Sliders },
   { label: 'Histórico', href: '/historico', icon: Clock },
   { label: 'Exportar', href: '/exportar', icon: Download },
-  { label: 'Primeiros Passos', href: '/primeiros-passos', icon: BookOpen },
 ]
 
 interface DashboardLayoutProps {
