@@ -39,23 +39,30 @@ export type ComparativoVRPOData = {
 // ─── getComparativoVRPO ────────────────────────────────────────────────────────
 
 export async function getComparativoVRPO(userId: string): Promise<ComparativoVRPOData> {
-  const [procedimentosRaw, custoFixoPorMinuto, especialidades] = await Promise.all([
+  const [procedimentos, custoFixoPorMinuto, especialidades] = await Promise.all([
     prisma.procedimento.findMany({
       where: { userId },
-      include: {
-        especialidade: true,
+      select: {
+        id: true,
+        codigo: true,
+        nome: true,
+        tempoMinutos: true,
+        custoLaboratorio: true,
+        especialidade: { select: { nome: true, codigo: true } },
         materiais: {
-          include: { material: true },
+          select: {
+            consumo: true,
+            divisor: true,
+            material: { select: { preco: true } },
+          },
           orderBy: { ordem: 'asc' },
         },
       },
       orderBy: { codigo: 'asc' },
-    }),
+    }) as Promise<ProcedimentoWithMateriais[]>,
     calcularCustoFixoPorMinuto(userId),
     prisma.especialidade.findMany({ orderBy: { faixaInicio: 'asc' } }),
   ])
-
-  const procedimentos = procedimentosRaw as ProcedimentoWithMateriais[]
 
   const codigos = procedimentos.map((p) => p.codigo)
   const vrpoRefs = await prisma.vRPOReferencia.findMany({

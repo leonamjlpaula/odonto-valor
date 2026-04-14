@@ -3,7 +3,7 @@
 import { cache } from 'react'
 import { prisma } from '@/lib/db'
 import { CustoFixoPorMinuto } from '@/domain/value-objects/CustoFixoPorMinuto'
-import { calcularCustoFixoPorMinuto } from './calcularCustoFixoPorMinuto'
+import { calcularCustoFixoPorMinuto, getPercConfig } from './calcularCustoFixoPorMinuto'
 import { calcularPrecoProcedimento } from './calcularPrecoProcedimento'
 import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository'
 
@@ -197,17 +197,11 @@ export async function getProcedimentosNoVermelho(
   userId: string,
   limit: number = 5
 ): Promise<ProcedimentoNoVermelho[]> {
-  const [procedimentos, custoFixoPorMinuto, config] = await Promise.all([
+  const [procedimentos, custoFixoPorMinuto, { percImpostos, percTaxaCartao }] = await Promise.all([
     getAllProcedimentos(userId),
     calcularCustoFixoPorMinuto(userId),
-    prisma.custoFixoConfig.findUnique({
-      where: { userId },
-      select: { percImpostos: true, percTaxaCartao: true },
-    }),
+    getPercConfig(userId),
   ])
-
-  const percImpostos = config?.percImpostos ?? 8
-  const percTaxaCartao = config?.percTaxaCartao ?? 4
 
   const noVermelho: ProcedimentoNoVermelho[] = []
 
