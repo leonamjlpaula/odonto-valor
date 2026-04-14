@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/db'
 import { calcularCustoFixoPorMinuto } from './calcularCustoFixoPorMinuto'
+import { getEspecialidades, getVrpoRefs } from '@/lib/referenceData'
 import { calcularPrecoProcedimento } from './calcularPrecoProcedimento'
 import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository'
 
@@ -39,7 +40,7 @@ export type ComparativoVRPOData = {
 // ─── getComparativoVRPO ────────────────────────────────────────────────────────
 
 export async function getComparativoVRPO(userId: string): Promise<ComparativoVRPOData> {
-  const [procedimentos, custoFixoPorMinuto, especialidades] = await Promise.all([
+  const [procedimentos, custoFixoPorMinuto, especialidades, vrpoRefsRaw] = await Promise.all([
     prisma.procedimento.findMany({
       where: { userId },
       select: {
@@ -61,14 +62,11 @@ export async function getComparativoVRPO(userId: string): Promise<ComparativoVRP
       orderBy: { codigo: 'asc' },
     }) as Promise<ProcedimentoWithMateriais[]>,
     calcularCustoFixoPorMinuto(userId),
-    prisma.especialidade.findMany({ orderBy: { faixaInicio: 'asc' } }),
+    getEspecialidades(),
+    getVrpoRefs(),
   ])
 
-  const codigos = procedimentos.map((p) => p.codigo)
-  const vrpoRefs = await prisma.vRPOReferencia.findMany({
-    where: { codigo: { in: codigos } },
-  })
-  const vrpoMap = new Map(vrpoRefs.map((v) => [v.codigo, v.valorReferencia]))
+  const vrpoMap = new Map(vrpoRefsRaw.map((v) => [v.codigo, v.valorReferencia]))
 
   const items: ComparativoItem[] = procedimentos.map((p) => {
     const { precoFinal } = calcularPrecoProcedimento(p, custoFixoPorMinuto)

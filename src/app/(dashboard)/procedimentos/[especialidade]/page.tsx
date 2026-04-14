@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getAuthUserId } from '@/lib/supabase/server'
 import { prisma } from '@/lib/db'
+import { getEspecialidades } from '@/lib/referenceData'
 import {
   getProcedimentosByEspecialidade,
   searchProcedimentos,
@@ -21,9 +22,7 @@ export default async function Page({
   const { especialidade: especialidadeSlug } = await params
   const { q: searchQuery } = await searchParams
 
-  const especialidades = await prisma.especialidade.findMany({
-    orderBy: { faixaInicio: 'asc' },
-  })
+  const especialidades = await getEspecialidades()
 
   const currentEspecialidade = especialidades.find((e) => e.codigo === especialidadeSlug)
   if (!currentEspecialidade) redirect('/procedimentos/diagnostico')
