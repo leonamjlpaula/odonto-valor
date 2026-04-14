@@ -6,6 +6,7 @@ import type { Material } from '@prisma/client'
 import {
   getMateriais,
   updateMaterial,
+  contarUsosDoMaterial,
   createMaterial,
   deleteMaterial,
 } from '@/application/usecases/materialActions'
@@ -42,6 +43,10 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingPreco, setEditingPreco] = useState('')
   const [editingDivisorPadrao, setEditingDivisorPadrao] = useState('')
+  const [propagationDialog, setPropagationDialog] = useState<{
+    material: Material; preco: number; divisorPadrao: number; count: number
+  } | null>(null)
+  const [propagateChecked, setPropagateChecked] = useState(false)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [addNome, setAddNome] = useState('')
   const [addUnidade, setAddUnidade] = useState('')
@@ -73,6 +78,30 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
     setEditingDivisorPadrao('')
   }
 
+  async function doUpdateMaterial(material: Material, preco: number, divisorPadrao: number, propagate: boolean) {
+    const result = await updateMaterial(material.id, userId, preco, divisorPadrao, propagate)
+    if (result.success) {
+      setMateriais((prev) => prev.map((m) => m.id === material.id ? { ...m, preco, divisorPadrao } : m))
+      setEditingId(null)
+      setEditingPreco('')
+      setEditingDivisorPadrao('')
+      const n = result.procedimentosNoVermelho ?? 0
+      toast({
+        title: 'Material atualizado!',
+        description:
+          n > 0
+            ? `${n} procedimento${n > 1 ? 's estão' : ' está'} abaixo de 10% de margem. Revise seus preços.`
+            : `${material.nome} atualizado com sucesso.`,
+      })
+    } else {
+      toast({
+        title: 'Erro ao atualizar',
+        description: result.errors?.general?.join(', ') ?? 'Tente novamente.',
+        variant: 'destructive',
+      })
+    }
+  }
+
   function confirmEdit(material: Material) {
     const preco = parseFloat(editingPreco.replace(',', '.'))
     const divisorPadrao = parseInt(editingDivisorPadrao, 10)
@@ -84,28 +113,19 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
       toast({ title: 'Usos inválido', description: 'Usos por embalagem deve ser pelo menos 1.', variant: 'destructive' })
       return
     }
+
+    const divisorChanged = divisorPadrao !== material.divisorPadrao
+
     startTransition(async () => {
-      const result = await updateMaterial(material.id, userId, preco, divisorPadrao)
-      if (result.success) {
-        setMateriais((prev) => prev.map((m) => m.id === material.id ? { ...m, preco, divisorPadrao } : m))
-        setEditingId(null)
-        setEditingPreco('')
-        setEditingDivisorPadrao('')
-        const n = result.procedimentosNoVermelho ?? 0
-        toast({
-          title: 'Material atualizado!',
-          description:
-            n > 0
-              ? `${n} procedimento${n > 1 ? 's estão' : ' está'} abaixo de 10% de margem. Revise seus preços.`
-              : `${material.nome} atualizado com sucesso.`,
-        })
-      } else {
-        toast({
-          title: 'Erro ao atualizar',
-          description: result.errors?.general?.join(', ') ?? 'Tente novamente.',
-          variant: 'destructive',
-        })
+      if (divisorChanged) {
+        const count = await contarUsosDoMaterial(material.id, userId)
+        if (count > 0) {
+          setPropagationDialog({ material, preco, divisorPadrao, count })
+          setPropagateChecked(false)
+          return
+        }
       }
+      await doUpdateMaterial(material, preco, divisorPadrao, false)
     })
   }
 
@@ -356,6 +376,51 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
           </div>
         </div>
       )}
+
+      {/* Propagation Dialog */}
+      <Dialog open={propagationDialog !== null} onOpenChange={(open) => { if (!open) setPropagationDialog(null) }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Atualizar usos por embalagem</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            O novo valor de usos/embalagem ({propagationDialog?.divisorPadrao}) será salvo para{' '}
+            <strong className="text-foreground">{propagationDialog?.material.nome}</strong>.
+          </p>
+          <label className="flex items-start gap-3 cursor-pointer rounded-md border p-3 hover:bg-muted/40 transition-colors">
+            <input
+              type="checkbox"
+              checked={propagateChecked}
+              onChange={(e) => setPropagateChecked(e.target.checked)}
+              className="mt-0.5 h-4 w-4 cursor-pointer accent-primary"
+            />
+            <span className="text-sm">
+              Atualizar também nos{' '}
+              <strong>{propagationDialog?.count} procedimento{propagationDialog?.count !== 1 ? 's' : ''}</strong>{' '}
+              que já usam este material
+              <span className="block text-xs text-muted-foreground mt-0.5">
+                Substitui o divisor salvo em cada procedimento pelo novo valor padrão.
+              </span>
+            </span>
+          </label>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPropagationDialog(null)} disabled={isPending}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                if (!propagationDialog) return
+                const { material, preco, divisorPadrao } = propagationDialog
+                setPropagationDialog(null)
+                startTransition(() => doUpdateMaterial(material, preco, divisorPadrao, propagateChecked))
+              }}
+              disabled={isPending}
+            >
+              {isPending ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Add Material Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={(open) => { setIsAddDialogOpen(open); if (!open) resetAddForm() }}>

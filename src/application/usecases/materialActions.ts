@@ -49,11 +49,18 @@ export type UpdateMaterialState = {
   procedimentosNoVermelho?: number
 }
 
+export async function contarUsosDoMaterial(materialId: string, userId: string): Promise<number> {
+  const material = await prisma.material.findFirst({ where: { id: materialId, userId } })
+  if (!material) return 0
+  return prisma.procedimentoMaterial.count({ where: { materialId } })
+}
+
 export async function updateMaterial(
   id: string,
   userId: string,
   preco: number,
-  divisorPadrao: number
+  divisorPadrao: number,
+  propagateDivisor?: boolean
 ): Promise<UpdateMaterialState> {
   if (preco <= 0) return { errors: { general: ['Preço deve ser maior que zero'] } }
   if (!Number.isInteger(divisorPadrao) || divisorPadrao < 1) {
@@ -61,7 +68,15 @@ export async function updateMaterial(
   }
 
   try {
-    await repository.updateFields(id, userId, { preco, divisorPadrao })
+    await prisma.$transaction(async (tx) => {
+      await tx.material.update({ where: { id, userId }, data: { preco, divisorPadrao } })
+      if (propagateDivisor) {
+        await tx.procedimentoMaterial.updateMany({
+          where: { materialId: id },
+          data: { divisor: divisorPadrao },
+        })
+      }
+    })
     const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId)
     return { success: true, procedimentosNoVermelho }
   } catch {

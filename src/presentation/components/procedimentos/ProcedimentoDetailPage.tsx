@@ -136,18 +136,18 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
   // ─── Material row editing ─────────────────────────────────────────────────
   const [editingPmaId, setEditingPmaId] = useState<string | null>(null)
   const [editConsumo, setEditConsumo] = useState('')
-  const [editDivisor, setEditDivisor] = useState(0)
+  const [editDivisor, setEditDivisor] = useState('')
 
   function startEditMaterial(pmaId: string, consumo: number, divisor: number) {
     setEditingPmaId(pmaId)
     setEditConsumo(String(consumo))
-    setEditDivisor(divisor)
+    setEditDivisor(String(divisor))
   }
 
   function cancelEditMaterial() {
     setEditingPmaId(null)
     setEditConsumo('')
-    setEditDivisor(0)
+    setEditDivisor('')
   }
 
   function handleSaveMaterial(pmaId: string) {
@@ -156,8 +156,13 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
       toast({ title: 'Consumo inválido', description: 'Informe um valor maior que zero.', variant: 'destructive' })
       return
     }
+    const divisor = parseFloat(editDivisor.replace(',', '.'))
+    if (isNaN(divisor) || divisor <= 0) {
+      toast({ title: 'Usos/embalagem inválido', description: 'Informe um valor maior que zero.', variant: 'destructive' })
+      return
+    }
     startTransition(async () => {
-      const result = await updateProcedimentoMaterial(pmaId, userId, consumo, editDivisor)
+      const result = await updateProcedimentoMaterial(pmaId, userId, consumo, divisor)
       if (result.success) {
         cancelEditMaterial()
         toast({ title: 'Material atualizado!' })
@@ -663,8 +668,19 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                             <span className="tabular-nums">{pma.consumo}</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                          {pma.divisor}
+                        <td className="px-4 py-3 text-right">
+                          {isEditing ? (
+                            <Input
+                              type="number"
+                              value={editDivisor}
+                              onChange={(e) => setEditDivisor(e.target.value)}
+                              className="w-20 ml-auto text-right"
+                              min={0.01}
+                              step={1}
+                            />
+                          ) : (
+                            <span className="tabular-nums text-muted-foreground">{pma.divisor}</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">
                           {formatBRL(pma.material.preco)}
