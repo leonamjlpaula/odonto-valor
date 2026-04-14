@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, X } from 'lucide-react'
 import type { Especialidade } from '@prisma/client'
 import type { ProcedimentoComPreco } from '@/application/usecases/procedimentoActions'
 import { createProcedimentoCustomizado } from '@/application/usecases/procedimentoActions'
@@ -78,26 +78,22 @@ export function ProcedimentosPage({
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
 
-  const [searchQuery, setSearchQuery] = useState(initialSearchQuery)
+  const [filterQuery, setFilterQuery] = useState('')
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [addCodigo, setAddCodigo] = useState('')
   const [addNome, setAddNome] = useState('')
   const [addTempo, setAddTempo] = useState('')
   const [addErrors, setAddErrors] = useState<Record<string, string>>({})
 
-  const isSearching = !!initialSearchQuery
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    const q = searchQuery.trim()
-    if (q) {
-      router.push(
-        `/procedimentos/${currentEspecialidade.codigo}?q=${encodeURIComponent(q)}`
-      )
-    } else {
-      router.push(`/procedimentos/${currentEspecialidade.codigo}`)
-    }
-  }
+  const filteredProcedimentos = useMemo(() => {
+    const q = filterQuery.trim().toLowerCase()
+    if (!q) return initialProcedimentos
+    return initialProcedimentos.filter(
+      ({ procedimento }) =>
+        procedimento.nome.toLowerCase().includes(q) ||
+        procedimento.codigo.toString().includes(q)
+    )
+  }, [filterQuery, initialProcedimentos])
 
   function resetAddForm() {
     setAddCodigo('')
@@ -160,7 +156,7 @@ export function ProcedimentosPage({
         </h2>
         <nav className="space-y-1">
           {especialidades.map((esp) => {
-            const isActive = esp.id === currentEspecialidade.id && !isSearching
+            const isActive = esp.id === currentEspecialidade.id
             return (
               <Link
                 key={esp.id}
@@ -209,13 +205,14 @@ export function ProcedimentosPage({
         {/* Header + Add button */}
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold">
-              {isSearching
-                ? `Resultados para "${initialSearchQuery}"`
-                : currentEspecialidade.nome}
-            </h1>
+            <h1 className="text-2xl font-bold">{currentEspecialidade.nome}</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              {initialProcedimentos.length} procedimento(s)
+              {filteredProcedimentos.length === initialProcedimentos.length
+                ? `${initialProcedimentos.length} procedimento(s)`
+                : `${filteredProcedimentos.length} de ${initialProcedimentos.length} procedimento(s)`}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-xl">
+              Veja o custo calculado e a margem de cada procedimento. Informe o preço de venda para monitorar se está no lucro ou no prejuízo. Clique em um procedimento para editar materiais e tempo.
             </p>
           </div>
           <Button onClick={() => { resetAddForm(); setIsAddOpen(true) }}>
@@ -225,32 +222,24 @@ export function ProcedimentosPage({
         </div>
 
         {/* Search */}
-        <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="Buscar por código ou nome..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <Button type="submit" variant="secondary">
-            Buscar
-          </Button>
-          {isSearching && (
-            <Button
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Filtrar por código ou nome..."
+            value={filterQuery}
+            onChange={(e) => setFilterQuery(e.target.value)}
+            className="pl-9 pr-9"
+          />
+          {filterQuery && (
+            <button
               type="button"
-              variant="ghost"
-              onClick={() => {
-                setSearchQuery('')
-                router.push(`/procedimentos/${currentEspecialidade.codigo}`)
-              }}
+              onClick={() => setFilterQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             >
-              Limpar
-            </Button>
+              <X className="h-4 w-4" />
+            </button>
           )}
-        </form>
+        </div>
 
         {/* Procedures table */}
         <div className="border rounded-lg overflow-hidden">
@@ -281,16 +270,16 @@ export function ProcedimentosPage({
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {initialProcedimentos.length === 0 ? (
+                {filteredProcedimentos.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="text-center py-8 text-muted-foreground">
-                      {isSearching
-                        ? 'Nenhum procedimento encontrado para a busca.'
+                      {filterQuery
+                        ? 'Nenhum procedimento encontrado para o filtro.'
                         : 'Nenhum procedimento cadastrado para esta especialidade.'}
                     </td>
                   </tr>
                 ) : (
-                  initialProcedimentos.map(({ procedimento, precoCalculado, vrpoReferencia }) => {
+                  filteredProcedimentos.map(({ procedimento, precoCalculado, vrpoReferencia }) => {
                     const diferenca =
                       vrpoReferencia !== null
                         ? ((precoCalculado.precoFinal - vrpoReferencia) / vrpoReferencia) * 100

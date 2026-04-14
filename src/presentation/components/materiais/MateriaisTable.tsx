@@ -181,7 +181,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
         <div>
           <h1 className="text-2xl font-bold">Materiais</h1>
           <p className="text-muted-foreground mt-1">
-            Gerencie os materiais do consultório e seus preços.
+            Cadastre insumos com custo por embalagem e número de usos. O custo por uso é calculado automaticamente e compõe o valor de cada procedimento. Use a busca para localizar materiais e edite os valores diretamente na tabela.
           </p>
         </div>
         <Button onClick={() => { resetAddForm(); setIsAddDialogOpen(true) }}>
