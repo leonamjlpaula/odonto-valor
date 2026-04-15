@@ -1,27 +1,27 @@
-'use server'
+'use server';
 
-import { z } from 'zod'
-import { prisma } from '@/lib/db'
-import { PrismaMaterialRepository } from '@/infrastructure/repositories/PrismaMaterialRepository'
-import { contarProcedimentosNoVermelho } from './dashboardActions'
-import type { Material } from '@prisma/client'
+import { z } from 'zod';
+import { prisma } from '@/lib/db';
+import { PrismaMaterialRepository } from '@/infrastructure/repositories/PrismaMaterialRepository';
+import { contarProcedimentosNoVermelho } from './dashboardActions';
+import type { Material } from '@prisma/client';
 
-const repository = new PrismaMaterialRepository()
+const repository = new PrismaMaterialRepository();
 
 // ─── getMateriais ──────────────────────────────────────────────────────────────
 
 export async function getMateriais(userId: string): Promise<Material[]> {
-  return repository.listByUserId(userId)
+  return repository.listByUserId(userId);
 }
 
 // ─── updateMaterialPrice ───────────────────────────────────────────────────────
 
 export type UpdateMaterialPriceState = {
-  errors?: { general?: string[] }
-  success?: boolean
+  errors?: { general?: string[] };
+  success?: boolean;
   /** Number of procedures now below 10% margin after the price update */
-  procedimentosNoVermelho?: number
-}
+  procedimentosNoVermelho?: number;
+};
 
 export async function updateMaterialPrice(
   id: string,
@@ -29,30 +29,30 @@ export async function updateMaterialPrice(
   preco: number
 ): Promise<UpdateMaterialPriceState> {
   if (preco <= 0) {
-    return { errors: { general: ['Preço deve ser maior que zero'] } }
+    return { errors: { general: ['Preço deve ser maior que zero'] } };
   }
 
   try {
-    await repository.updatePrice(id, userId, preco)
-    const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId)
-    return { success: true, procedimentosNoVermelho }
+    await repository.updatePrice(id, userId, preco);
+    const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId);
+    return { success: true, procedimentosNoVermelho };
   } catch {
-    return { errors: { general: ['Erro ao atualizar preço. Tente novamente.'] } }
+    return { errors: { general: ['Erro ao atualizar preço. Tente novamente.'] } };
   }
 }
 
 // ─── updateMaterial ────────────────────────────────────────────────────────────
 
 export type UpdateMaterialState = {
-  errors?: { general?: string[] }
-  success?: boolean
-  procedimentosNoVermelho?: number
-}
+  errors?: { general?: string[] };
+  success?: boolean;
+  procedimentosNoVermelho?: number;
+};
 
 export async function contarUsosDoMaterial(materialId: string, userId: string): Promise<number> {
-  const material = await prisma.material.findFirst({ where: { id: materialId, userId } })
-  if (!material) return 0
-  return prisma.procedimentoMaterial.count({ where: { materialId } })
+  const material = await prisma.material.findFirst({ where: { id: materialId, userId } });
+  if (!material) return 0;
+  return prisma.procedimentoMaterial.count({ where: { materialId } });
 }
 
 export async function updateMaterial(
@@ -62,25 +62,25 @@ export async function updateMaterial(
   divisorPadrao: number,
   propagateDivisor?: boolean
 ): Promise<UpdateMaterialState> {
-  if (preco <= 0) return { errors: { general: ['Preço deve ser maior que zero'] } }
+  if (preco <= 0) return { errors: { general: ['Preço deve ser maior que zero'] } };
   if (!Number.isInteger(divisorPadrao) || divisorPadrao < 1) {
-    return { errors: { general: ['Usos por embalagem deve ser pelo menos 1'] } }
+    return { errors: { general: ['Usos por embalagem deve ser pelo menos 1'] } };
   }
 
   try {
     await prisma.$transaction(async (tx) => {
-      await tx.material.update({ where: { id, userId }, data: { preco, divisorPadrao } })
+      await tx.material.update({ where: { id, userId }, data: { preco, divisorPadrao } });
       if (propagateDivisor) {
         await tx.procedimentoMaterial.updateMany({
           where: { materialId: id },
           data: { divisor: divisorPadrao },
-        })
+        });
       }
-    })
-    const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId)
-    return { success: true, procedimentosNoVermelho }
+    });
+    const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId);
+    return { success: true, procedimentosNoVermelho };
   } catch {
-    return { errors: { general: ['Erro ao atualizar material. Tente novamente.'] } }
+    return { errors: { general: ['Erro ao atualizar material. Tente novamente.'] } };
   }
 }
 
@@ -91,13 +91,19 @@ const createMaterialSchema = z.object({
   unidade: z.string().min(1, 'Unidade é obrigatória'),
   preco: z.number().positive('Preço deve ser maior que zero'),
   divisorPadrao: z.number().int().min(1, 'Divisor deve ser pelo menos 1'),
-})
+});
 
 export type CreateMaterialState = {
-  errors?: { nome?: string[]; unidade?: string[]; preco?: string[]; divisorPadrao?: string[]; general?: string[] }
-  success?: boolean
-  material?: Material
-}
+  errors?: {
+    nome?: string[];
+    unidade?: string[];
+    preco?: string[];
+    divisorPadrao?: string[];
+    general?: string[];
+  };
+  success?: boolean;
+  material?: Material;
+};
 
 export async function createMaterial(
   userId: string,
@@ -106,9 +112,9 @@ export async function createMaterial(
   preco: number,
   divisorPadrao: number
 ): Promise<CreateMaterialState> {
-  const result = createMaterialSchema.safeParse({ nome, unidade, preco, divisorPadrao })
+  const result = createMaterialSchema.safeParse({ nome, unidade, preco, divisorPadrao });
   if (!result.success) {
-    const fieldErrors = result.error.flatten().fieldErrors
+    const fieldErrors = result.error.flatten().fieldErrors;
     return {
       errors: {
         nome: fieldErrors.nome,
@@ -116,54 +122,51 @@ export async function createMaterial(
         preco: fieldErrors.preco,
         divisorPadrao: fieldErrors.divisorPadrao,
       },
-    }
+    };
   }
 
   try {
-    const material = await repository.create(userId, result.data)
-    return { success: true, material }
+    const material = await repository.create(userId, result.data);
+    return { success: true, material };
   } catch {
-    return { errors: { general: ['Erro ao criar material. Tente novamente.'] } }
+    return { errors: { general: ['Erro ao criar material. Tente novamente.'] } };
   }
 }
 
 // ─── deleteMaterial ────────────────────────────────────────────────────────────
 
 export type DeleteMaterialState = {
-  errors?: { general?: string[]; procedimentos?: string[] }
-  success?: boolean
-}
+  errors?: { general?: string[]; procedimentos?: string[] };
+  success?: boolean;
+};
 
-export async function deleteMaterial(
-  id: string,
-  userId: string
-): Promise<DeleteMaterialState> {
+export async function deleteMaterial(id: string, userId: string): Promise<DeleteMaterialState> {
   try {
     // Verify the material belongs to the user
-    const material = await prisma.material.findFirst({ where: { id, userId } })
+    const material = await prisma.material.findFirst({ where: { id, userId } });
     if (!material) {
-      return { errors: { general: ['Material não encontrado'] } }
+      return { errors: { general: ['Material não encontrado'] } };
     }
 
     // Check if material is in use by any procedure
     const procedimentoMateriais = await prisma.procedimentoMaterial.findMany({
       where: { materialId: id },
       include: { procedimento: { select: { nome: true } } },
-    })
+    });
 
     if (procedimentoMateriais.length > 0) {
-      const nomeProcedimentos = procedimentoMateriais.map((pm) => pm.procedimento.nome)
+      const nomeProcedimentos = procedimentoMateriais.map((pm) => pm.procedimento.nome);
       return {
         errors: {
           general: ['Este material está em uso e não pode ser excluído'],
           procedimentos: nomeProcedimentos,
         },
-      }
+      };
     }
 
-    await repository.delete(id, userId)
-    return { success: true }
+    await repository.delete(id, userId);
+    return { success: true };
   } catch {
-    return { errors: { general: ['Erro ao excluir material. Tente novamente.'] } }
+    return { errors: { general: ['Erro ao excluir material. Tente novamente.'] } };
   }
 }

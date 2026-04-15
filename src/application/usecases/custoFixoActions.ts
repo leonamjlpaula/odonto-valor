@@ -1,31 +1,31 @@
-'use server'
+'use server';
 
-import { z } from 'zod'
-import { revalidateTag } from 'next/cache'
-import { prisma } from '@/lib/db'
-import { CustoFixoPorMinuto } from '@/domain/value-objects/CustoFixoPorMinuto'
-import { PrismaCustoFixoRepository } from '@/infrastructure/repositories/PrismaCustoFixoRepository'
-import { contarProcedimentosNoVermelho } from './dashboardActions'
-import type { CustoFixoConfig, CustoFixoItem } from '@prisma/client'
+import { z } from 'zod';
+import { revalidateTag } from 'next/cache';
+import { prisma } from '@/lib/db';
+import { CustoFixoPorMinuto } from '@/domain/value-objects/CustoFixoPorMinuto';
+import { PrismaCustoFixoRepository } from '@/infrastructure/repositories/PrismaCustoFixoRepository';
+import { contarProcedimentosNoVermelho } from './dashboardActions';
+import type { CustoFixoConfig, CustoFixoItem } from '@prisma/client';
 
 export type CustoFixoConfigResult = {
-  config: CustoFixoConfig
-  items: CustoFixoItem[]
-  custoFixoPorMinuto: number
-}
+  config: CustoFixoConfig;
+  items: CustoFixoItem[];
+  custoFixoPorMinuto: number;
+};
 
-const repository = new PrismaCustoFixoRepository()
+const repository = new PrismaCustoFixoRepository();
 
 // ─── getCustoFixoConfig ────────────────────────────────────────────────────────
 
 export async function getCustoFixoConfig(userId: string): Promise<CustoFixoConfigResult | null> {
-  const data = await repository.getByUserId(userId)
-  if (!data) return null
+  const data = await repository.getByUserId(userId);
+  if (!data) return null;
 
-  const { items, ...config } = data
-  const custoFixoPorMinuto = CustoFixoPorMinuto.calculate(config, items)
+  const { items, ...config } = data;
+  const custoFixoPorMinuto = CustoFixoPorMinuto.calculate(config, items);
 
-  return { config, items, custoFixoPorMinuto }
+  return { config, items, custoFixoPorMinuto };
 }
 
 // ─── saveCustoFixoConfig ───────────────────────────────────────────────────────
@@ -54,42 +54,42 @@ const saveConfigSchema = z.object({
       isCustom: z.boolean(),
     })
   ),
-})
+});
 
-export type SaveCustoFixoConfigData = z.infer<typeof saveConfigSchema>
+export type SaveCustoFixoConfigData = z.infer<typeof saveConfigSchema>;
 
 export type SaveCustoFixoConfigState = {
-  errors?: { general?: string[] }
-  success?: boolean
+  errors?: { general?: string[] };
+  success?: boolean;
   /** Number of procedures now below 10% margin after the save */
-  procedimentosNoVermelho?: number
-}
+  procedimentosNoVermelho?: number;
+};
 
 export async function saveCustoFixoConfig(
   userId: string,
   data: SaveCustoFixoConfigData
 ): Promise<SaveCustoFixoConfigState> {
-  const result = saveConfigSchema.safeParse(data)
+  const result = saveConfigSchema.safeParse(data);
   if (!result.success) {
-    return { errors: { general: result.error.errors.map((e) => e.message) } }
+    return { errors: { general: result.error.errors.map((e) => e.message) } };
   }
 
   try {
-    await repository.upsert(userId, result.data)
-    revalidateTag(`config-${userId}`)
-    const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId)
-    return { success: true, procedimentosNoVermelho }
+    await repository.upsert(userId, result.data);
+    revalidateTag(`config-${userId}`);
+    const procedimentosNoVermelho = await contarProcedimentosNoVermelho(userId);
+    return { success: true, procedimentosNoVermelho };
   } catch {
-    return { errors: { general: ['Erro ao salvar configuração. Tente novamente.'] } }
+    return { errors: { general: ['Erro ao salvar configuração. Tente novamente.'] } };
   }
 }
 
 // ─── addCustoFixoItem ──────────────────────────────────────────────────────────
 
 export type AddCustoFixoItemState = {
-  errors?: { general?: string[] }
-  success?: boolean
-}
+  errors?: { general?: string[] };
+  success?: boolean;
+};
 
 export async function addCustoFixoItem(
   userId: string,
@@ -97,24 +97,24 @@ export async function addCustoFixoItem(
   valor: number
 ): Promise<AddCustoFixoItemState> {
   if (!nome || nome.trim().length === 0) {
-    return { errors: { general: ['Nome do item é obrigatório'] } }
+    return { errors: { general: ['Nome do item é obrigatório'] } };
   }
   if (valor < 0) {
-    return { errors: { general: ['Valor não pode ser negativo'] } }
+    return { errors: { general: ['Valor não pode ser negativo'] } };
   }
 
   try {
-    const config = await prisma.custoFixoConfig.findUnique({ where: { userId } })
+    const config = await prisma.custoFixoConfig.findUnique({ where: { userId } });
     if (!config) {
-      return { errors: { general: ['Configuração não encontrada'] } }
+      return { errors: { general: ['Configuração não encontrada'] } };
     }
 
     // Determine order (after last item)
     const lastItem = await prisma.custoFixoItem.findFirst({
       where: { configId: config.id },
       orderBy: { ordem: 'desc' },
-    })
-    const nextOrdem = (lastItem?.ordem ?? 0) + 1
+    });
+    const nextOrdem = (lastItem?.ordem ?? 0) + 1;
 
     await prisma.custoFixoItem.create({
       data: {
@@ -124,21 +124,21 @@ export async function addCustoFixoItem(
         ordem: nextOrdem,
         isCustom: true,
       },
-    })
+    });
 
-    revalidateTag(`config-${userId}`)
-    return { success: true }
+    revalidateTag(`config-${userId}`);
+    return { success: true };
   } catch {
-    return { errors: { general: ['Erro ao adicionar item. Tente novamente.'] } }
+    return { errors: { general: ['Erro ao adicionar item. Tente novamente.'] } };
   }
 }
 
 // ─── deleteCustoFixoItem ───────────────────────────────────────────────────────
 
 export type DeleteCustoFixoItemState = {
-  errors?: { general?: string[] }
-  success?: boolean
-}
+  errors?: { general?: string[] };
+  success?: boolean;
+};
 
 export async function deleteCustoFixoItem(
   itemId: string,
@@ -146,28 +146,28 @@ export async function deleteCustoFixoItem(
 ): Promise<DeleteCustoFixoItemState> {
   try {
     // Verify the item belongs to the user's config and is custom
-    const config = await prisma.custoFixoConfig.findUnique({ where: { userId } })
+    const config = await prisma.custoFixoConfig.findUnique({ where: { userId } });
     if (!config) {
-      return { errors: { general: ['Configuração não encontrada'] } }
+      return { errors: { general: ['Configuração não encontrada'] } };
     }
 
     const item = await prisma.custoFixoItem.findFirst({
       where: { id: itemId, configId: config.id },
-    })
+    });
 
     if (!item) {
-      return { errors: { general: ['Item não encontrado'] } }
+      return { errors: { general: ['Item não encontrado'] } };
     }
 
     if (!item.isCustom) {
-      return { errors: { general: ['Apenas itens customizados podem ser excluídos'] } }
+      return { errors: { general: ['Apenas itens customizados podem ser excluídos'] } };
     }
 
-    await prisma.custoFixoItem.delete({ where: { id: itemId } })
+    await prisma.custoFixoItem.delete({ where: { id: itemId } });
 
-    revalidateTag(`config-${userId}`)
-    return { success: true }
+    revalidateTag(`config-${userId}`);
+    return { success: true };
   } catch {
-    return { errors: { general: ['Erro ao excluir item. Tente novamente.'] } }
+    return { errors: { general: ['Erro ao excluir item. Tente novamente.'] } };
   }
 }

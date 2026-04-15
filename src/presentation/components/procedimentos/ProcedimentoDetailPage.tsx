@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
-import { useState, useTransition } from 'react'
-import { MaterialCombobox } from '@/presentation/components/ui/material-combobox'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft, Edit2, Trash2, Plus, Check, X } from 'lucide-react'
-import type { Material } from '@prisma/client'
-import type { ProcedimentoComPreco } from '@/application/usecases/procedimentoActions'
+import { useState, useTransition } from 'react';
+import { MaterialCombobox } from '@/presentation/components/ui/material-combobox';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { ArrowLeft, Edit2, Trash2, Plus, Check, X } from 'lucide-react';
+import type { Material } from '@prisma/client';
+import type { ProcedimentoComPreco } from '@/application/usecases/procedimentoActions';
 import {
   updateProcedimentoTempo,
   updatePrecoVenda,
@@ -15,200 +15,226 @@ import {
   removeMaterialFromProcedimento,
   updateProcedimentoMaterial,
   deleteProcedimento,
-} from '@/application/usecases/procedimentoActions'
-import { margemColor } from '@/application/usecases/calcularPrecoProcedimento'
-import { useToast } from '@/presentation/hooks/use-toast'
-import { Button } from '@/presentation/components/ui/button'
-import { Input } from '@/presentation/components/ui/input'
-import { Label } from '@/presentation/components/ui/label'
-import { Badge } from '@/presentation/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/card'
+} from '@/application/usecases/procedimentoActions';
+import { margemColor } from '@/application/usecases/calcularPrecoProcedimento';
+import { useToast } from '@/presentation/hooks/use-toast';
+import { Button } from '@/presentation/components/ui/button';
+import { Input } from '@/presentation/components/ui/input';
+import { Label } from '@/presentation/components/ui/label';
+import { Badge } from '@/presentation/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/card';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/presentation/components/ui/dialog'
-import { cn } from '@/lib/utils'
+} from '@/presentation/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 function formatBRL(value: number): string {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 function formatPerc(value: number): string {
-  const sign = value >= 0 ? '+' : ''
-  return `${sign}${value.toFixed(1)}%`
+  const sign = value >= 0 ? '+' : '';
+  return `${sign}${value.toFixed(1)}%`;
 }
 
 interface Props {
-  userId: string
-  especialidadeSlug: string
-  detail: ProcedimentoComPreco
-  materiais: Material[]
+  userId: string;
+  especialidadeSlug: string;
+  detail: ProcedimentoComPreco;
+  materiais: Material[];
 }
 
 export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, materiais }: Props) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [isPending, startTransition] = useTransition()
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
-  const { procedimento, precoCalculado, vrpoReferencia } = detail
+  const { procedimento, precoCalculado, vrpoReferencia } = detail;
   const diferencaPerc =
     vrpoReferencia !== null
       ? ((precoCalculado.precoFinal - vrpoReferencia) / vrpoReferencia) * 100
-      : null
+      : null;
 
   // ─── precoVenda editing ───────────────────────────────────────────────────
-  const [editingPreco, setEditingPreco] = useState(false)
+  const [editingPreco, setEditingPreco] = useState(false);
   const [precoValue, setPrecoValue] = useState(
     procedimento.precoVenda != null ? String(procedimento.precoVenda).replace('.', ',') : ''
-  )
+  );
 
   function handleSavePreco() {
-    const raw = precoValue.replace(',', '.').trim()
-    const valor = raw === '' ? null : parseFloat(raw)
+    const raw = precoValue.replace(',', '.').trim();
+    const valor = raw === '' ? null : parseFloat(raw);
     if (valor !== null && (isNaN(valor) || valor < 0)) {
-      toast({ title: 'Preço inválido', description: 'Informe um valor positivo.', variant: 'destructive' })
-      return
+      toast({
+        title: 'Preço inválido',
+        description: 'Informe um valor positivo.',
+        variant: 'destructive',
+      });
+      return;
     }
     startTransition(async () => {
-      const result = await updatePrecoVenda(procedimento.id, userId, valor)
+      const result = await updatePrecoVenda(procedimento.id, userId, valor);
       if (result.success) {
-        setEditingPreco(false)
-        toast({ title: 'Preço de venda atualizado!' })
-        router.refresh()
+        setEditingPreco(false);
+        toast({ title: 'Preço de venda atualizado!' });
+        router.refresh();
       } else {
-        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' });
       }
-    })
+    });
   }
 
   // ─── custoLaboratorio editing ─────────────────────────────────────────────
-  const [editingLab, setEditingLab] = useState(false)
+  const [editingLab, setEditingLab] = useState(false);
   const [labValue, setLabValue] = useState(
     procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0
       ? String(procedimento.custoLaboratorio).replace('.', ',')
       : ''
-  )
+  );
 
   function handleSaveLab() {
-    const raw = labValue.replace(',', '.').trim()
-    const valor = raw === '' ? null : parseFloat(raw)
+    const raw = labValue.replace(',', '.').trim();
+    const valor = raw === '' ? null : parseFloat(raw);
     if (valor !== null && (isNaN(valor) || valor < 0)) {
-      toast({ title: 'Valor inválido', description: 'Informe um valor positivo.', variant: 'destructive' })
-      return
+      toast({
+        title: 'Valor inválido',
+        description: 'Informe um valor positivo.',
+        variant: 'destructive',
+      });
+      return;
     }
     startTransition(async () => {
-      const result = await updateCustoLaboratorio(procedimento.id, userId, valor)
+      const result = await updateCustoLaboratorio(procedimento.id, userId, valor);
       if (result.success) {
-        setEditingLab(false)
-        toast({ title: 'Custo de laboratório atualizado!' })
-        router.refresh()
+        setEditingLab(false);
+        toast({ title: 'Custo de laboratório atualizado!' });
+        router.refresh();
       } else {
-        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' });
       }
-    })
+    });
   }
 
   // ─── Tempo editing ────────────────────────────────────────────────────────
-  const [editingTempo, setEditingTempo] = useState(false)
-  const [tempoValue, setTempoValue] = useState(String(procedimento.tempoMinutos))
+  const [editingTempo, setEditingTempo] = useState(false);
+  const [tempoValue, setTempoValue] = useState(String(procedimento.tempoMinutos));
 
   function handleSaveTempo() {
-    const tempo = parseFloat(tempoValue.replace(',', '.'))
+    const tempo = parseFloat(tempoValue.replace(',', '.'));
     if (isNaN(tempo) || tempo <= 0) {
-      toast({ title: 'Tempo inválido', description: 'Informe um valor maior que zero.', variant: 'destructive' })
-      return
+      toast({
+        title: 'Tempo inválido',
+        description: 'Informe um valor maior que zero.',
+        variant: 'destructive',
+      });
+      return;
     }
     startTransition(async () => {
-      const result = await updateProcedimentoTempo(procedimento.id, userId, tempo)
+      const result = await updateProcedimentoTempo(procedimento.id, userId, tempo);
       if (result.success) {
-        setEditingTempo(false)
-        toast({ title: 'Tempo atualizado com sucesso!' })
-        router.refresh()
+        setEditingTempo(false);
+        toast({ title: 'Tempo atualizado com sucesso!' });
+        router.refresh();
       } else {
-        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' });
       }
-    })
+    });
   }
 
   // ─── Material row editing ─────────────────────────────────────────────────
-  const [editingPmaId, setEditingPmaId] = useState<string | null>(null)
-  const [editConsumo, setEditConsumo] = useState('')
-  const [editDivisor, setEditDivisor] = useState('')
+  const [editingPmaId, setEditingPmaId] = useState<string | null>(null);
+  const [editConsumo, setEditConsumo] = useState('');
+  const [editDivisor, setEditDivisor] = useState('');
 
   function startEditMaterial(pmaId: string, consumo: number, divisor: number) {
-    setEditingPmaId(pmaId)
-    setEditConsumo(String(consumo))
-    setEditDivisor(String(divisor))
+    setEditingPmaId(pmaId);
+    setEditConsumo(String(consumo));
+    setEditDivisor(String(divisor));
   }
 
   function cancelEditMaterial() {
-    setEditingPmaId(null)
-    setEditConsumo('')
-    setEditDivisor('')
+    setEditingPmaId(null);
+    setEditConsumo('');
+    setEditDivisor('');
   }
 
   function handleSaveMaterial(pmaId: string) {
-    const consumo = parseFloat(editConsumo.replace(',', '.'))
+    const consumo = parseFloat(editConsumo.replace(',', '.'));
     if (isNaN(consumo) || consumo <= 0) {
-      toast({ title: 'Consumo inválido', description: 'Informe um valor maior que zero.', variant: 'destructive' })
-      return
+      toast({
+        title: 'Consumo inválido',
+        description: 'Informe um valor maior que zero.',
+        variant: 'destructive',
+      });
+      return;
     }
-    const divisor = parseFloat(editDivisor.replace(',', '.'))
+    const divisor = parseFloat(editDivisor.replace(',', '.'));
     if (isNaN(divisor) || divisor <= 0) {
-      toast({ title: 'Usos/embalagem inválido', description: 'Informe um valor maior que zero.', variant: 'destructive' })
-      return
+      toast({
+        title: 'Usos/embalagem inválido',
+        description: 'Informe um valor maior que zero.',
+        variant: 'destructive',
+      });
+      return;
     }
     startTransition(async () => {
-      const result = await updateProcedimentoMaterial(pmaId, userId, consumo, divisor)
+      const result = await updateProcedimentoMaterial(pmaId, userId, consumo, divisor);
       if (result.success) {
-        cancelEditMaterial()
-        toast({ title: 'Material atualizado!' })
-        router.refresh()
+        cancelEditMaterial();
+        toast({ title: 'Material atualizado!' });
+        router.refresh();
       } else {
-        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' });
       }
-    })
+    });
   }
 
   function handleRemoveMaterial(pmaId: string, materialNome: string) {
     startTransition(async () => {
-      const result = await removeMaterialFromProcedimento(pmaId, userId)
+      const result = await removeMaterialFromProcedimento(pmaId, userId);
       if (result.success) {
-        toast({ title: `${materialNome} removido!` })
-        router.refresh()
+        toast({ title: `${materialNome} removido!` });
+        router.refresh();
       } else {
-        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' });
       }
-    })
+    });
   }
 
   // ─── Add material form ────────────────────────────────────────────────────
-  const [showAddMaterial, setShowAddMaterial] = useState(false)
-  const [selectedMatId, setSelectedMatId] = useState('')
-  const [addConsumo, setAddConsumo] = useState('1')
-  const [addMatInfo, setAddMatInfo] = useState<{ unidade: string; divisorPadrao: number } | null>(null)
-  const [comboboxKey, setComboboxKey] = useState(0)
+  const [showAddMaterial, setShowAddMaterial] = useState(false);
+  const [selectedMatId, setSelectedMatId] = useState('');
+  const [addConsumo, setAddConsumo] = useState('1');
+  const [addMatInfo, setAddMatInfo] = useState<{ unidade: string; divisorPadrao: number } | null>(
+    null
+  );
+  const [comboboxKey, setComboboxKey] = useState(0);
 
   function resetAddForm() {
-    setSelectedMatId('')
-    setAddConsumo('1')
-    setAddMatInfo(null)
-    setComboboxKey((k) => k + 1)
+    setSelectedMatId('');
+    setAddConsumo('1');
+    setAddMatInfo(null);
+    setComboboxKey((k) => k + 1);
   }
 
   function handleAddMaterial() {
     if (!selectedMatId) {
-      toast({ title: 'Selecione um material', variant: 'destructive' })
-      return
+      toast({ title: 'Selecione um material', variant: 'destructive' });
+      return;
     }
-    const consumo = parseFloat(addConsumo.replace(',', '.'))
-    const divisor = addMatInfo?.divisorPadrao ?? 1
+    const consumo = parseFloat(addConsumo.replace(',', '.'));
+    const divisor = addMatInfo?.divisorPadrao ?? 1;
     if (isNaN(consumo) || consumo <= 0) {
-      toast({ title: 'Consumo inválido', description: 'Informe um valor maior que zero.', variant: 'destructive' })
-      return
+      toast({
+        title: 'Consumo inválido',
+        description: 'Informe um valor maior que zero.',
+        variant: 'destructive',
+      });
+      return;
     }
     startTransition(async () => {
       const result = await addMaterialToProcedimento(
@@ -217,32 +243,32 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
         selectedMatId,
         consumo,
         divisor
-      )
+      );
       if (result.success) {
-        setShowAddMaterial(false)
-        resetAddForm()
-        toast({ title: 'Material adicionado!' })
-        router.refresh()
+        setShowAddMaterial(false);
+        resetAddForm();
+        toast({ title: 'Material adicionado!' });
+        router.refresh();
       } else {
-        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' });
       }
-    })
+    });
   }
 
   // ─── Delete procedure ─────────────────────────────────────────────────────
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   function handleDeleteProcedimento() {
     startTransition(async () => {
-      const result = await deleteProcedimento(procedimento.id, userId)
+      const result = await deleteProcedimento(procedimento.id, userId);
       if (result.success) {
-        toast({ title: 'Procedimento excluído!' })
-        router.push(`/procedimentos/${especialidadeSlug}`)
+        toast({ title: 'Procedimento excluído!' });
+        router.push(`/procedimentos/${especialidadeSlug}`);
       } else {
-        toast({ title: 'Erro', description: result.error, variant: 'destructive' })
-        setShowDeleteDialog(false)
+        toast({ title: 'Erro', description: result.error, variant: 'destructive' });
+        setShowDeleteDialog(false);
       }
-    })
+    });
   }
 
   return (
@@ -267,11 +293,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
           <p className="text-sm font-mono text-muted-foreground">Código: {procedimento.codigo}</p>
         </div>
         {procedimento.isCustom && (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setShowDeleteDialog(true)}
-          >
+          <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)}>
             <Trash2 className="h-4 w-4 mr-2" />
             Excluir Procedimento
           </Button>
@@ -300,9 +322,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Custo Fixo
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Custo Fixo</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xl font-bold tabular-nums">
@@ -316,9 +336,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
 
         <Card className="border-primary/30 bg-primary/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Preço Final
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Preço Final</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-2xl font-bold tabular-nums text-primary">
@@ -355,7 +373,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
 
         {/* Margem de lucro */}
         {(() => {
-          const color = margemColor(precoCalculado.margemLucro)
+          const color = margemColor(precoCalculado.margemLucro);
           const colorClass =
             color === 'green'
               ? 'border-green-200 bg-green-50'
@@ -363,7 +381,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                 ? 'border-yellow-200 bg-yellow-50'
                 : color === 'red'
                   ? 'border-red-200 bg-red-50'
-                  : ''
+                  : '';
           const textClass =
             color === 'green'
               ? 'text-green-800'
@@ -371,11 +389,16 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                 ? 'text-yellow-800'
                 : color === 'red'
                   ? 'text-red-800'
-                  : 'text-muted-foreground'
+                  : 'text-muted-foreground';
           return (
             <Card className={cn(color !== null && colorClass)}>
               <CardHeader className="pb-2">
-                <CardTitle className={cn('text-sm font-medium', color !== null ? textClass : 'text-muted-foreground')}>
+                <CardTitle
+                  className={cn(
+                    'text-sm font-medium',
+                    color !== null ? textClass : 'text-muted-foreground'
+                  )}
+                >
                   Margem de Lucro
                 </CardTitle>
               </CardHeader>
@@ -386,7 +409,11 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                       {(precoCalculado.margemLucro * 100).toFixed(1)}%
                     </p>
                     <p className={cn('text-xs mt-1', textClass)}>
-                      {color === 'green' ? 'Acima de 30%' : color === 'yellow' ? 'Abaixo de 30%' : 'Abaixo de 10%'}
+                      {color === 'green'
+                        ? 'Acima de 30%'
+                        : color === 'yellow'
+                          ? 'Abaixo de 30%'
+                          : 'Abaixo de 10%'}
                     </p>
                   </>
                 ) : (
@@ -397,7 +424,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                 )}
               </CardContent>
             </Card>
-          )
+          );
         })()}
 
         {/* Preço mínimo para 30% */}
@@ -425,7 +452,9 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
               {editingPreco ? (
                 'Quanto você cobra por este procedimento'
               ) : procedimento.precoVenda != null ? (
-                <span className="text-foreground font-medium">{formatBRL(procedimento.precoVenda)}</span>
+                <span className="text-foreground font-medium">
+                  {formatBRL(procedimento.precoVenda)}
+                </span>
               ) : (
                 'Não configurado — defina para ver sua margem real'
               )}
@@ -442,10 +471,14 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                 className="w-28"
                 placeholder="ex: 280,00"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSavePreco()
+                  if (e.key === 'Enter') handleSavePreco();
                   if (e.key === 'Escape') {
-                    setEditingPreco(false)
-                    setPrecoValue(procedimento.precoVenda != null ? String(procedimento.precoVenda).replace('.', ',') : '')
+                    setEditingPreco(false);
+                    setPrecoValue(
+                      procedimento.precoVenda != null
+                        ? String(procedimento.precoVenda).replace('.', ',')
+                        : ''
+                    );
                   }
                 }}
                 autoFocus
@@ -457,8 +490,12 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                 size="icon"
                 variant="ghost"
                 onClick={() => {
-                  setEditingPreco(false)
-                  setPrecoValue(procedimento.precoVenda != null ? String(procedimento.precoVenda).replace('.', ',') : '')
+                  setEditingPreco(false);
+                  setPrecoValue(
+                    procedimento.precoVenda != null
+                      ? String(procedimento.precoVenda).replace('.', ',')
+                      : ''
+                  );
                 }}
               >
                 <X className="h-4 w-4" />
@@ -498,40 +535,31 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                 min={1}
                 step={1}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSaveTempo()
+                  if (e.key === 'Enter') handleSaveTempo();
                   if (e.key === 'Escape') {
-                    setEditingTempo(false)
-                    setTempoValue(String(procedimento.tempoMinutos))
+                    setEditingTempo(false);
+                    setTempoValue(String(procedimento.tempoMinutos));
                   }
                 }}
                 autoFocus
               />
               <span className="text-sm text-muted-foreground">min</span>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={handleSaveTempo}
-                disabled={isPending}
-              >
+              <Button size="icon" variant="ghost" onClick={handleSaveTempo} disabled={isPending}>
                 <Check className="h-4 w-4 text-green-600" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
                 onClick={() => {
-                  setEditingTempo(false)
-                  setTempoValue(String(procedimento.tempoMinutos))
+                  setEditingTempo(false);
+                  setTempoValue(String(procedimento.tempoMinutos));
                 }}
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setEditingTempo(true)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setEditingTempo(true)}>
               <Edit2 className="h-4 w-4 mr-2" />
               Editar Tempo
             </Button>
@@ -548,7 +576,9 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
               {editingLab ? (
                 'Valor cobrado pelo laboratório (próteses, facetas, ortodontia)'
               ) : procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0 ? (
-                <span className="text-foreground font-medium">{formatBRL(procedimento.custoLaboratorio)}</span>
+                <span className="text-foreground font-medium">
+                  {formatBRL(procedimento.custoLaboratorio)}
+                </span>
               ) : (
                 'Não configurado — deixe em branco se não aplicável'
               )}
@@ -565,14 +595,14 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                 className="w-28"
                 placeholder="ex: 350,00"
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSaveLab()
+                  if (e.key === 'Enter') handleSaveLab();
                   if (e.key === 'Escape') {
-                    setEditingLab(false)
+                    setEditingLab(false);
                     setLabValue(
                       procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0
                         ? String(procedimento.custoLaboratorio).replace('.', ',')
                         : ''
-                    )
+                    );
                   }
                 }}
                 autoFocus
@@ -584,12 +614,12 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                 size="icon"
                 variant="ghost"
                 onClick={() => {
-                  setEditingLab(false)
+                  setEditingLab(false);
                   setLabValue(
                     procedimento.custoLaboratorio != null && procedimento.custoLaboratorio > 0
                       ? String(procedimento.custoLaboratorio).replace('.', ',')
                       : ''
-                  )
+                  );
                 }}
               >
                 <X className="h-4 w-4" />
@@ -611,11 +641,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Materiais Utilizados</h2>
           {!showAddMaterial && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAddMaterial(true)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowAddMaterial(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Adicionar Material
             </Button>
@@ -628,12 +654,22 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
               <thead className="bg-muted/50">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground w-10">Nº</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Material</th>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Embalagem</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Consumo</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Divisor (usos/embalagem)</th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                    Material
+                  </th>
+                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                    Embalagem
+                  </th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Consumo
+                  </th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Divisor (usos/embalagem)
+                  </th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground">Preço</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Custo/Uso</th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                    Custo/Uso
+                  </th>
                   <th className="px-4 py-3 w-24"></th>
                 </tr>
               </thead>
@@ -646,14 +682,16 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                   </tr>
                 ) : (
                   procedimento.materiais.map((pma, index) => {
-                    const custoPorcao = (pma.material.preco / pma.divisor) * pma.consumo
-                    const isEditing = editingPmaId === pma.id
+                    const custoPorcao = (pma.material.preco / pma.divisor) * pma.consumo;
+                    const isEditing = editingPmaId === pma.id;
 
                     return (
                       <tr key={pma.id} className="hover:bg-muted/20 transition-colors">
                         <td className="px-4 py-3 text-muted-foreground">{index + 1}</td>
                         <td className="px-4 py-3 font-medium">{pma.material.nome}</td>
-                        <td className="px-4 py-3 text-muted-foreground text-xs">{pma.material.unidade}</td>
+                        <td className="px-4 py-3 text-muted-foreground text-xs">
+                          {pma.material.unidade}
+                        </td>
                         <td className="px-4 py-3 text-right">
                           {isEditing ? (
                             <Input
@@ -679,7 +717,9 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                               step={1}
                             />
                           ) : (
-                            <span className="tabular-nums text-muted-foreground">{pma.divisor}</span>
+                            <span className="tabular-nums text-muted-foreground">
+                              {pma.divisor}
+                            </span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">
@@ -732,7 +772,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                           )}
                         </td>
                       </tr>
-                    )
+                    );
                   })
                 )}
               </tbody>
@@ -751,12 +791,12 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
                   key={comboboxKey}
                   options={materiais}
                   onSelect={(id, divisorPadrao, unidade) => {
-                    setSelectedMatId(id)
-                    setAddMatInfo({ divisorPadrao, unidade })
+                    setSelectedMatId(id);
+                    setAddMatInfo({ divisorPadrao, unidade });
                   }}
                   onClear={() => {
-                    setSelectedMatId('')
-                    setAddMatInfo(null)
+                    setSelectedMatId('');
+                    setAddMatInfo(null);
                   }}
                   placeholder="Buscar material..."
                   disabled={isPending}
@@ -764,8 +804,13 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
               </div>
               {addMatInfo && (
                 <div className="flex gap-4 text-sm text-muted-foreground">
-                  <span>Unidade: <strong className="text-foreground">{addMatInfo.unidade}</strong></span>
-                  <span>Usos/embalagem: <strong className="text-foreground">{addMatInfo.divisorPadrao}</strong></span>
+                  <span>
+                    Unidade: <strong className="text-foreground">{addMatInfo.unidade}</strong>
+                  </span>
+                  <span>
+                    Usos/embalagem:{' '}
+                    <strong className="text-foreground">{addMatInfo.divisorPadrao}</strong>
+                  </span>
                 </div>
               )}
               <div className="space-y-2">
@@ -788,8 +833,8 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
               <Button
                 variant="outline"
                 onClick={() => {
-                  setShowAddMaterial(false)
-                  resetAddForm()
+                  setShowAddMaterial(false);
+                  resetAddForm();
                 }}
               >
                 Cancelar
@@ -806,23 +851,19 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
             <DialogTitle>Excluir Procedimento</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Tem certeza que deseja excluir o procedimento{' '}
-            <strong>{procedimento.nome}</strong>? Esta ação não pode ser desfeita.
+            Tem certeza que deseja excluir o procedimento <strong>{procedimento.nome}</strong>? Esta
+            ação não pode ser desfeita.
           </p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
               Cancelar
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteProcedimento}
-              disabled={isPending}
-            >
+            <Button variant="destructive" onClick={handleDeleteProcedimento} disabled={isPending}>
               {isPending ? 'Excluindo...' : 'Excluir'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

@@ -1,93 +1,93 @@
-'use client'
+'use client';
 
-import { useState, useMemo, useTransition } from 'react'
-import { FileText, FileSpreadsheet, ChevronLeft, ChevronRight, Download } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import type { ExportData, ExportPreviewItem } from '@/application/usecases/exportActions'
+import { useState, useMemo, useTransition } from 'react';
+import { FileText, FileSpreadsheet, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { ExportData, ExportPreviewItem } from '@/application/usecases/exportActions';
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 20;
 
-type TipoFilter = 'all' | 'standard' | 'custom'
+type TipoFilter = 'all' | 'standard' | 'custom';
 
 // ─── Formatters ────────────────────────────────────────────────────────────────
 
 function formatBRL(value: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 type Props = {
-  data: ExportData
-}
+  data: ExportData;
+};
 
 export function ExportarPage({ data }: Props) {
-  const { items, especialidades } = data
+  const { items, especialidades } = data;
 
-  const [especialidade, setEspecialidade] = useState<string>('all')
-  const [tipo, setTipo] = useState<TipoFilter>('all')
-  const [currentPage, setCurrentPage] = useState(1)
-  const [downloadingPdf, startPdfTransition] = useTransition()
-  const [downloadingExcel, startExcelTransition] = useTransition()
-  const [downloadingCredenciamento, startCredenciamentoTransition] = useTransition()
+  const [especialidade, setEspecialidade] = useState<string>('all');
+  const [tipo, setTipo] = useState<TipoFilter>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [downloadingPdf, startPdfTransition] = useTransition();
+  const [downloadingExcel, startExcelTransition] = useTransition();
+  const [downloadingCredenciamento, startCredenciamentoTransition] = useTransition();
 
   // Filter items based on selected filters
   const filteredItems = useMemo(() => {
     return items.filter((item: ExportPreviewItem) => {
-      if (especialidade !== 'all' && item.especialidadeSlug !== especialidade) return false
-      if (tipo === 'standard' && item.isCustom) return false
-      if (tipo === 'custom' && !item.isCustom) return false
-      return true
-    })
-  }, [items, especialidade, tipo])
+      if (especialidade !== 'all' && item.especialidadeSlug !== especialidade) return false;
+      if (tipo === 'standard' && item.isCustom) return false;
+      if (tipo === 'custom' && !item.isCustom) return false;
+      return true;
+    });
+  }, [items, especialidade, tipo]);
 
   // Paginate filtered items
-  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE))
-  const safePage = Math.min(currentPage, totalPages)
-  const pageStart = (safePage - 1) * PAGE_SIZE
-  const pageItems = filteredItems.slice(pageStart, pageStart + PAGE_SIZE)
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const pageItems = filteredItems.slice(pageStart, pageStart + PAGE_SIZE);
 
   // Reset to page 1 when filters change
   function handleEspecialidadeChange(value: string) {
-    setEspecialidade(value)
-    setCurrentPage(1)
+    setEspecialidade(value);
+    setCurrentPage(1);
   }
 
   function handleTipoChange(value: TipoFilter) {
-    setTipo(value)
-    setCurrentPage(1)
+    setTipo(value);
+    setCurrentPage(1);
   }
 
   // Build query string for download URLs
   function buildQueryParams() {
-    const params = new URLSearchParams()
-    params.set('especialidade', especialidade)
-    params.set('tipo', tipo)
-    return params.toString()
+    const params = new URLSearchParams();
+    params.set('especialidade', especialidade);
+    params.set('tipo', tipo);
+    return params.toString();
   }
 
   // Download credenciamento PDF (no filters — always full export)
   function handleDownloadCredenciamento() {
     startCredenciamentoTransition(async () => {
-      const response = await fetch('/api/export/pdf-credenciamento')
-      if (!response.ok) return
+      const response = await fetch('/api/export/pdf-credenciamento');
+      if (!response.ok) return;
 
-      const blob = await response.blob()
-      const objectUrl = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = objectUrl
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
 
-      const disposition = response.headers.get('Content-Disposition') ?? ''
-      const match = disposition.match(/filename="([^"]+)"/)
-      a.download = match ? match[1] : 'credenciamento.pdf'
+      const disposition = response.headers.get('Content-Disposition') ?? '';
+      const match = disposition.match(/filename="([^"]+)"/);
+      a.download = match ? match[1] : 'credenciamento.pdf';
 
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(objectUrl)
-    })
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+    });
   }
 
   // Download via fetch + blob
@@ -95,29 +95,29 @@ export function ExportarPage({ data }: Props) {
     const url =
       format === 'pdf'
         ? `/api/export/pdf?${buildQueryParams()}`
-        : `/api/export/excel?${buildQueryParams()}`
+        : `/api/export/excel?${buildQueryParams()}`;
 
-    const startFn = format === 'pdf' ? startPdfTransition : startExcelTransition
+    const startFn = format === 'pdf' ? startPdfTransition : startExcelTransition;
 
     startFn(async () => {
-      const response = await fetch(url)
-      if (!response.ok) return
+      const response = await fetch(url);
+      if (!response.ok) return;
 
-      const blob = await response.blob()
-      const objectUrl = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = objectUrl
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
 
       // Extract filename from Content-Disposition header
-      const disposition = response.headers.get('Content-Disposition') ?? ''
-      const match = disposition.match(/filename="([^"]+)"/)
-      a.download = match ? match[1] : format === 'pdf' ? 'odontovalor.pdf' : 'odontovalor.xlsx'
+      const disposition = response.headers.get('Content-Disposition') ?? '';
+      const match = disposition.match(/filename="([^"]+)"/);
+      a.download = match ? match[1] : format === 'pdf' ? 'odontovalor.pdf' : 'odontovalor.xlsx';
 
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(objectUrl)
-    })
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+    });
   }
 
   return (
@@ -228,8 +228,8 @@ export function ExportarPage({ data }: Props) {
             <h2 className="text-sm font-semibold">PDF de Credenciamento</h2>
             <p className="mt-0.5 text-xs text-muted-foreground max-w-prose">
               Exporta todos os procedimentos com memória completa de cálculo (cada item de custo,
-              depreciação, remuneração, taxa de retorno) e a metodologia CNCC referenciada.
-              Indicado para negociações com operadoras e processos de credenciamento.
+              depreciação, remuneração, taxa de retorno) e a metodologia CNCC referenciada. Indicado
+              para negociações com operadoras e processos de credenciamento.
             </p>
           </div>
           <button
@@ -273,10 +273,7 @@ export function ExportarPage({ data }: Props) {
               <tbody>
                 {pageItems.length === 0 ? (
                   <tr>
-                    <td
-                      colSpan={7}
-                      className="px-4 py-8 text-center text-sm text-muted-foreground"
-                    >
+                    <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
                       Nenhum procedimento encontrado com os filtros selecionados.
                     </td>
                   </tr>
@@ -297,9 +294,7 @@ export function ExportarPage({ data }: Props) {
                       <td className="px-4 py-2.5 text-muted-foreground">
                         {item.especialidadeNome}
                       </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums">
-                        {item.tempoMinutos}
-                      </td>
+                      <td className="px-4 py-2.5 text-right tabular-nums">{item.tempoMinutos}</td>
                       <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                         {formatBRL(item.custoVariavel)}
                       </td>
@@ -349,5 +344,5 @@ export function ExportarPage({ data }: Props) {
         )}
       </div>
     </div>
-  )
+  );
 }

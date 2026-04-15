@@ -1,9 +1,9 @@
-'use client'
+'use client';
 
-import { useState, useTransition, useRef } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/presentation/components/ui/button'
+import { useState, useTransition, useRef } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/presentation/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -11,59 +11,59 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
-} from '@/presentation/components/ui/dialog'
-import { Input } from '@/presentation/components/ui/input'
-import { Label } from '@/presentation/components/ui/label'
-import { useToast } from '@/presentation/hooks/use-toast'
-import { Camera, BookOpen, X, ArrowRight } from 'lucide-react'
-import { createSnapshot } from '@/application/usecases/snapshotActions'
-import { OnboardingWizard } from '@/presentation/components/layout/OnboardingWizard'
+} from '@/presentation/components/ui/dialog';
+import { Input } from '@/presentation/components/ui/input';
+import { Label } from '@/presentation/components/ui/label';
+import { useToast } from '@/presentation/hooks/use-toast';
+import { Camera, BookOpen, X, ArrowRight } from 'lucide-react';
+import { createSnapshot } from '@/application/usecases/snapshotActions';
+import { OnboardingWizard } from '@/presentation/components/layout/OnboardingWizard';
 
-const GUIA_BANNER_KEY = 'odontovalor_guia_dispensado'
+const GUIA_BANNER_KEY = 'odontovalor_guia_dispensado';
 
 type Props = {
-  userId: string
-  onboardingCompleted: boolean
-  perfilConsultorio: string | null
-}
+  userId: string;
+  onboardingCompleted: boolean;
+  perfilConsultorio: string | null;
+};
 
 export function DashboardShell({ userId, onboardingCompleted, perfilConsultorio }: Props) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [isPending, startTransition] = useTransition()
-  const [snapshotOpen, setSnapshotOpen] = useState(false)
-  const [snapNome, setSnapNome] = useState('')
-  const [snapDesc, setSnapDesc] = useState('')
-  const [snapError, setSnapError] = useState<string | null>(null)
-  const guiaBannerRef = useRef<HTMLDivElement>(null)
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
+  const [snapshotOpen, setSnapshotOpen] = useState(false);
+  const [snapNome, setSnapNome] = useState('');
+  const [snapDesc, setSnapDesc] = useState('');
+  const [snapError, setSnapError] = useState<string | null>(null);
+  const guiaBannerRef = useRef<HTMLDivElement>(null);
 
   function dispensarGuiaBanner() {
-    localStorage.setItem(GUIA_BANNER_KEY, '1')
-    if (guiaBannerRef.current) guiaBannerRef.current.style.display = 'none'
+    localStorage.setItem(GUIA_BANNER_KEY, '1');
+    if (guiaBannerRef.current) guiaBannerRef.current.style.display = 'none';
   }
 
   function handleSnapshotOpen() {
-    setSnapNome('')
-    setSnapDesc('')
-    setSnapError(null)
-    setSnapshotOpen(true)
+    setSnapNome('');
+    setSnapDesc('');
+    setSnapError(null);
+    setSnapshotOpen(true);
   }
 
   function handleSnapshotSubmit() {
     if (!snapNome.trim()) {
-      setSnapError('Nome é obrigatório')
-      return
+      setSnapError('Nome é obrigatório');
+      return;
     }
     startTransition(async () => {
-      const result = await createSnapshot(userId, snapNome.trim(), snapDesc.trim() || undefined)
+      const result = await createSnapshot(userId, snapNome.trim(), snapDesc.trim() || undefined);
       if (!result.success) {
-        setSnapError(result.error ?? 'Erro ao salvar registro')
-        return
+        setSnapError(result.error ?? 'Erro ao salvar registro');
+        return;
       }
-      setSnapshotOpen(false)
-      toast({ title: 'Registro salvo!', description: 'Acesse o Histórico para visualizá-lo.' })
-      router.refresh()
-    })
+      setSnapshotOpen(false);
+      toast({ title: 'Registro salvo!', description: 'Acesse o Histórico para visualizá-lo.' });
+      router.refresh();
+    });
   }
 
   return (
@@ -82,7 +82,9 @@ export function DashboardShell({ userId, onboardingCompleted, perfilConsultorio 
       >
         <BookOpen className="h-5 w-5 shrink-0 text-primary mt-0.5" aria-hidden="true" />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground">Novo por aqui? Veja o guia de primeiros passos</p>
+          <p className="text-sm font-medium text-foreground">
+            Novo por aqui? Veja o guia de primeiros passos
+          </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
             Configure seus custos, materiais e preços de venda em poucos minutos.
           </p>
@@ -103,7 +105,8 @@ export function DashboardShell({ userId, onboardingCompleted, perfilConsultorio 
       {/* Static inline script — content is a compile-time constant, no user input, no XSS risk */}
       <script
         dangerouslySetInnerHTML={{
-          __html: "(function(){try{if(!localStorage.getItem('odontovalor_guia_dispensado')){var b=document.getElementById('guia-banner-primeiros-passos');if(b)b.style.display=''}}catch(e){}})();",
+          __html:
+            "(function(){try{if(!localStorage.getItem('odontovalor_guia_dispensado')){var b=document.getElementById('guia-banner-primeiros-passos');if(b)b.style.display=''}}catch(e){}})();",
         }}
       />
 
@@ -126,7 +129,10 @@ export function DashboardShell({ userId, onboardingCompleted, perfilConsultorio 
               <Input
                 id="dash-snap-nome"
                 value={snapNome}
-                onChange={(e) => { setSnapNome(e.target.value); setSnapError(null) }}
+                onChange={(e) => {
+                  setSnapNome(e.target.value);
+                  setSnapError(null);
+                }}
                 placeholder="Ex: Março 2026"
                 onKeyDown={(e) => e.key === 'Enter' && handleSnapshotSubmit()}
               />
@@ -144,7 +150,9 @@ export function DashboardShell({ userId, onboardingCompleted, perfilConsultorio 
           </div>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline" disabled={isPending}>Cancelar</Button>
+              <Button variant="outline" disabled={isPending}>
+                Cancelar
+              </Button>
             </DialogClose>
             <Button onClick={handleSnapshotSubmit} disabled={isPending}>
               {isPending ? 'Salvando…' : 'Salvar'}
@@ -153,5 +161,5 @@ export function DashboardShell({ userId, onboardingCompleted, perfilConsultorio 
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

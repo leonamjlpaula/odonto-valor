@@ -60,13 +60,13 @@ Cada arquivo tem um papel distinto e um momento certo de atualização:
 
 ## Resumo operacional
 
-| Momento | Ação |
-|---|---|
-| Início de sessão | Mencione a fase que quer executar e peça para o Claude ler os docs relevantes antes de codar |
-| Durante a fase | Peça `npm run typecheck` após mudanças estruturais |
-| Final de fase | Commit → atualiza `ROADMAP.md` e `CLAUDE.md` → `/remember` |
-| Início de nova sessão | Nenhuma cerimônia — o `CLAUDE.md` já contextualiza automaticamente |
-| Dúvida sobre decisão anterior | Aponte para `references/analise-fase*.md` — o raciocínio está todo lá |
+| Momento                       | Ação                                                                                         |
+| ----------------------------- | -------------------------------------------------------------------------------------------- |
+| Início de sessão              | Mencione a fase que quer executar e peça para o Claude ler os docs relevantes antes de codar |
+| Durante a fase                | Peça `npm run typecheck` após mudanças estruturais                                           |
+| Final de fase                 | Commit → atualiza `ROADMAP.md` e `CLAUDE.md` → `/remember`                                   |
+| Início de nova sessão         | Nenhuma cerimônia — o `CLAUDE.md` já contextualiza automaticamente                           |
+| Dúvida sobre decisão anterior | Aponte para `references/analise-fase*.md` — o raciocínio está todo lá                        |
 
 A coisa mais importante é o commit ao final de cada fase com a documentação atualizada. Git + CLAUDE.md atualizado é o estado durável — o resto da conversa é descartável.
 

@@ -1,11 +1,11 @@
-import { Suspense } from 'react'
-import { redirect } from 'next/navigation'
-import { getAuthUserId } from '@/lib/supabase/server'
-import { prisma } from '@/lib/db'
-import { Skeleton } from '@/presentation/components/ui/skeleton'
-import { DashboardShell } from '@/presentation/components/dashboard/DashboardShell'
-import { StatsSection } from '@/presentation/components/dashboard/StatsSection'
-import { TablesSection } from '@/presentation/components/dashboard/TablesSection'
+import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+import { getAuthUserId } from '@/lib/supabase/server';
+import { prisma } from '@/lib/db';
+import { Skeleton } from '@/presentation/components/ui/skeleton';
+import { DashboardShell } from '@/presentation/components/dashboard/DashboardShell';
+import { StatsSection } from '@/presentation/components/dashboard/StatsSection';
+import { TablesSection } from '@/presentation/components/dashboard/TablesSection';
 
 function StatsSkeleton() {
   return (
@@ -26,7 +26,7 @@ function StatsSkeleton() {
         <Skeleton className="h-14 w-full rounded-lg" />
       </div>
     </div>
-  )
+  );
 }
 
 function TablesSkeleton() {
@@ -47,17 +47,17 @@ function TablesSkeleton() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 export default async function DashboardRoute() {
-  const userId = await getAuthUserId()
-  if (!userId) redirect('/login')
+  const userId = await getAuthUserId();
+  if (!userId) redirect('/login');
 
   const profile = await prisma.user.findUnique({
     where: { id: userId },
     select: { onboardingCompleted: true, perfilConsultorio: true },
-  })
+  });
 
   return (
     <div className="space-y-6">
@@ -73,5 +73,5 @@ export default async function DashboardRoute() {
         <TablesSection userId={userId} />
       </Suspense>
     </div>
-  )
+  );
 }

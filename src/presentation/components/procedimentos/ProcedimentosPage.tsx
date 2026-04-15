@@ -1,70 +1,81 @@
-'use client'
+'use client';
 
-import { useState, useTransition, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Search, Plus, X } from 'lucide-react'
-import type { Especialidade } from '@prisma/client'
-import type { ProcedimentoComPrecoLista } from '@/application/usecases/procedimentoActions'
-import { createProcedimentoCustomizado } from '@/application/usecases/procedimentoActions'
-import { margemColor } from '@/application/usecases/calcularPrecoProcedimento'
-import { useToast } from '@/presentation/hooks/use-toast'
-import { Button } from '@/presentation/components/ui/button'
-import { Input } from '@/presentation/components/ui/input'
-import { Label } from '@/presentation/components/ui/label'
-import { Badge } from '@/presentation/components/ui/badge'
+import { useState, useTransition, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Search, Plus, X } from 'lucide-react';
+import type { Especialidade } from '@prisma/client';
+import type { ProcedimentoComPrecoLista } from '@/application/usecases/procedimentoActions';
+import { createProcedimentoCustomizado } from '@/application/usecases/procedimentoActions';
+import { margemColor } from '@/application/usecases/calcularPrecoProcedimento';
+import { useToast } from '@/presentation/hooks/use-toast';
+import { Button } from '@/presentation/components/ui/button';
+import { Input } from '@/presentation/components/ui/input';
+import { Label } from '@/presentation/components/ui/label';
+import { Badge } from '@/presentation/components/ui/badge';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/presentation/components/ui/dialog'
-import { cn } from '@/lib/utils'
+} from '@/presentation/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
-type EspecialidadeWithCount = Especialidade & { count: number }
+type EspecialidadeWithCount = Especialidade & { count: number };
 
 interface Props {
-  userId: string
-  especialidades: EspecialidadeWithCount[]
-  currentEspecialidade: Especialidade
-  initialProcedimentos: ProcedimentoComPrecoLista[]
-  initialSearchQuery: string
+  userId: string;
+  especialidades: EspecialidadeWithCount[];
+  currentEspecialidade: Especialidade;
+  initialProcedimentos: ProcedimentoComPrecoLista[];
+  initialSearchQuery: string;
 }
 
 function formatBRL(value: number): string {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 function formatPercentage(value: number): string {
-  const sign = value >= 0 ? '+' : ''
-  return `${sign}${value.toFixed(1)}%`
+  const sign = value >= 0 ? '+' : '';
+  return `${sign}${value.toFixed(1)}%`;
 }
 
-function MargemBadge({ margemLucro, precoMinimoParaMargem30 }: { margemLucro: number | null; precoMinimoParaMargem30: number }) {
-  const color = margemColor(margemLucro)
+function MargemBadge({
+  margemLucro,
+  precoMinimoParaMargem30,
+}: {
+  margemLucro: number | null;
+  precoMinimoParaMargem30: number;
+}) {
+  const color = margemColor(margemLucro);
 
   if (color === null) {
     return (
       <span className="text-xs text-muted-foreground whitespace-nowrap">
         Mín: {formatBRL(precoMinimoParaMargem30)}
       </span>
-    )
+    );
   }
 
-  const pct = (margemLucro! * 100).toFixed(1)
+  const pct = (margemLucro! * 100).toFixed(1);
   const colorClass =
     color === 'green'
       ? 'bg-green-100 text-green-800 border-green-200'
       : color === 'yellow'
         ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-        : 'bg-red-100 text-red-800 border-red-200'
+        : 'bg-red-100 text-red-800 border-red-200';
 
   return (
-    <span className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border tabular-nums', colorClass)}>
+    <span
+      className={cn(
+        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border tabular-nums',
+        colorClass
+      )}
+    >
       {pct}%
     </span>
-  )
+  );
 }
 
 export function ProcedimentosPage({
@@ -72,45 +83,44 @@ export function ProcedimentosPage({
   especialidades,
   currentEspecialidade,
   initialProcedimentos,
-  initialSearchQuery,
+  initialSearchQuery: _initialSearchQuery,
 }: Props) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [isPending, startTransition] = useTransition()
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
-  const [filterQuery, setFilterQuery] = useState('')
-  const [isAddOpen, setIsAddOpen] = useState(false)
-  const [addCodigo, setAddCodigo] = useState('')
-  const [addNome, setAddNome] = useState('')
-  const [addTempo, setAddTempo] = useState('')
-  const [addErrors, setAddErrors] = useState<Record<string, string>>({})
+  const [filterQuery, setFilterQuery] = useState('');
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const [addCodigo, setAddCodigo] = useState('');
+  const [addNome, setAddNome] = useState('');
+  const [addTempo, setAddTempo] = useState('');
+  const [addErrors, setAddErrors] = useState<Record<string, string>>({});
 
   const filteredProcedimentos = useMemo(() => {
-    const q = filterQuery.trim().toLowerCase()
-    if (!q) return initialProcedimentos
+    const q = filterQuery.trim().toLowerCase();
+    if (!q) return initialProcedimentos;
     return initialProcedimentos.filter(
       ({ procedimento }) =>
-        procedimento.nome.toLowerCase().includes(q) ||
-        procedimento.codigo.toString().includes(q)
-    )
-  }, [filterQuery, initialProcedimentos])
+        procedimento.nome.toLowerCase().includes(q) || procedimento.codigo.toString().includes(q)
+    );
+  }, [filterQuery, initialProcedimentos]);
 
   function resetAddForm() {
-    setAddCodigo('')
-    setAddNome('')
-    setAddTempo('')
-    setAddErrors({})
+    setAddCodigo('');
+    setAddNome('');
+    setAddTempo('');
+    setAddErrors({});
   }
 
   function handleAddProcedimento() {
-    const errors: Record<string, string> = {}
-    if (!addCodigo.trim()) errors.codigo = 'Código é obrigatório'
-    if (!addNome.trim()) errors.nome = 'Nome é obrigatório'
-    const tempo = parseFloat(addTempo.replace(',', '.'))
-    if (isNaN(tempo) || tempo <= 0) errors.tempo = 'Tempo deve ser maior que zero'
+    const errors: Record<string, string> = {};
+    if (!addCodigo.trim()) errors.codigo = 'Código é obrigatório';
+    if (!addNome.trim()) errors.nome = 'Nome é obrigatório';
+    const tempo = parseFloat(addTempo.replace(',', '.'));
+    if (isNaN(tempo) || tempo <= 0) errors.tempo = 'Tempo deve ser maior que zero';
     if (Object.keys(errors).length > 0) {
-      setAddErrors(errors)
-      return
+      setAddErrors(errors);
+      return;
     }
 
     startTransition(async () => {
@@ -120,31 +130,31 @@ export function ProcedimentosPage({
         addCodigo.trim(),
         addNome.trim(),
         tempo
-      )
+      );
       if (result.success) {
-        setIsAddOpen(false)
-        resetAddForm()
+        setIsAddOpen(false);
+        resetAddForm();
         toast({
           title: 'Procedimento adicionado!',
           description: `${addNome} criado com sucesso.`,
-        })
-        router.refresh()
+        });
+        router.refresh();
       } else {
-        const fieldErrors: Record<string, string> = {}
-        if (result.errors?.codigo) fieldErrors.codigo = result.errors.codigo[0]
-        if (result.errors?.nome) fieldErrors.nome = result.errors.nome[0]
-        if (result.errors?.tempo) fieldErrors.tempo = result.errors.tempo[0]
+        const fieldErrors: Record<string, string> = {};
+        if (result.errors?.codigo) fieldErrors.codigo = result.errors.codigo[0];
+        if (result.errors?.nome) fieldErrors.nome = result.errors.nome[0];
+        if (result.errors?.tempo) fieldErrors.tempo = result.errors.tempo[0];
         if (Object.keys(fieldErrors).length > 0) {
-          setAddErrors(fieldErrors)
+          setAddErrors(fieldErrors);
         } else {
           toast({
             title: 'Erro ao criar',
             description: result.errors?.general?.join(', ') ?? 'Tente novamente.',
             variant: 'destructive',
-          })
+          });
         }
       }
-    })
+    });
   }
 
   return (
@@ -156,7 +166,7 @@ export function ProcedimentosPage({
         </h2>
         <nav className="space-y-1">
           {especialidades.map((esp) => {
-            const isActive = esp.id === currentEspecialidade.id
+            const isActive = esp.id === currentEspecialidade.id;
             return (
               <Link
                 key={esp.id}
@@ -180,7 +190,7 @@ export function ProcedimentosPage({
                   {esp.count}
                 </span>
               </Link>
-            )
+            );
           })}
         </nav>
       </aside>
@@ -212,10 +222,17 @@ export function ProcedimentosPage({
                 : `${filteredProcedimentos.length} de ${initialProcedimentos.length} procedimento(s)`}
             </p>
             <p className="text-sm text-muted-foreground mt-1 max-w-xl">
-              Veja o custo calculado e a margem de cada procedimento. Informe o preço de venda para monitorar se está no lucro ou no prejuízo. Clique em um procedimento para editar materiais e tempo.
+              Veja o custo calculado e a margem de cada procedimento. Informe o preço de venda para
+              monitorar se está no lucro ou no prejuízo. Clique em um procedimento para editar
+              materiais e tempo.
             </p>
           </div>
-          <Button onClick={() => { resetAddForm(); setIsAddOpen(true) }}>
+          <Button
+            onClick={() => {
+              resetAddForm();
+              setIsAddOpen(true);
+            }}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Adicionar Procedimento
           </Button>
@@ -258,9 +275,7 @@ export function ProcedimentosPage({
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground">
                     Preço Calculado
                   </th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
-                    Margem
-                  </th>
+                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">Margem</th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground">
                     VRPO Ref.
                   </th>
@@ -283,25 +298,23 @@ export function ProcedimentosPage({
                     const diferenca =
                       vrpoReferencia !== null
                         ? ((precoCalculado.precoFinal - vrpoReferencia) / vrpoReferencia) * 100
-                        : null
+                        : null;
 
                     const diferencaColor =
                       diferenca === null
                         ? 'text-muted-foreground'
                         : diferenca >= 0
                           ? 'text-green-600'
-                          : 'text-red-600'
+                          : 'text-red-600';
 
-                    const especialidadeSlug = procedimento.especialidade.codigo
+                    const especialidadeSlug = procedimento.especialidade.codigo;
 
                     return (
                       <tr
                         key={procedimento.id}
                         className="hover:bg-muted/30 transition-colors cursor-pointer"
                         onClick={() =>
-                          router.push(
-                            `/procedimentos/${especialidadeSlug}/${procedimento.id}`
-                          )
+                          router.push(`/procedimentos/${especialidadeSlug}/${procedimento.id}`)
                         }
                       >
                         <td className="px-4 py-3">
@@ -342,7 +355,7 @@ export function ProcedimentosPage({
                           {diferenca !== null ? formatPercentage(diferenca) : '—'}
                         </td>
                       </tr>
-                    )
+                    );
                   })
                 )}
               </tbody>
@@ -355,8 +368,8 @@ export function ProcedimentosPage({
       <Dialog
         open={isAddOpen}
         onOpenChange={(open) => {
-          setIsAddOpen(open)
-          if (!open) resetAddForm()
+          setIsAddOpen(open);
+          if (!open) resetAddForm();
         }}
       >
         <DialogContent>
@@ -375,9 +388,7 @@ export function ProcedimentosPage({
                 value={addCodigo}
                 onChange={(e) => setAddCodigo(e.target.value)}
               />
-              {addErrors.codigo && (
-                <p className="text-xs text-destructive">{addErrors.codigo}</p>
-              )}
+              {addErrors.codigo && <p className="text-xs text-destructive">{addErrors.codigo}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="add-nome">Nome</Label>
@@ -387,9 +398,7 @@ export function ProcedimentosPage({
                 value={addNome}
                 onChange={(e) => setAddNome(e.target.value)}
               />
-              {addErrors.nome && (
-                <p className="text-xs text-destructive">{addErrors.nome}</p>
-              )}
+              {addErrors.nome && <p className="text-xs text-destructive">{addErrors.nome}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="add-tempo">Tempo de execução (min)</Label>
@@ -402,17 +411,15 @@ export function ProcedimentosPage({
                 min={1}
                 step={1}
               />
-              {addErrors.tempo && (
-                <p className="text-xs text-destructive">{addErrors.tempo}</p>
-              )}
+              {addErrors.tempo && <p className="text-xs text-destructive">{addErrors.tempo}</p>}
             </div>
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => {
-                setIsAddOpen(false)
-                resetAddForm()
+                setIsAddOpen(false);
+                resetAddForm();
               }}
             >
               Cancelar
@@ -424,5 +431,5 @@ export function ProcedimentosPage({
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

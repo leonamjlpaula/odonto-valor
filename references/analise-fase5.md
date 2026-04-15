@@ -118,13 +118,13 @@ Sem data comprometida. Executar na ordem de demanda dos usuários:
 
 ## Visão Consolidada do Roadmap
 
-| Fase | Foco | Esforço estimado | Valor |
-|---|---|---|---|
-| 1 | Correções de cálculo | Pequeno (1–2 dias) | Crítico — corrige erros silenciosos |
-| 2 | Margem visível + alertas | Médio (3–4 dias) | Alto — muda a proposta de valor central |
-| 3 | Seed completo | Grande (5–8 dias, dominado por curadoria de dados) | Crítico — sem isso o onboarding falha |
-| 4 | Onboarding + dashboard | Médio (3–4 dias) | Alto — retenção no primeiro uso |
-| 5 | Simulador + PDF profissional | Médio-grande (4–6 dias) | Diferencial — justifica assinatura |
-| 6 | Nice-to-haves | Variável | Incremental |
+| Fase | Foco                         | Esforço estimado                                   | Valor                                   |
+| ---- | ---------------------------- | -------------------------------------------------- | --------------------------------------- |
+| 1    | Correções de cálculo         | Pequeno (1–2 dias)                                 | Crítico — corrige erros silenciosos     |
+| 2    | Margem visível + alertas     | Médio (3–4 dias)                                   | Alto — muda a proposta de valor central |
+| 3    | Seed completo                | Grande (5–8 dias, dominado por curadoria de dados) | Crítico — sem isso o onboarding falha   |
+| 4    | Onboarding + dashboard       | Médio (3–4 dias)                                   | Alto — retenção no primeiro uso         |
+| 5    | Simulador + PDF profissional | Médio-grande (4–6 dias)                            | Diferencial — justifica assinatura      |
+| 6    | Nice-to-haves                | Variável                                           | Incremental                             |
 
 A ordem recomendada é exatamente essa: Fase 1 e 3 podem correr em paralelo (cálculo é código, seed é dados), Fase 2 depende da 1, Fase 4 depende da 2 e 3, Fase 5 depende da 4.

@@ -1,12 +1,12 @@
-'use server'
+'use server';
 
-import { prisma } from '@/lib/db'
+import { prisma } from '@/lib/db';
 
 export async function updateOnboardingCompleted(userId: string): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
     data: { onboardingCompleted: true },
-  })
+  });
 }
 
 export async function savePerfilConsultorio(
@@ -16,5 +16,5 @@ export async function savePerfilConsultorio(
   await prisma.user.update({
     where: { id: userId },
     data: { perfilConsultorio: perfil },
-  })
+  });
 }

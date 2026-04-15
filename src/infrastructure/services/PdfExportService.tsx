@@ -1,17 +1,17 @@
-import React from 'react'
-import { Document, Page, View, Text, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
+import React from 'react';
+import { Document, Page, View, Text, StyleSheet, renderToBuffer } from '@react-pdf/renderer';
 
 export type ProcedimentoExport = {
-  codigo: string
-  nome: string
-  tempoMinutos: number
-  custoVariavel: number
-  precoFinal: number
-  vrpoReferencia: number | null
-}
+  codigo: string;
+  nome: string;
+  tempoMinutos: number;
+  custoVariavel: number;
+  precoFinal: number;
+  vrpoReferencia: number | null;
+};
 
 const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
 const styles = StyleSheet.create({
   page: { padding: 32, fontSize: 9, fontFamily: 'Helvetica' },
@@ -41,13 +41,13 @@ const styles = StyleSheet.create({
   colVrpo: { width: '15%', textAlign: 'right' },
   headerText: { fontFamily: 'Helvetica-Bold' },
   empty: { textAlign: 'center', paddingTop: 16, color: '#6b7280' },
-})
+});
 
 type DocProps = {
-  procedimentos: ProcedimentoExport[]
-  userName: string
-  generatedAt: string
-}
+  procedimentos: ProcedimentoExport[];
+  userName: string;
+  generatedAt: string;
+};
 
 const OdontoValorDocument = ({ procedimentos, userName, generatedAt }: DocProps) => (
   <Document>
@@ -85,7 +85,7 @@ const OdontoValorDocument = ({ procedimentos, userName, generatedAt }: DocProps)
       </View>
     </Page>
   </Document>
-)
+);
 
 export class PdfExportService {
   async generate(
@@ -99,6 +99,6 @@ export class PdfExportService {
         userName={userName}
         generatedAt={generatedAt}
       />
-    )
+    );
   }
 }

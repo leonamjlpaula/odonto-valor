@@ -46,6 +46,7 @@ O produto implementa metodologia híbrida de duas fontes:
 **CNCC/VRPO:** Metodologia oficial da Comissão Nacional de Convênios e Credenciamentos. Define 14 itens de custo fixo padrão, depreciação de equipamentos (sobre **11 meses** — 1 mês de férias), remuneração profissional com encargos (fundo de reserva 11% + insalubridade 40% + imprevistos 20% + férias + 13º), e taxa de retorno de 3% do investimento em 3 anos. Resultado final da planilha original: R$ 2,475/min com os dados de exemplo.
 
 **Gestão financeira moderna (mentora Aline Silva):** Itens ausentes na CNCC que distorcem o cálculo para a realidade atual:
+
 - **Número de cadeiras:** o custo fixo é dividido pelas cadeiras ativas da clínica
 - **Taxa de ociosidade:** minutos úteis reais = teóricos × (1 − ociosidade%). Padrão sugerido: 20%
 - **Impostos sobre faturamento como % do preço** (não custo fixo): ISS/Simples varia entre 6–16%
@@ -53,6 +54,7 @@ O produto implementa metodologia híbrida de duas fontes:
 - **Margem de lucro alvo: 30%** — benchmark explícito da mentora. Procedimento abaixo disso está no "amarelo" ou "vermelho"
 
 **Fórmula completa (ver PRD.md para detalhes):**
+
 ```
 minutosUteis = diasUteis × horasTrabalho × 60 × (1 − ociosidade/100)
 custoBase = totalItens / (minutosUteis × numeroCadeiras)
@@ -95,28 +97,33 @@ src/
 ## Padrões de código
 
 ### Pages vs Components
+
 - **Pages** (`app/**/page.tsx`): server components. Verificam sessão, buscam dados, passam para client component.
 - **Client components**: ficam em `src/presentation/components/`. Recebem dados via props, gerenciam estado local.
 - Padrão típico de page: `getAuthUserId()` → redirect se não autenticado → `Promise.all([...actions])` → renderiza client component.
 
 ### Caching
+
 - **`React cache()`** — deduplicação por request. Usado em `calcularCustoFixoPorMinuto` e `getPercConfig`.
 - **`unstable_cache` (next/cache)** — persistência cross-request (Data Cache). Usado em `src/lib/referenceData.ts` (especialidades e refs VRPO, TTL 24h) e na config do usuário (por userId, invalidada via `revalidateTag`).
 - **Padrão de invalidação**: mutations em `custoFixoActions.ts` chamam `revalidateTag('config-{userId}')` para forçar recálculo no próximo request.
 - Dados globais (`Especialidade`, `VRPOReferencia`) nunca mudam em produção — cacheados sem tag, apenas TTL.
 
 ### Server Actions
+
 - Ficam em `src/application/usecases/*Actions.ts` com `'use server'` no topo.
 - Retornam `{ success: true }` ou `{ errors: { general: string[] } }`.
 - Validação com Zod antes de qualquer operação no banco.
 - Ownership sempre verificado: operações de escrita confirmam que o recurso pertence ao `userId`.
 
 ### Repositórios
+
 - Interface em `src/application/interfaces/I*Repository.ts`.
 - Implementação Prisma em `src/infrastructure/repositories/Prisma*Repository.ts`.
 - Server actions instanciam o repositório diretamente (sem injeção de dependência formal).
 
 ### Autenticação
+
 - `getAuthUserId()` de `@/lib/supabase/server` em server components/actions para obter userId.
 - Middleware em `src/middleware.ts` protege todas as rotas autenticadas: `/dashboard`, `/custos-fixos`, `/materiais`, `/procedimentos`, `/comparativo-vrpo`, `/historico`, `/exportar`, `/primeiros-passos`, `/simulador`, `/conta`.
 - Middleware usa `supabase.auth.getSession()` (lê JWT do cookie sem roundtrip). Server components usam `getAuthUserId()` que chama `getUser()` para validação segura com o servidor Supabase.
@@ -134,6 +141,7 @@ src/
 - Seed por usuário em `src/lib/vrpo-seed-data.ts`: materiais, procedimentos e itens de custo fixo padrão — chamado no `createUser`.
 
 **Campos adicionados nas Fases 1, 2 e 3** (já existem no schema):
+
 - `CustoFixoConfig.numeroCadeiras` (Int, default 1) — Fase 1
 - `CustoFixoConfig.percOciosidade` (Float, default 0) — Fase 1
 - `CustoFixoConfig.percImpostos` (Float, default 8) — Fase 1
@@ -148,6 +156,7 @@ src/
 **Fundação técnica:** sólida. Arquitetura limpa, autenticação completa (incluindo recuperação de senha), CRUD de materiais/procedimentos/custos fixos, comparativo VRPO, snapshots, exportação PDF/Excel, onboarding wizard.
 
 **Fases concluídas:**
+
 - **Fase 1 ✅** — Correções de cálculo: depreciação/retorno com 11 meses (CNCC), número de cadeiras, taxa de ociosidade, percImpostos e percTaxaCartao no config.
 - **Fase 2 ✅** — Margem de lucro visível: campo `precoVenda` no Procedimento, badge verde/amarelo/vermelho na listagem, cards de margem e preço mínimo para 30% no detalhe, dashboard com "Procedimentos no Vermelho", alerta pós-save com contagem de procedimentos afetados.
 - **Fase 3 ✅** — Seed completo: 200 procedimentos, 134 materiais, composições pré-configuradas, `custoLaboratorio` em prótese/endo/ortod, 200 valores VRPO atualizados. Performance: `contarProcedimentosNoVermelho` reescrito com select mínimo; query serial de config em `getProcedimentosNoVermelho` movida para `Promise.all`.
@@ -162,15 +171,16 @@ src/
 
 Dev e prod apontam para o **mesmo Supabase** — não há banco Docker local para o app. O Docker Compose sobe um PostgreSQL auxiliar para testes locais sem Supabase, mas o fluxo padrão usa Supabase direto.
 
-| Variável | Descrição |
-|---|---|
-| `DATABASE_URL` | Transaction Pooler porta 6543 — `?pgbouncer=true&connection_limit=1` obrigatório |
-| `DIRECT_URL` | Direct connection porta 5432 — usado pelo `prisma migrate` |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase (`https://xxxx.supabase.co`) |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key (prefixo `sb_publishable_`) |
-| `SUPABASE_SECRET_KEY` | Secret key — **nunca expor no client** nem em variável `NEXT_PUBLIC_` |
+| Variável                               | Descrição                                                                        |
+| -------------------------------------- | -------------------------------------------------------------------------------- |
+| `DATABASE_URL`                         | Transaction Pooler porta 6543 — `?pgbouncer=true&connection_limit=1` obrigatório |
+| `DIRECT_URL`                           | Direct connection porta 5432 — usado pelo `prisma migrate`                       |
+| `NEXT_PUBLIC_SUPABASE_URL`             | URL do projeto Supabase (`https://xxxx.supabase.co`)                             |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key (prefixo `sb_publishable_`)                                      |
+| `SUPABASE_SECRET_KEY`                  | Secret key — **nunca expor no client** nem em variável `NEXT_PUBLIC_`            |
 
 **Setup dev:**
+
 ```bash
 cp .env.example .env.local   # preencher com valores do painel Supabase
 npx prisma migrate dev

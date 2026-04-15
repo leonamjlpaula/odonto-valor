@@ -1,42 +1,42 @@
-'use server'
+'use server';
 
-import { prisma } from '@/lib/db'
-import { CustoFixoPorMinuto } from '@/domain/value-objects/CustoFixoPorMinuto'
-import { calcularPrecoProcedimento } from './calcularPrecoProcedimento'
-import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository'
+import { prisma } from '@/lib/db';
+import { CustoFixoPorMinuto } from '@/domain/value-objects/CustoFixoPorMinuto';
+import { calcularPrecoProcedimento } from './calcularPrecoProcedimento';
+import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository';
 
 export type SimuladorProcedimento = {
-  id: string
-  codigo: string
-  nome: string
-  especialidadeNome: string
-  tempoMinutos: number
-  custoVariavel: number
-  precoVenda: number | null
-}
+  id: string;
+  codigo: string;
+  nome: string;
+  especialidadeNome: string;
+  tempoMinutos: number;
+  custoVariavel: number;
+  precoVenda: number | null;
+};
 
 export type SimuladorConfig = {
-  diasUteis: number
-  horasTrabalho: number
-  investimentoEquipamentos: number
-  anosDepreciacao: number
-  salarioBase: number
-  percFundoReserva: number
-  percInsalubridade: number
-  percImprevistos: number
-  anosRetorno: number
-  numeroCadeiras: number
-  percOciosidade: number
-  percImpostos: number
-  percTaxaCartao: number
-}
+  diasUteis: number;
+  horasTrabalho: number;
+  investimentoEquipamentos: number;
+  anosDepreciacao: number;
+  salarioBase: number;
+  percFundoReserva: number;
+  percInsalubridade: number;
+  percImprevistos: number;
+  anosRetorno: number;
+  numeroCadeiras: number;
+  percOciosidade: number;
+  percImpostos: number;
+  percTaxaCartao: number;
+};
 
 export type SimuladorData = {
-  config: SimuladorConfig
-  totalItens: number
-  custoFixoPorMinutoAtual: number
-  procedimentos: SimuladorProcedimento[]
-}
+  config: SimuladorConfig;
+  totalItens: number;
+  custoFixoPorMinutoAtual: number;
+  procedimentos: SimuladorProcedimento[];
+};
 
 export async function getSimuladorData(userId: string): Promise<SimuladorData | null> {
   const [configComItems, procedimentos] = await Promise.all([
@@ -64,20 +64,23 @@ export async function getSimuladorData(userId: string): Promise<SimuladorData | 
         },
       },
     }) as Promise<ProcedimentoWithMateriais[]>,
-  ])
+  ]);
 
-  if (!configComItems) return null
+  if (!configComItems) return null;
 
-  const totalItens = configComItems.items.reduce((sum, item) => sum + item.valor, 0)
-  const custoFixoPorMinutoAtual = CustoFixoPorMinuto.calculate(configComItems, configComItems.items)
+  const totalItens = configComItems.items.reduce((sum, item) => sum + item.valor, 0);
+  const custoFixoPorMinutoAtual = CustoFixoPorMinuto.calculate(
+    configComItems,
+    configComItems.items
+  );
 
   const procedimentosSimulados: SimuladorProcedimento[] = procedimentos.map((p) => {
     const preco = calcularPrecoProcedimento(
       p,
       custoFixoPorMinutoAtual,
       configComItems.percImpostos,
-      configComItems.percTaxaCartao,
-    )
+      configComItems.percTaxaCartao
+    );
     return {
       id: p.id,
       codigo: p.codigo,
@@ -86,8 +89,8 @@ export async function getSimuladorData(userId: string): Promise<SimuladorData | 
       tempoMinutos: p.tempoMinutos,
       custoVariavel: preco.custoVariavel,
       precoVenda: p.precoVenda ?? null,
-    }
-  })
+    };
+  });
 
   const config: SimuladorConfig = {
     diasUteis: configComItems.diasUteis,
@@ -103,7 +106,7 @@ export async function getSimuladorData(userId: string): Promise<SimuladorData | 
     percOciosidade: configComItems.percOciosidade,
     percImpostos: configComItems.percImpostos,
     percTaxaCartao: configComItems.percTaxaCartao,
-  }
+  };
 
-  return { config, totalItens, custoFixoPorMinutoAtual, procedimentos: procedimentosSimulados }
+  return { config, totalItens, custoFixoPorMinutoAtual, procedimentos: procedimentosSimulados };
 }

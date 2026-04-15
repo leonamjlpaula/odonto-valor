@@ -1,8 +1,8 @@
-import { prisma } from '@/lib/db'
+import { prisma } from '@/lib/db';
 import type {
   IProcedimentoRepository,
   ProcedimentoWithMateriais,
-} from '@/application/interfaces/IProcedimentoRepository'
+} from '@/application/interfaces/IProcedimentoRepository';
 
 export class PrismaProcedimentoRepository implements IProcedimentoRepository {
   async listByUserAndEspecialidade(
@@ -19,7 +19,7 @@ export class PrismaProcedimentoRepository implements IProcedimentoRepository {
         },
       },
       orderBy: { codigo: 'asc' },
-    })
+    });
   }
 
   async getDetail(id: string, userId: string): Promise<ProcedimentoWithMateriais | null> {
@@ -32,6 +32,6 @@ export class PrismaProcedimentoRepository implements IProcedimentoRepository {
           orderBy: { ordem: 'asc' },
         },
       },
-    })
+    });
   }
 }

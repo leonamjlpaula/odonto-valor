@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
-import { PlusCircle, Eye, Trash2, ArrowLeft, GitCompare, Camera } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { Button } from '@/presentation/components/ui/button'
+import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
+import { Eye, Trash2, ArrowLeft, GitCompare, Camera } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/presentation/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -12,10 +12,10 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
-} from '@/presentation/components/ui/dialog'
-import { Input } from '@/presentation/components/ui/input'
-import { Label } from '@/presentation/components/ui/label'
-import { useToast } from '@/presentation/hooks/use-toast'
+} from '@/presentation/components/ui/dialog';
+import { Input } from '@/presentation/components/ui/input';
+import { Label } from '@/presentation/components/ui/label';
+import { useToast } from '@/presentation/hooks/use-toast';
 import {
   createSnapshot,
   deleteSnapshot,
@@ -25,18 +25,18 @@ import {
   type SnapshotFull,
   type ComparisonResult,
   type CustoItemDiff,
-} from '@/application/usecases/snapshotActions'
+} from '@/application/usecases/snapshotActions';
 
-const SNAPSHOT_LIMIT = 10
+const SNAPSHOT_LIMIT = 10;
 
 // ─── Formatters ───────────────────────────────────────────────────────────────
 
 function formatBRL(value: number) {
-  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
 function formatPerc(value: number) {
-  return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`
+  return `${value >= 0 ? '+' : ''}${value.toFixed(1)}%`;
 }
 
 function formatDate(date: Date | string) {
@@ -46,81 +46,81 @@ function formatDate(date: Date | string) {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(date))
+  }).format(new Date(date));
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ViewMode = 'list' | 'snapshot' | 'comparison'
+type ViewMode = 'list' | 'snapshot' | 'comparison';
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 type Props = {
-  userId: string
-  initialSnapshots: SnapshotListItem[]
-}
+  userId: string;
+  initialSnapshots: SnapshotListItem[];
+};
 
 export function HistoricoPage({ userId, initialSnapshots }: Props) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [isPending, startTransition] = useTransition()
+  const router = useRouter();
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
 
-  const [snapshots, setSnapshots] = useState<SnapshotListItem[]>(initialSnapshots)
-  const [viewMode, setViewMode] = useState<ViewMode>('list')
-  const [selectedSnapshot, setSelectedSnapshot] = useState<SnapshotFull | null>(null)
-  const [comparisonData, setComparisonData] = useState<ComparisonResult | null>(null)
+  const [snapshots, setSnapshots] = useState<SnapshotListItem[]>(initialSnapshots);
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [selectedSnapshot, setSelectedSnapshot] = useState<SnapshotFull | null>(null);
+  const [comparisonData, setComparisonData] = useState<ComparisonResult | null>(null);
 
   // Create snapshot modal
-  const [createOpen, setCreateOpen] = useState(false)
-  const [nome, setNome] = useState('')
-  const [descricao, setDescricao] = useState('')
-  const [createError, setCreateError] = useState<string | null>(null)
+  const [createOpen, setCreateOpen] = useState(false);
+  const [nome, setNome] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [createError, setCreateError] = useState<string | null>(null);
 
   // Delete confirmation
-  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
 
   function handleCreateOpen() {
-    setNome('')
-    setDescricao('')
-    setCreateError(null)
-    setCreateOpen(true)
+    setNome('');
+    setDescricao('');
+    setCreateError(null);
+    setCreateOpen(true);
   }
 
   function handleCreateSubmit() {
     if (!nome.trim()) {
-      setCreateError('Nome é obrigatório')
-      return
+      setCreateError('Nome é obrigatório');
+      return;
     }
 
     startTransition(async () => {
-      const result = await createSnapshot(userId, nome.trim(), descricao.trim() || undefined)
+      const result = await createSnapshot(userId, nome.trim(), descricao.trim() || undefined);
       if (!result.success) {
-        setCreateError(result.error ?? 'Erro ao salvar snapshot')
-        return
+        setCreateError(result.error ?? 'Erro ao salvar snapshot');
+        return;
       }
-      setCreateOpen(false)
-      toast({ title: 'Registro salvo com sucesso!' })
-      router.refresh()
+      setCreateOpen(false);
+      toast({ title: 'Registro salvo com sucesso!' });
+      router.refresh();
       // Refresh local list
-      const { listSnapshots } = await import('@/application/usecases/snapshotActions')
-      const updated = await listSnapshots(userId)
-      setSnapshots(updated)
-    })
+      const { listSnapshots } = await import('@/application/usecases/snapshotActions');
+      const updated = await listSnapshots(userId);
+      setSnapshots(updated);
+    });
   }
 
   function handleView(id: string) {
     startTransition(async () => {
-      const snapshot = await getSnapshot(id, userId)
+      const snapshot = await getSnapshot(id, userId);
       if (!snapshot) {
-        toast({ title: 'Registro não encontrado', variant: 'destructive' })
-        return
+        toast({ title: 'Registro não encontrado', variant: 'destructive' });
+        return;
       }
-      setSelectedSnapshot(snapshot)
-      setComparisonData(null)
-      setViewMode('snapshot')
-    })
+      setSelectedSnapshot(snapshot);
+      setComparisonData(null);
+      setViewMode('snapshot');
+    });
   }
 
   function handleCompare(id: string) {
@@ -128,41 +128,41 @@ export function HistoricoPage({ userId, initialSnapshots }: Props) {
       const [snapshot, comparison] = await Promise.all([
         getSnapshot(id, userId),
         compareSnapshotWithCurrent(id, userId),
-      ])
+      ]);
       if (!snapshot) {
-        toast({ title: 'Registro não encontrado', variant: 'destructive' })
-        return
+        toast({ title: 'Registro não encontrado', variant: 'destructive' });
+        return;
       }
-      setSelectedSnapshot(snapshot)
-      setComparisonData(comparison)
-      setViewMode('comparison')
-    })
+      setSelectedSnapshot(snapshot);
+      setComparisonData(comparison);
+      setViewMode('comparison');
+    });
   }
 
   function handleDeleteConfirm() {
-    if (!deleteId) return
-    const id = deleteId
-    setDeleteId(null)
+    if (!deleteId) return;
+    const id = deleteId;
+    setDeleteId(null);
 
     startTransition(async () => {
-      const result = await deleteSnapshot(id, userId)
+      const result = await deleteSnapshot(id, userId);
       if (!result.success) {
-        toast({ title: result.error ?? 'Erro ao excluir registro', variant: 'destructive' })
-        return
+        toast({ title: result.error ?? 'Erro ao excluir registro', variant: 'destructive' });
+        return;
       }
-      toast({ title: 'Registro excluído' })
-      setSnapshots((prev) => prev.filter((s) => s.id !== id))
+      toast({ title: 'Registro excluído' });
+      setSnapshots((prev) => prev.filter((s) => s.id !== id));
       if (selectedSnapshot?.id === id) {
-        setViewMode('list')
-        setSelectedSnapshot(null)
+        setViewMode('list');
+        setSelectedSnapshot(null);
       }
-    })
+    });
   }
 
   function handleBackToList() {
-    setViewMode('list')
-    setSelectedSnapshot(null)
-    setComparisonData(null)
+    setViewMode('list');
+    setSelectedSnapshot(null);
+    setComparisonData(null);
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -177,7 +177,10 @@ export function HistoricoPage({ userId, initialSnapshots }: Props) {
             Registre versões da sua precificação e compare sua evolução ao longo do tempo.
           </p>
         </div>
-        <Button onClick={handleCreateOpen} disabled={snapshots.length >= SNAPSHOT_LIMIT || isPending}>
+        <Button
+          onClick={handleCreateOpen}
+          disabled={snapshots.length >= SNAPSHOT_LIMIT || isPending}
+        >
           <Camera className="mr-2 h-4 w-4" />
           Registrar Precificação Atual
         </Button>
@@ -240,8 +243,8 @@ export function HistoricoPage({ userId, initialSnapshots }: Props) {
                 id="snapshot-nome"
                 value={nome}
                 onChange={(e) => {
-                  setNome(e.target.value)
-                  setCreateError(null)
+                  setNome(e.target.value);
+                  setCreateError(null);
                 }}
                 placeholder="Ex: Março 2026 — antes do reajuste"
                 onKeyDown={(e) => e.key === 'Enter' && handleCreateSubmit()}
@@ -291,18 +294,18 @@ export function HistoricoPage({ userId, initialSnapshots }: Props) {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
 
 // ─── SnapshotList ─────────────────────────────────────────────────────────────
 
 type SnapshotListProps = {
-  snapshots: SnapshotListItem[]
-  isPending: boolean
-  onView: (id: string) => void
-  onCompare: (id: string) => void
-  onDelete: (id: string) => void
-}
+  snapshots: SnapshotListItem[];
+  isPending: boolean;
+  onView: (id: string) => void;
+  onCompare: (id: string) => void;
+  onDelete: (id: string) => void;
+};
 
 function SnapshotList({ snapshots, isPending, onView, onCompare, onDelete }: SnapshotListProps) {
   if (snapshots.length === 0) {
@@ -312,7 +315,7 @@ function SnapshotList({ snapshots, isPending, onView, onCompare, onDelete }: Sna
           Nenhum registro salvo. Registre o estado atual da sua precificação.
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -380,18 +383,18 @@ function SnapshotList({ snapshots, isPending, onView, onCompare, onDelete }: Sna
         </tbody>
       </table>
     </div>
-  )
+  );
 }
 
 // ─── SnapshotView ─────────────────────────────────────────────────────────────
 
 type SnapshotViewProps = {
-  snapshot: SnapshotFull
-  isPending: boolean
-  onBack: () => void
-  onCompare: () => void
-  onDelete: () => void
-}
+  snapshot: SnapshotFull;
+  isPending: boolean;
+  onBack: () => void;
+  onCompare: () => void;
+  onDelete: () => void;
+};
 
 function SnapshotView({ snapshot, isPending, onBack, onCompare, onDelete }: SnapshotViewProps) {
   return (
@@ -473,19 +476,19 @@ function SnapshotView({ snapshot, isPending, onBack, onCompare, onDelete }: Snap
         {snapshot.dados.procedimentos.length} procedimentos neste registro
       </p>
     </div>
-  )
+  );
 }
 
 // ─── ComparisonView ───────────────────────────────────────────────────────────
 
 type ComparisonViewProps = {
-  snapshot: SnapshotFull
-  result: ComparisonResult
-  onBack: () => void
-}
+  snapshot: SnapshotFull;
+  result: ComparisonResult;
+  onBack: () => void;
+};
 
 function ComparisonView({ snapshot, result, onBack }: ComparisonViewProps) {
-  const { procedimentos: comparison, custoItemsDiff } = result
+  const { procedimentos: comparison, custoItemsDiff } = result;
 
   return (
     <div className="space-y-4">
@@ -509,9 +512,7 @@ function ComparisonView({ snapshot, result, onBack }: ComparisonViewProps) {
       </div>
 
       {/* ── Variações nos custos fixos ─────────────────────────────────── */}
-      {custoItemsDiff.length > 0 && (
-        <CustoItemsDiffSection items={custoItemsDiff} />
-      )}
+      {custoItemsDiff.length > 0 && <CustoItemsDiffSection items={custoItemsDiff} />}
 
       {/* ── Tabela de procedimentos ────────────────────────────────────── */}
       <div className="rounded-md border">
@@ -520,7 +521,9 @@ function ComparisonView({ snapshot, result, onBack }: ComparisonViewProps) {
             <thead>
               <tr className="border-b bg-muted/50 text-left text-xs font-medium text-muted-foreground">
                 <th className="px-4 py-3">Procedimento</th>
-                <th className="px-4 py-3 hidden sm:table-cell text-muted-foreground">Especialidade</th>
+                <th className="px-4 py-3 hidden sm:table-cell text-muted-foreground">
+                  Especialidade
+                </th>
                 <th className="px-4 py-3 text-right">Preço na Versão</th>
                 <th className="px-4 py-3 text-right">Preço Atual</th>
                 <th className="px-4 py-3 text-right">Diferença R$</th>
@@ -550,7 +553,9 @@ function ComparisonView({ snapshot, result, onBack }: ComparisonViewProps) {
                       {formatBRL(item.precoSnapshot)}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums">
-                      {item.precoAtual > 0 ? formatBRL(item.precoAtual) : (
+                      {item.precoAtual > 0 ? (
+                        formatBRL(item.precoAtual)
+                      ) : (
                         <span className="text-muted-foreground">—</span>
                       )}
                     </td>
@@ -587,7 +592,7 @@ function ComparisonView({ snapshot, result, onBack }: ComparisonViewProps) {
       </div>
       <p className="text-xs text-muted-foreground">{comparison.length} procedimentos comparados</p>
     </div>
-  )
+  );
 }
 
 // ─── CustoItemsDiffSection ────────────────────────────────────────────────────
@@ -619,19 +624,23 @@ function CustoItemsDiffSection({ items }: { items: CustoItemDiff[] }) {
                   {item.valorSnapshot > 0 ? formatBRL(item.valorSnapshot) : '—'}
                 </td>
                 <td className="px-4 py-2 text-right tabular-nums">
-                  {item.valorAtual > 0 ? formatBRL(item.valorAtual) : (
+                  {item.valorAtual > 0 ? (
+                    formatBRL(item.valorAtual)
+                  ) : (
                     <span className="text-muted-foreground">Removido</span>
                   )}
                 </td>
                 <td
                   className={cn(
                     'px-4 py-2 text-right tabular-nums font-medium',
-                    item.delta > 0 ? 'text-red-600' : 'text-green-600',
+                    item.delta > 0 ? 'text-red-600' : 'text-green-600'
                   )}
                 >
-                  {item.delta > 0 ? '+' : ''}{formatBRL(item.delta)}
+                  {item.delta > 0 ? '+' : ''}
+                  {formatBRL(item.delta)}
                   <span className="ml-1 text-xs font-normal">
-                    ({item.deltaPerc > 0 ? '+' : ''}{item.deltaPerc.toFixed(1)}%)
+                    ({item.deltaPerc > 0 ? '+' : ''}
+                    {item.deltaPerc.toFixed(1)}%)
                   </span>
                 </td>
               </tr>
@@ -640,5 +649,5 @@ function CustoItemsDiffSection({ items }: { items: CustoItemDiff[] }) {
         </table>
       </div>
     </div>
-  )
+  );
 }

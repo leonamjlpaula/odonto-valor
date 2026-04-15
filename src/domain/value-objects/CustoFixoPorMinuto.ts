@@ -1,13 +1,13 @@
-import type { CustoFixoConfig, CustoFixoItem } from '@prisma/client'
+import type { CustoFixoConfig, CustoFixoItem } from '@prisma/client';
 
 export type BreakEvenMensal = {
   /** Custos do consultório sem pró-labore (itens + depreciação + retorno) */
-  semProLabore: number
+  semProLabore: number;
   /** Custos totais com pró-labore — faturar acima disso é lucro acima do esperado */
-  comProLabore: number
+  comProLabore: number;
   /** Valor mensal do pró-labore (salário + encargos) */
-  proLaboreMensal: number
-}
+  proLaboreMensal: number;
+};
 
 export class CustoFixoPorMinuto {
   /**
@@ -35,10 +35,13 @@ export class CustoFixoPorMinuto {
    *   - percImpostos and percTaxaCartao are NOT used here; they affect margin (Fase 2)
    */
   static calculate(config: CustoFixoConfig, items: CustoFixoItem[]): number {
-    return this.calculateBreakdown(config, items).porMinuto
+    return this.calculateBreakdown(config, items).porMinuto;
   }
 
-  static calculateBreakdown(config: CustoFixoConfig, items: CustoFixoItem[]): BreakEvenMensal & { porMinuto: number } {
+  static calculateBreakdown(
+    config: CustoFixoConfig,
+    items: CustoFixoItem[]
+  ): BreakEvenMensal & { porMinuto: number } {
     const {
       diasUteis,
       horasTrabalho,
@@ -51,22 +54,22 @@ export class CustoFixoPorMinuto {
       anosRetorno,
       numeroCadeiras,
       percOciosidade,
-    } = config
+    } = config;
 
-    const minutosUteis = diasUteis * horasTrabalho * 60 * (1 - percOciosidade / 100)
+    const minutosUteis = diasUteis * horasTrabalho * 60 * (1 - percOciosidade / 100);
     if (minutosUteis <= 0) {
-      return { semProLabore: 0, comProLabore: 0, proLaboreMensal: 0, porMinuto: 0 }
+      return { semProLabore: 0, comProLabore: 0, proLaboreMensal: 0, porMinuto: 0 };
     }
 
-    const cadeiras = Math.max(1, numeroCadeiras)
+    const cadeiras = Math.max(1, numeroCadeiras);
 
     // 1. Fixed costs base (monthly items) — divided among active chairs
-    const totalItens = items.reduce((sum, item) => sum + item.valor, 0)
-    const custoFixoBase = totalItens / (minutosUteis * cadeiras)
+    const totalItens = items.reduce((sum, item) => sum + item.valor, 0);
+    const custoFixoBase = totalItens / (minutosUteis * cadeiras);
 
     // 2. Equipment depreciation — CNCC uses 11 months/year (1 month vacation)
-    const minutosAnuais = minutosUteis * 11
-    const depreciacao = investimentoEquipamentos / (anosDepreciacao * minutosAnuais)
+    const minutosAnuais = minutosUteis * 11;
+    const depreciacao = investimentoEquipamentos / (anosDepreciacao * minutosAnuais);
 
     // 3. Professional remuneration (salary + social charges)
     //    Mandatory CLT charges added per CNCC spreadsheet (rows 248–252):
@@ -79,23 +82,23 @@ export class CustoFixoPorMinuto {
         percInsalubridade / 100 +
         percImprevistos / 100 +
         4 / 36 + // férias (1/12) + adicional de férias (1/3 de 1/12)
-        1 / 12) // 13º salário
-    const remuneracao = proLaboreMensal / minutosUteis
+        1 / 12); // 13º salário
+    const remuneracao = proLaboreMensal / minutosUteis;
 
     // 4. Return on investment — CNCC uses 11 months/year.
     //    The formula divides the full investment by the number of years (no % multiplier).
     //    "Taxa de retorno de 3% em 3 anos" = recover investment in 3 years; taxaRetornoPerc
     //    is NOT applied here — verified in planilha CNCC row 255: 29969.28 ÷ 3 ÷ 11 ÷ … = 0.086.
-    const taxaRetorno = investimentoEquipamentos / (anosRetorno * minutosAnuais)
+    const taxaRetorno = investimentoEquipamentos / (anosRetorno * minutosAnuais);
 
-    const porMinutoSemProLabore = custoFixoBase + depreciacao + taxaRetorno
-    const porMinuto = porMinutoSemProLabore + remuneracao
+    const porMinutoSemProLabore = custoFixoBase + depreciacao + taxaRetorno;
+    const porMinuto = porMinutoSemProLabore + remuneracao;
 
     return {
       semProLabore: porMinutoSemProLabore * minutosUteis,
       comProLabore: porMinuto * minutosUteis,
       proLaboreMensal,
       porMinuto,
-    }
+    };
   }
 }

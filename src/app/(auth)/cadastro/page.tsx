@@ -1,35 +1,36 @@
-'use client'
+'use client';
 
-import { useActionState, useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button } from '@/presentation/components/ui/button'
-import banner from '@/assets/odonto_valor_banner.png'
-import { Input } from '@/presentation/components/ui/input'
-import { PasswordInput } from '@/presentation/components/ui/password-input'
-import { Label } from '@/presentation/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/presentation/components/ui/card'
-import { createUser, type CreateUserState } from '@/application/usecases/createUser'
+import { useActionState, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/presentation/components/ui/button';
+import banner from '@/assets/odonto_valor_banner.png';
+import { Input } from '@/presentation/components/ui/input';
+import { PasswordInput } from '@/presentation/components/ui/password-input';
+import { Label } from '@/presentation/components/ui/label';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/presentation/components/ui/card';
+import { createUser, type CreateUserState } from '@/application/usecases/createUser';
 
-const initialState: CreateUserState = {}
+const initialState: CreateUserState = {};
 
 export default function CadastroPage() {
-  const [state, action, isPending] = useActionState(createUser, initialState)
-  const [nome, setNome] = useState('')
-  const [email, setEmail] = useState('')
-  const [senha, setSenha] = useState('')
-  const [confirmSenha, setConfirmSenha] = useState('')
+  const [state, action, isPending] = useActionState(createUser, initialState);
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [confirmSenha, setConfirmSenha] = useState('');
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <div className="px-6 pt-6">
-          <Image
-            src={banner}
-            alt="OdontoValor"
-            className="w-full h-auto rounded-md"
-            priority
-          />
+          <Image src={banner} alt="OdontoValor" className="w-full h-auto rounded-md" priority />
         </div>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Criar conta</CardTitle>
@@ -41,10 +42,16 @@ export default function CadastroPage() {
           {state.success && (
             <div className="p-4 rounded-md bg-green-50 border border-green-200 text-green-800 text-sm space-y-1">
               <p className="font-medium">Conta criada com sucesso!</p>
-              <p>Enviamos um email de confirmação para o seu endereço. Verifique a caixa de entrada (e o spam) e clique no link para ativar sua conta.</p>
+              <p>
+                Enviamos um email de confirmação para o seu endereço. Verifique a caixa de entrada
+                (e o spam) e clique no link para ativar sua conta.
+              </p>
               <p className="pt-1">
                 Depois de confirmar,{' '}
-                <a href="/login" className="underline font-medium">faça login aqui</a>.
+                <a href="/login" className="underline font-medium">
+                  faça login aqui
+                </a>
+                .
               </p>
             </div>
           )}
@@ -134,7 +141,10 @@ export default function CadastroPage() {
           {!state.success && (
             <div className="mt-4 text-center text-sm text-muted-foreground">
               Já tem uma conta?{' '}
-              <Link href="/login" className="text-primary underline-offset-4 hover:underline font-medium">
+              <Link
+                href="/login"
+                className="text-primary underline-offset-4 hover:underline font-medium"
+              >
                 Faça login
               </Link>
             </div>
@@ -142,5 +152,5 @@ export default function CadastroPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

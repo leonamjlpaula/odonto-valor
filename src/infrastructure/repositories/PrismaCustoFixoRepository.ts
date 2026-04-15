@@ -1,26 +1,26 @@
-import { prisma } from '@/lib/db'
+import { prisma } from '@/lib/db';
 import type {
   ICustoFixoRepository,
   CustoFixoWithItems,
   UpsertCustoFixoData,
-} from '@/application/interfaces/ICustoFixoRepository'
+} from '@/application/interfaces/ICustoFixoRepository';
 
 export class PrismaCustoFixoRepository implements ICustoFixoRepository {
   async getByUserId(userId: string): Promise<CustoFixoWithItems | null> {
     return prisma.custoFixoConfig.findUnique({
       where: { userId },
       include: { items: { orderBy: { ordem: 'asc' } } },
-    })
+    });
   }
 
   async upsert(userId: string, data: UpsertCustoFixoData): Promise<CustoFixoWithItems> {
-    const { items, ...configData } = data
+    const { items, ...configData } = data;
 
     // Get existing config to determine if we need to create or update
     const existing = await prisma.custoFixoConfig.findUnique({
       where: { userId },
       include: { items: true },
-    })
+    });
 
     if (!existing) {
       // Create new config with items
@@ -40,13 +40,13 @@ export class PrismaCustoFixoRepository implements ICustoFixoRepository {
             : undefined,
         },
         include: { items: { orderBy: { ordem: 'asc' } } },
-      })
+      });
     }
 
     // Update config and sync items
     if (items !== undefined) {
       // Delete all existing items and recreate — simplest upsert strategy
-      await prisma.custoFixoItem.deleteMany({ where: { configId: existing.id } })
+      await prisma.custoFixoItem.deleteMany({ where: { configId: existing.id } });
       await prisma.custoFixoItem.createMany({
         data: items.map((item) => ({
           configId: existing.id,
@@ -55,13 +55,13 @@ export class PrismaCustoFixoRepository implements ICustoFixoRepository {
           ordem: item.ordem,
           isCustom: item.isCustom,
         })),
-      })
+      });
     }
 
     return prisma.custoFixoConfig.update({
       where: { userId },
       data: configData,
       include: { items: { orderBy: { ordem: 'asc' } } },
-    })
+    });
   }
 }

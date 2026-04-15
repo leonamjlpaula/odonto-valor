@@ -1,13 +1,13 @@
-import { redirect } from 'next/navigation'
-import { getAuthUserId } from '@/lib/supabase/server'
-import { getComparativoVRPO } from '@/application/usecases/comparativoActions'
-import { ComparativoVRPOPage } from '@/presentation/components/comparativo-vrpo/ComparativoVRPOPage'
+import { redirect } from 'next/navigation';
+import { getAuthUserId } from '@/lib/supabase/server';
+import { getComparativoVRPO } from '@/application/usecases/comparativoActions';
+import { ComparativoVRPOPage } from '@/presentation/components/comparativo-vrpo/ComparativoVRPOPage';
 
 export default async function ComparativoVRPORoute() {
-  const userId = await getAuthUserId()
-  if (!userId) redirect('/login')
+  const userId = await getAuthUserId();
+  if (!userId) redirect('/login');
 
-  const data = await getComparativoVRPO(userId)
+  const data = await getComparativoVRPO(userId);
 
-  return <ComparativoVRPOPage data={data} />
+  return <ComparativoVRPOPage data={data} />;
 }

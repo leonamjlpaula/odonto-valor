@@ -1,70 +1,70 @@
-import React from 'react'
-import { Document, Page, View, Text, StyleSheet, renderToBuffer } from '@react-pdf/renderer'
+import React from 'react';
+import { Document, Page, View, Text, StyleSheet, renderToBuffer } from '@react-pdf/renderer';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type CredenciamentoCustoBreakdown = {
   /** Sum of CustoFixoItem.valor (monthly) */
-  totalItens: number
+  totalItens: number;
   /** Depreciation per month */
-  depreciacaoMensal: number
+  depreciacaoMensal: number;
   /** Professional remuneration per month (salary + charges) */
-  remuneracaoMensal: number
+  remuneracaoMensal: number;
   /** Return on investment per month */
-  taxaRetornoMensal: number
+  taxaRetornoMensal: number;
   /** Total monthly break-even (sum of above + remuneracao) */
-  totalMensal: number
+  totalMensal: number;
   /** Useful minutes per month */
-  minutosUteis: number
+  minutosUteis: number;
   /** Cost per minute */
-  porMinuto: number
-}
+  porMinuto: number;
+};
 
 export type CredenciamentoConfigInfo = {
-  diasUteis: number
-  horasTrabalho: number
-  numeroCadeiras: number
-  percOciosidade: number
-  investimentoEquipamentos: number
-  anosDepreciacao: number
-  salarioBase: number
-  anosRetorno: number
-}
+  diasUteis: number;
+  horasTrabalho: number;
+  numeroCadeiras: number;
+  percOciosidade: number;
+  investimentoEquipamentos: number;
+  anosDepreciacao: number;
+  salarioBase: number;
+  anosRetorno: number;
+};
 
 export type CredenciamentoCustoItem = {
-  nome: string
-  valor: number
-}
+  nome: string;
+  valor: number;
+};
 
 export type CredenciamentoProcedimento = {
-  codigo: string
-  nome: string
-  tempoMinutos: number
-  custoVariavel: number
-  precoFinal: number
-  vrpoReferencia: number | null
-}
+  codigo: string;
+  nome: string;
+  tempoMinutos: number;
+  custoVariavel: number;
+  precoFinal: number;
+  vrpoReferencia: number | null;
+};
 
 export type CredenciamentoEspecialidade = {
-  nome: string
-  procedimentos: CredenciamentoProcedimento[]
-}
+  nome: string;
+  procedimentos: CredenciamentoProcedimento[];
+};
 
 export type CredenciamentoDocumentData = {
-  userName: string
-  generatedAt: string
-  configInfo: CredenciamentoConfigInfo
-  custoItems: CredenciamentoCustoItem[]
-  breakdown: CredenciamentoCustoBreakdown
-  especialidades: CredenciamentoEspecialidade[]
-}
+  userName: string;
+  generatedAt: string;
+  configInfo: CredenciamentoConfigInfo;
+  custoItems: CredenciamentoCustoItem[];
+  breakdown: CredenciamentoCustoBreakdown;
+  especialidades: CredenciamentoEspecialidade[];
+};
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const formatCurrency = (value: number) =>
-  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+  new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-const formatNum = (value: number, decimals = 0) => value.toFixed(decimals).replace('.', ',')
+const formatNum = (value: number, decimals = 0) => value.toFixed(decimals).replace('.', ',');
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
@@ -151,7 +151,12 @@ const s = StyleSheet.create({
     padding: 8,
     marginTop: 8,
   },
-  methodologyTitle: { fontFamily: 'Helvetica-Bold', fontSize: 8.5, marginBottom: 3, color: '#0369a1' },
+  methodologyTitle: {
+    fontFamily: 'Helvetica-Bold',
+    fontSize: 8.5,
+    marginBottom: 3,
+    color: '#0369a1',
+  },
   methodologyText: { fontSize: 7.5, color: '#374151', lineHeight: 1.5 },
 
   // Total row
@@ -167,11 +172,11 @@ const s = StyleSheet.create({
 
   // Highlight value
   highlight: { fontFamily: 'Helvetica-Bold', fontSize: 11, color: '#1d4ed8' },
-})
+});
 
 // ─── Document Component ───────────────────────────────────────────────────────
 
-type DocProps = CredenciamentoDocumentData
+type DocProps = CredenciamentoDocumentData;
 
 function CredenciamentoDocument({
   userName,
@@ -181,7 +186,7 @@ function CredenciamentoDocument({
   breakdown,
   especialidades,
 }: DocProps) {
-  const minutosUteis = breakdown.minutosUteis
+  const minutosUteis = breakdown.minutosUteis;
 
   return (
     <Document>
@@ -243,28 +248,30 @@ function CredenciamentoDocument({
           <Text style={[s.headerCell, s.colBreakMensal]}>Mensal</Text>
           <Text style={[s.headerCell, s.colBreakMinuto]}>Por minuto</Text>
         </View>
-        {([
+        {(
           [
-            'Custo fixo base (itens ÷ cadeiras)',
-            breakdown.totalItens / configInfo.numeroCadeiras,
-            breakdown.totalItens / configInfo.numeroCadeiras / minutosUteis,
-          ],
-          [
-            'Depreciação de equipamentos',
-            breakdown.depreciacaoMensal,
-            breakdown.depreciacaoMensal / minutosUteis,
-          ],
-          [
-            'Remuneração profissional (pró-labore + encargos)',
-            breakdown.remuneracaoMensal,
-            breakdown.remuneracaoMensal / minutosUteis,
-          ],
-          [
-            'Taxa de retorno sobre investimento',
-            breakdown.taxaRetornoMensal,
-            breakdown.taxaRetornoMensal / minutosUteis,
-          ],
-        ] as [string, number, number][]).map(([nome, mensal, porMin], i) => (
+            [
+              'Custo fixo base (itens ÷ cadeiras)',
+              breakdown.totalItens / configInfo.numeroCadeiras,
+              breakdown.totalItens / configInfo.numeroCadeiras / minutosUteis,
+            ],
+            [
+              'Depreciação de equipamentos',
+              breakdown.depreciacaoMensal,
+              breakdown.depreciacaoMensal / minutosUteis,
+            ],
+            [
+              'Remuneração profissional (pró-labore + encargos)',
+              breakdown.remuneracaoMensal,
+              breakdown.remuneracaoMensal / minutosUteis,
+            ],
+            [
+              'Taxa de retorno sobre investimento',
+              breakdown.taxaRetornoMensal,
+              breakdown.taxaRetornoMensal / minutosUteis,
+            ],
+          ] as [string, number, number][]
+        ).map(([nome, mensal, porMin], i) => (
           <View key={nome} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
             <Text style={[s.cell, s.colBreakNome]}>{nome}</Text>
             <Text style={[s.cell, s.colBreakMensal]}>{formatCurrency(mensal)}</Text>
@@ -273,7 +280,9 @@ function CredenciamentoDocument({
         ))}
         <View style={s.totalRow}>
           <Text style={[s.totalText, s.colBreakNome]}>Custo fixo por minuto</Text>
-          <Text style={[s.totalText, s.colBreakMensal]}>{formatCurrency(breakdown.totalMensal)}</Text>
+          <Text style={[s.totalText, s.colBreakMensal]}>
+            {formatCurrency(breakdown.totalMensal)}
+          </Text>
           <Text style={[s.highlight, s.colBreakMinuto]}>{formatCurrency(breakdown.porMinuto)}</Text>
         </View>
 
@@ -303,7 +312,9 @@ function CredenciamentoDocument({
           </View>
           <View style={s.headerRight}>
             <Text style={[s.subtitle, { fontFamily: 'Helvetica-Bold' }]}>OdontoValor</Text>
-            <Text style={s.dateText}>Custo/min: {formatCurrency(breakdown.porMinuto)}/min · Gerado em {generatedAt}</Text>
+            <Text style={s.dateText}>
+              Custo/min: {formatCurrency(breakdown.porMinuto)}/min · Gerado em {generatedAt}
+            </Text>
           </View>
         </View>
 
@@ -324,7 +335,7 @@ function CredenciamentoDocument({
               const diff =
                 p.vrpoReferencia && p.vrpoReferencia > 0
                   ? ((p.precoFinal - p.vrpoReferencia) / p.vrpoReferencia) * 100
-                  : null
+                  : null;
 
               return (
                 <View key={p.codigo} style={[s.tableRow, i % 2 === 1 ? s.tableRowAlt : {}]}>
@@ -348,19 +359,19 @@ function CredenciamentoDocument({
                     {diff !== null ? `${diff > 0 ? '+' : ''}${formatNum(diff, 1)}%` : '—'}
                   </Text>
                 </View>
-              )
+              );
             })}
           </View>
         ))}
       </Page>
     </Document>
-  )
+  );
 }
 
 // ─── Service ──────────────────────────────────────────────────────────────────
 
 export class CredenciamentoPdfService {
   async generate(data: CredenciamentoDocumentData): Promise<Buffer> {
-    return renderToBuffer(<CredenciamentoDocument {...data} />)
+    return renderToBuffer(<CredenciamentoDocument {...data} />);
   }
 }

@@ -1,15 +1,15 @@
-'use client'
+'use client';
 
-import Link from 'next/link'
+import Link from 'next/link';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/presentation/components/ui/card'
-import { Button } from '@/presentation/components/ui/button'
-import { Badge } from '@/presentation/components/ui/badge'
+} from '@/presentation/components/ui/card';
+import { Button } from '@/presentation/components/ui/button';
+import { Badge } from '@/presentation/components/ui/badge';
 import {
   DollarSign,
   Package,
@@ -20,7 +20,7 @@ import {
   Download,
   ArrowRight,
   TrendingUp,
-} from 'lucide-react'
+} from 'lucide-react';
 
 const configuracaoSteps = [
   {
@@ -50,7 +50,7 @@ const configuracaoSteps = [
     href: '/procedimentos/diagnostico',
     tip: 'Margem verde ≥ 30% · amarelo 10–29% · vermelho < 10%.',
   },
-]
+];
 
 const analiseSteps = [
   {
@@ -70,7 +70,7 @@ const analiseSteps = [
     href: '/simulador',
     isNew: true,
   },
-]
+];
 
 const ferramentas = [
   {
@@ -89,7 +89,7 @@ const ferramentas = [
     href: '/exportar',
     label: 'Ir para Exportar',
   },
-]
+];
 
 export function PrimeirosPassosPage() {
   return (
@@ -98,8 +98,8 @@ export function PrimeirosPassosPage() {
       <div className="space-y-3">
         <h1 className="text-2xl font-bold tracking-tight">Primeiros Passos</h1>
         <p className="text-muted-foreground leading-relaxed max-w-2xl">
-          Configure o OdontoValor em poucos passos e descubra se cada procedimento está gerando lucro
-          real — com base nos seus custos reais e na metodologia oficial da CNCC.
+          Configure o OdontoValor em poucos passos e descubra se cada procedimento está gerando
+          lucro real — com base nos seus custos reais e na metodologia oficial da CNCC.
         </p>
       </div>
 
@@ -115,17 +115,23 @@ export function PrimeirosPassosPage() {
               <p className="text-sm font-semibold">Tempo (min)</p>
               <p className="text-xs text-muted-foreground">duração do procedimento</p>
             </div>
-            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">×</div>
+            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">
+              ×
+            </div>
             <div className="flex-1 rounded-lg border bg-muted/50 p-4 space-y-1">
               <p className="text-sm font-semibold">Custo Fixo/min</p>
               <p className="text-xs text-muted-foreground">custo do consultório por minuto</p>
             </div>
-            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">+</div>
+            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">
+              +
+            </div>
             <div className="flex-1 rounded-lg border bg-muted/50 p-4 space-y-1">
               <p className="text-sm font-semibold">Custo Variável</p>
               <p className="text-xs text-muted-foreground">materiais usados no procedimento</p>
             </div>
-            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">=</div>
+            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">
+              =
+            </div>
             <div className="flex-1 rounded-lg border border-primary bg-primary/5 p-4 space-y-1">
               <p className="text-sm font-semibold text-primary">Preço de Custo</p>
               <p className="text-xs text-muted-foreground">base para calcular sua margem</p>
@@ -136,8 +142,8 @@ export function PrimeirosPassosPage() {
             <TrendingUp className="h-4 w-4 shrink-0 mt-0.5 text-primary" aria-hidden="true" />
             <span>
               A <strong className="text-foreground">margem de lucro</strong> é calculada sobre o
-              preço de venda que você pratica, descontando impostos (ISS/Simples) e taxa de
-              cartão. Meta: <strong className="text-foreground">30% ou mais</strong>.
+              preço de venda que você pratica, descontando impostos (ISS/Simples) e taxa de cartão.
+              Meta: <strong className="text-foreground">30% ou mais</strong>.
             </span>
           </div>
         </CardContent>
@@ -150,7 +156,7 @@ export function PrimeirosPassosPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {configuracaoSteps.map((step) => {
-            const Icon = step.icon
+            const Icon = step.icon;
             return (
               <Card key={step.number} className="flex flex-col">
                 <CardHeader className="pb-3">
@@ -183,7 +189,7 @@ export function PrimeirosPassosPage() {
                   </Button>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
       </section>
@@ -195,7 +201,7 @@ export function PrimeirosPassosPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {analiseSteps.map((step) => {
-            const Icon = step.icon
+            const Icon = step.icon;
             return (
               <Card key={step.number} className="flex flex-col">
                 <CardHeader className="pb-3">
@@ -212,7 +218,9 @@ export function PrimeirosPassosPage() {
                         <CardTitle className="text-sm leading-tight">{step.title}</CardTitle>
                       </div>
                       {step.isNew && (
-                        <Badge variant="default" className="text-xs">Novo</Badge>
+                        <Badge variant="default" className="text-xs">
+                          Novo
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -226,7 +234,7 @@ export function PrimeirosPassosPage() {
                   </Button>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
       </section>
@@ -238,7 +246,7 @@ export function PrimeirosPassosPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {ferramentas.map((item) => {
-            const Icon = item.icon
+            const Icon = item.icon;
             return (
               <Card key={item.href} className="flex flex-col">
                 <CardHeader className="pb-3">
@@ -254,10 +262,10 @@ export function PrimeirosPassosPage() {
                   </Button>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
       </section>
     </div>
-  )
+  );
 }

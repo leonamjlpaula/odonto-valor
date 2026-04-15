@@ -1,47 +1,46 @@
-import { redirect } from 'next/navigation'
-import { getAuthUserId } from '@/lib/supabase/server'
-import { prisma } from '@/lib/db'
-import { getEspecialidades } from '@/lib/referenceData'
+import { redirect } from 'next/navigation';
+import { getAuthUserId } from '@/lib/supabase/server';
+import { prisma } from '@/lib/db';
+import { getEspecialidades } from '@/lib/referenceData';
 import {
   getProcedimentosByEspecialidade,
   searchProcedimentos,
-} from '@/application/usecases/procedimentoActions'
-import { ProcedimentosPage } from '@/presentation/components/procedimentos/ProcedimentosPage'
+} from '@/application/usecases/procedimentoActions';
+import { ProcedimentosPage } from '@/presentation/components/procedimentos/ProcedimentosPage';
 
 export default async function Page({
   params,
   searchParams,
 }: {
-  params: Promise<{ especialidade: string }>
-  searchParams: Promise<{ q?: string }>
+  params: Promise<{ especialidade: string }>;
+  searchParams: Promise<{ q?: string }>;
 }) {
-  const userId = await getAuthUserId()
-  if (!userId) redirect('/login')
+  const userId = await getAuthUserId();
+  if (!userId) redirect('/login');
 
-  
-  const { especialidade: especialidadeSlug } = await params
-  const { q: searchQuery } = await searchParams
+  const { especialidade: especialidadeSlug } = await params;
+  const { q: searchQuery } = await searchParams;
 
-  const especialidades = await getEspecialidades()
+  const especialidades = await getEspecialidades();
 
-  const currentEspecialidade = especialidades.find((e) => e.codigo === especialidadeSlug)
-  if (!currentEspecialidade) redirect('/procedimentos/diagnostico')
+  const currentEspecialidade = especialidades.find((e) => e.codigo === especialidadeSlug);
+  if (!currentEspecialidade) redirect('/procedimentos/diagnostico');
 
   const counts = await prisma.procedimento.groupBy({
     by: ['especialidadeId'],
     where: { userId },
     _count: { id: true },
-  })
-  const countMap = new Map(counts.map((c) => [c.especialidadeId, c._count.id]))
+  });
+  const countMap = new Map(counts.map((c) => [c.especialidadeId, c._count.id]));
 
   const especialidadesWithCount = especialidades.map((e) => ({
     ...e,
     count: countMap.get(e.id) ?? 0,
-  }))
+  }));
 
   const procedimentos = searchQuery
     ? await searchProcedimentos(userId, searchQuery)
-    : await getProcedimentosByEspecialidade(userId, especialidadeSlug)
+    : await getProcedimentosByEspecialidade(userId, especialidadeSlug);
 
   return (
     <ProcedimentosPage
@@ -51,5 +50,5 @@ export default async function Page({
       initialProcedimentos={procedimentos}
       initialSearchQuery={searchQuery ?? ''}
     />
-  )
+  );
 }

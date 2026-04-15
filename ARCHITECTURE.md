@@ -8,19 +8,19 @@ O **Precifica** é uma aplicação SaaS de precificação odontológica baseada 
 
 ## Stack Tecnológica
 
-| Camada | Tecnologia |
-|---|---|
-| Framework | Next.js 15 (App Router) |
-| UI | React 19 + TailwindCSS 3 + Radix UI |
-| Linguagem | TypeScript 5 (strict) |
-| ORM | Prisma 6 |
-| Banco de Dados | PostgreSQL |
-| Autenticação | NextAuth.js 4 (Credentials + JWT) |
-| Validação | Zod 3 |
-| Ícones | Lucide React |
-| Variantes de estilo | Class Variance Authority (CVA) |
-| Export PDF | @react-pdf/renderer |
-| Export Excel | XLSX |
+| Camada              | Tecnologia                          |
+| ------------------- | ----------------------------------- |
+| Framework           | Next.js 15 (App Router)             |
+| UI                  | React 19 + TailwindCSS 3 + Radix UI |
+| Linguagem           | TypeScript 5 (strict)               |
+| ORM                 | Prisma 6                            |
+| Banco de Dados      | PostgreSQL                          |
+| Autenticação        | NextAuth.js 4 (Credentials + JWT)   |
+| Validação           | Zod 3                               |
+| Ícones              | Lucide React                        |
+| Variantes de estilo | Class Variance Authority (CVA)      |
+| Export PDF          | @react-pdf/renderer                 |
+| Export Excel        | XLSX                                |
 
 ---
 
@@ -174,6 +174,7 @@ PasswordResetToken      — tokens de recuperação de senha
 ### Campos planejados (roadmap Fase 1–3)
 
 **Em `CustoFixoConfig`** — novos campos para metodologia completa:
+
 ```
 numeroCadeiras      Int     @default(1)      # divisor do custo base por cadeira
 percOciosidade      Float   @default(0)      # % de horas ociosas (sugerido: 20)
@@ -182,11 +183,13 @@ percTaxaCartao      Float   @default(4)      # taxa média de cartão
 ```
 
 **Em `ProcedimentoMaterial`** — laboratório como categoria própria:
+
 ```
 custoLaboratorio    Float?  @default(0)      # custo de laboratório (prótese, faceta)
 ```
 
 **Pontos de destaque (invariantes do modelo):**
+
 - Todos os dados operacionais têm `userId` — multitenancy por coluna
 - `Snapshot.dados` é `Json` — salva estado inteiro de precificação
 - `Procedimento` tem `@@unique([userId, codigo])`
@@ -243,11 +246,11 @@ precoMinimoParaMargem30 =
 
 ## Divisão Server / Client Components
 
-| Tipo | Onde | Responsabilidade |
-|---|---|---|
-| Server Component | `src/app/(dashboard)/*/page.tsx` | Busca dados, verifica sessão, passa props |
-| Client Component | `src/presentation/components/**/*.tsx` | Estado local, formulários, transições |
-| Server Action | `src/application/usecases/*.ts` | Mutações, validação, acesso ao banco |
+| Tipo             | Onde                                   | Responsabilidade                          |
+| ---------------- | -------------------------------------- | ----------------------------------------- |
+| Server Component | `src/app/(dashboard)/*/page.tsx`       | Busca dados, verifica sessão, passa props |
+| Client Component | `src/presentation/components/**/*.tsx` | Estado local, formulários, transições     |
+| Server Action    | `src/application/usecases/*.ts`        | Mutações, validação, acesso ao banco      |
 
 **Padrão de fluxo de dados:**
 
@@ -267,30 +270,32 @@ FooPage.tsx ('use client')
 
 ## Funcionalidades por Rota
 
-| Funcionalidade | Rota | Status |
-|---|---|---|
-| Dashboard | `/dashboard` | ✅ Implementado — evoluir para diagnóstico ativo |
-| Custos Fixos | `/custos-fixos` | 🟡 Implementado — adicionar cadeiras/ociosidade/impostos |
-| Materiais | `/materiais` | ✅ Implementado |
-| Procedimentos | `/procedimentos/:especialidade` | 🟡 Implementado — adicionar coluna de margem |
-| Detalhe Procedimento | `/procedimentos/:especialidade/:id` | 🟡 Implementado — adicionar laboratório e margem |
-| Comparativo VRPO | `/comparativo-vrpo` | 🟡 Implementado — refatorar framing |
-| Histórico | `/historico` | 🟡 Implementado — adicionar narrativa de diff |
-| Exportar | `/exportar` | 🟡 Implementado — adicionar template credenciamento |
-| Primeiros Passos | `/primeiros-passos` | 🟡 Implementado — tornar adaptativo por perfil |
-| Simulador | `/simulador` | 🔴 Planejado (Roadmap Fase 5) |
+| Funcionalidade       | Rota                                | Status                                                   |
+| -------------------- | ----------------------------------- | -------------------------------------------------------- |
+| Dashboard            | `/dashboard`                        | ✅ Implementado — evoluir para diagnóstico ativo         |
+| Custos Fixos         | `/custos-fixos`                     | 🟡 Implementado — adicionar cadeiras/ociosidade/impostos |
+| Materiais            | `/materiais`                        | ✅ Implementado                                          |
+| Procedimentos        | `/procedimentos/:especialidade`     | 🟡 Implementado — adicionar coluna de margem             |
+| Detalhe Procedimento | `/procedimentos/:especialidade/:id` | 🟡 Implementado — adicionar laboratório e margem         |
+| Comparativo VRPO     | `/comparativo-vrpo`                 | 🟡 Implementado — refatorar framing                      |
+| Histórico            | `/historico`                        | 🟡 Implementado — adicionar narrativa de diff            |
+| Exportar             | `/exportar`                         | 🟡 Implementado — adicionar template credenciamento      |
+| Primeiros Passos     | `/primeiros-passos`                 | 🟡 Implementado — tornar adaptativo por perfil           |
+| Simulador            | `/simulador`                        | 🔴 Planejado (Roadmap Fase 5)                            |
 
 ---
 
 ## Seed de Dados
 
 ### Estado atual
+
 - 11 especialidades
 - ~65 VRPOReferencias (estimativas)
 - 30 materiais padrão
 - ~40 procedimentos padrão com composições estimadas
 
 ### Estado planejado (Roadmap Fase 3)
+
 - 11 especialidades (sem mudança)
 - 200+ VRPOReferencias com valores oficiais CNCC
 - ~130 materiais com preços de referência do mercado nacional
@@ -302,39 +307,45 @@ FooPage.tsx ('use client')
 ## Padrões Recorrentes
 
 ### Server Action com validação Zod
+
 ```ts
-'use server'
+'use server';
 export async function createMaterial(userId: string, nome: string, preco: number) {
-  const schema = z.object({ nome: z.string().min(1), preco: z.number().positive() })
-  const result = schema.safeParse({ nome, preco })
-  if (!result.success) return { errors: result.error.flatten().fieldErrors }
-  return { success: true, data: material }
+  const schema = z.object({ nome: z.string().min(1), preco: z.number().positive() });
+  const result = schema.safeParse({ nome, preco });
+  if (!result.success) return { errors: result.error.flatten().fieldErrors };
+  return { success: true, data: material };
 }
 ```
 
 ### Componente client com transição
+
 ```ts
-'use client'
-const [isPending, startTransition] = useTransition()
+'use client';
+const [isPending, startTransition] = useTransition();
 startTransition(async () => {
-  const result = await createMaterial(userId, nome, preco)
-  if (result.errors) { /* exibe erros */ }
-  else { toast({ title: 'Material criado' }) }
-})
+  const result = await createMaterial(userId, nome, preco);
+  if (result.errors) {
+    /* exibe erros */
+  } else {
+    toast({ title: 'Material criado' });
+  }
+});
 ```
 
 ### Repositório com interface
+
 ```ts
 // Interface (application/interfaces)
 interface IMaterialRepository {
-  listByUserId(userId: string): Promise<Material[]>
-  updatePrice(id: string, preco: number): Promise<void>
+  listByUserId(userId: string): Promise<Material[]>;
+  updatePrice(id: string, preco: number): Promise<void>;
 }
 
 // Implementação (infrastructure/repositories)
 class PrismaMaterialRepository implements IMaterialRepository {
   listByUserId(userId: string) {
-    return prisma.material.findMany({ where: { userId } })
+    return prisma.material.findMany({ where: { userId } });
   }
 }
 ```

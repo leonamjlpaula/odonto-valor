@@ -1,27 +1,27 @@
-import { prisma } from '@/lib/db'
-import { calcularCustoFixoPorMinuto } from './calcularCustoFixoPorMinuto'
-import { calcularPrecoProcedimento } from './calcularPrecoProcedimento'
-import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository'
+import { prisma } from '@/lib/db';
+import { calcularCustoFixoPorMinuto } from './calcularCustoFixoPorMinuto';
+import { calcularPrecoProcedimento } from './calcularPrecoProcedimento';
+import type { ProcedimentoWithMateriais } from '@/application/interfaces/IProcedimentoRepository';
 
 export type SnapshotItem = {
-  procedimentoId: string
-  codigo: string
-  nome: string
-  especialidadeNome: string
-  precoCalculado: number
-}
+  procedimentoId: string;
+  codigo: string;
+  nome: string;
+  especialidadeNome: string;
+  precoCalculado: number;
+};
 
 export type SnapshotCustoFixoItem = {
-  nome: string
-  valor: number
-}
+  nome: string;
+  valor: number;
+};
 
 export type SnapshotDados = {
-  custoFixoPorMinuto: number
+  custoFixoPorMinuto: number;
   /** Items de custo fixo no momento do snapshot (Fase 5+). Ausente em snapshots antigos. */
-  custoFixoItems?: SnapshotCustoFixoItem[]
-  procedimentos: SnapshotItem[]
-}
+  custoFixoItems?: SnapshotCustoFixoItem[];
+  procedimentos: SnapshotItem[];
+};
 
 export async function gerarSnapshot(userId: string): Promise<SnapshotDados> {
   const [procedimentos, configComItems, custoFixoPorMinuto] = await Promise.all([
@@ -40,7 +40,7 @@ export async function gerarSnapshot(userId: string): Promise<SnapshotDados> {
       include: { items: { orderBy: { ordem: 'asc' } } },
     }),
     calcularCustoFixoPorMinuto(userId),
-  ])
+  ]);
 
   const snapshotProcedimentos: SnapshotItem[] = procedimentos.map((p) => ({
     procedimentoId: p.id,
@@ -48,15 +48,15 @@ export async function gerarSnapshot(userId: string): Promise<SnapshotDados> {
     nome: p.nome,
     especialidadeNome: p.especialidade.nome,
     precoCalculado: calcularPrecoProcedimento(p, custoFixoPorMinuto).precoFinal,
-  }))
+  }));
 
   const custoFixoItems: SnapshotCustoFixoItem[] | undefined = configComItems
     ? configComItems.items.map((item) => ({ nome: item.nome, valor: item.valor }))
-    : undefined
+    : undefined;
 
   return {
     custoFixoPorMinuto,
     custoFixoItems,
     procedimentos: snapshotProcedimentos,
-  }
+  };
 }
