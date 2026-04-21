@@ -33,9 +33,21 @@ Antes de qualquer tarefa de produto, leia:
 npm run dev              # inicia servidor de desenvolvimento
 npm run typecheck        # tsc --noEmit (rodar antes de commitar)
 npm run lint             # eslint
+npm run format:check     # prettier --check
+npm run format           # prettier --write (corrige formato)
 npm run prisma:migrate   # aplica migrations usando .env.local
 npm run prisma:seed      # popula dados padrão VRPO usando .env.local
 ```
+
+### Pré-PR obrigatório
+
+Antes de abrir qualquer PR (`gh pr create`), rodar:
+
+```bash
+npm run typecheck && npm run lint && npm run format:check
+```
+
+Enforçado via hook `PreToolUse` em `.claude/settings.json` — se qualquer check falhar, o `gh pr create` é bloqueado. Ajustar código ou rodar `npm run format` antes de tentar de novo.
 
 ---
 
