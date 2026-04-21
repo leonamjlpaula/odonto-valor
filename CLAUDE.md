@@ -63,6 +63,7 @@ refactor/<N>-<slug-curto>   # refactor sem mudança de comportamento
 `<slug-curto>`: kebab-case, 2–4 palavras, derivado do título da issue.
 
 Exemplos:
+
 - Issue #9 "Tooltip de glossário" → `feat/9-glossary-tooltip`
 - Issue #13 "Usar parseBR nas server actions" → `refactor/13-parse-br-actions`
 
