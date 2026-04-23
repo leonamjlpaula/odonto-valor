@@ -31,7 +31,7 @@ export const GLOSSARY: Record<TermKey, GlossaryEntry> = {
     short: 'ociosidade',
     friendly: 'TODO(#20)',
     tooltip:
-      'Ociosidade: % do tempo produtivo não utilizado. Reduz os minutos úteis disponíveis e eleva o custo por minuto.',
+      '% do tempo produtivo não utilizado. Reduz os minutos úteis disponíveis e eleva o custo por minuto.',
   },
   proLabore: {
     short: 'pró-labore',
@@ -47,8 +47,7 @@ export const GLOSSARY: Record<TermKey, GlossaryEntry> = {
   fundoReserva: {
     short: 'fundo de reserva',
     friendly: 'TODO(#20)',
-    tooltip:
-      'Fundo de reserva: ~11% do salário provisionado para cobrir 13º salário, férias e eventuais rescisões.',
+    tooltip: '~11% do salário provisionado para cobrir 13º salário, férias e eventuais rescisões.',
   },
   breakEven: {
     short: 'break-even',
