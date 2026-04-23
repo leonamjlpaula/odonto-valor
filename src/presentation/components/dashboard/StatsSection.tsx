@@ -28,6 +28,8 @@ export async function StatsSection({ userId }: { userId: string }) {
     stats.custosDesatualizados ||
     stats.ociosidadeNaoConfigurada;
 
+  const corMargemMedia = margemColor(stats.margemMedia);
+
   return (
     <>
       {hasAlertas && (
@@ -79,7 +81,7 @@ export async function StatsSection({ userId }: { userId: string }) {
                   <span className="text-green-600">0</span>
                 )}
                 <span className="ml-1 text-lg font-normal text-muted-foreground">
-                  / {stats.totalProcedimentos}
+                  / {stats.totalProcedimentosComPreco}
                 </span>
               </CardTitle>
             </CardHeader>
@@ -93,35 +95,37 @@ export async function StatsSection({ userId }: { userId: string }) {
           </Card>
         </Link>
 
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Margem Média</CardDescription>
-            <CardTitle className="text-3xl tabular-nums">
-              {stats.margemMedia !== null ? (
-                <span
-                  className={
-                    margemColor(stats.margemMedia) === 'green'
-                      ? 'text-green-600'
-                      : margemColor(stats.margemMedia) === 'yellow'
-                        ? 'text-yellow-600'
-                        : 'text-red-600'
-                  }
-                >
-                  {(stats.margemMedia * 100).toFixed(1)}%
-                </span>
-              ) : (
-                <span className="text-muted-foreground text-2xl">—</span>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              {stats.margemMedia !== null
-                ? 'Média dos procedimentos com preço de venda'
-                : 'Configure preços de venda nos procedimentos'}
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/procedimentos" className="block">
+          <Card className="h-full transition-shadow hover:shadow-md">
+            <CardHeader className="pb-2">
+              <CardDescription>Margem Média</CardDescription>
+              <CardTitle className="text-3xl tabular-nums">
+                {stats.margemMedia !== null ? (
+                  <span
+                    className={
+                      corMargemMedia === 'green'
+                        ? 'text-green-600'
+                        : corMargemMedia === 'yellow'
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                    }
+                  >
+                    {(stats.margemMedia * 100).toFixed(1)}%
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground text-2xl">—</span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground">
+                {stats.margemMedia !== null
+                  ? 'Média dos procedimentos com preço de venda'
+                  : 'Configure preços de venda nos procedimentos'}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
         <Link href="/custos-fixos" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">

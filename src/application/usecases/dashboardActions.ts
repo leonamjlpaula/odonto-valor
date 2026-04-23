@@ -14,6 +14,7 @@ export type DashboardStats = {
   totalCustosFixosMensais: number;
   totalProcedimentos: number;
   totalMateriais: number;
+  totalProcedimentosComPreco: number;
   margemMedia: number | null;
   breakEven: {
     semProLabore: number;
@@ -106,9 +107,10 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     ? { percImpostos: config.percImpostos, percTaxaCartao: config.percTaxaCartao }
     : { percImpostos: 0, percTaxaCartao: 0 };
 
-  const margensCalculadas = procedimentos
+  const procedimentosComPreco = procedimentos.filter((p) => p.precoVenda != null);
+
+  const margensCalculadas = procedimentosComPreco
     .map((p) => {
-      if (!p.precoVenda) return null;
       const calc = calcularPrecoProcedimento(p, custoFixoPorMinuto, percImpostos, percTaxaCartao);
       return calc.margemLucro;
     })
@@ -127,6 +129,7 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     totalCustosFixosMensais,
     totalProcedimentos,
     totalMateriais,
+    totalProcedimentosComPreco: procedimentosComPreco.length,
     margemMedia,
     breakEven,
     ociosidadeNaoConfigurada: config?.percOciosidade === 0,
