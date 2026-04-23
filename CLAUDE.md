@@ -1,4 +1,8 @@
-# OdontoValor — CLAUDE.md
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+# OdontoValor
 
 SaaS de precificação para consultórios odontológicos brasileiros. Posicionamento central: **"Configure em 10 minutos e saiba se está no lucro ou no prejuízo em cada procedimento."**
 
@@ -11,7 +15,9 @@ Antes de qualquer tarefa de produto, leia:
 - `PRD.md` — visão do produto, perfis de usuário, funcionalidades, fórmulas completas
 - `ARCHITECTURE.md` — stack, estrutura de diretórios, modelo de dados, padrões de código
 - `ROADMAP.md` — 6 fases priorizadas, esforço, critérios de "feito" e dependências
+- `MODUS_OPERANDI.md` — workflow de sessão: como abrir/fechar fases, manter docs vivos, camadas de persistência
 - `references/analise-fase1.md` a `analise-fase5.md` — análise profunda das duas metodologias (CNCC e live da mentora Aline Silva), diagnóstico do MVP e raciocínio por trás de cada decisão do roadmap
+- `progress.txt` — histórico acumulado de progresso por fase (consulte para entender decisões passadas)
 
 ---
 
@@ -39,10 +45,21 @@ Sempre usar `rtk` como prefixo — filtra output irrelevante, economiza tokens.
 
 ```bash
 rtk npm run dev              # inicia servidor de desenvolvimento
+rtk npm run build            # build de produção
 rtk npm run typecheck        # tsc --noEmit (rodar antes de commitar)
 rtk npm run lint             # eslint
+rtk npm run lint:fix         # eslint com auto-fix
+rtk npm run format           # prettier --write em *.ts,tsx,json,md,css
+rtk npm run format:check     # verifica formatação (roda no CI)
+rtk npm run prisma:generate  # regenera Prisma Client sem migration
 rtk npm run prisma:migrate   # aplica migrations usando .env.local
 rtk npm run prisma:seed      # popula dados padrão VRPO usando .env.local
+```
+
+**Gate do CI** (lint + format + typecheck — bloqueia PR se falhar):
+
+```bash
+rtk npm run lint && rtk npm run format:check && rtk npm run typecheck
 ```
 
 Subcomandos rtk úteis:
