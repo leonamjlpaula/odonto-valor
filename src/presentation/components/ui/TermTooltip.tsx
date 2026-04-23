@@ -3,11 +3,7 @@
 import { Info } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/presentation/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/presentation/components/ui/tooltip';
 import { GLOSSARY, type TermKey } from '@/lib/glossary';
 import { cn } from '@/lib/utils';
 
