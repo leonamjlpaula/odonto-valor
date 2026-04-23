@@ -6,7 +6,6 @@ import type { ReactNode } from 'react';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '@/presentation/components/ui/tooltip';
 import { GLOSSARY, type TermKey } from '@/lib/glossary';
@@ -24,25 +23,23 @@ export function TermTooltip({ term, children, className, iconClassName }: TermTo
   const label = children ?? entry.short;
 
   return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span
-            tabIndex={0}
-            className={cn(
-              'inline-flex items-center gap-1 cursor-help underline decoration-dotted underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
-              className
-            )}
-            aria-label={`${entry.short}: ${entry.tooltip}`}
-          >
-            {label}
-            <Info className={cn('h-3.5 w-3.5 text-muted-foreground', iconClassName)} aria-hidden />
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-xs text-xs leading-snug">
-          {entry.tooltip}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          tabIndex={0}
+          className={cn(
+            'inline-flex items-center gap-1 cursor-help underline decoration-dotted underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
+            className
+          )}
+          aria-label={`${entry.short}: ${entry.tooltip}`}
+        >
+          {label}
+          <Info className={cn('h-3.5 w-3.5 text-muted-foreground', iconClassName)} aria-hidden />
+        </span>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-xs text-xs leading-snug">
+        {entry.tooltip}
+      </TooltipContent>
+    </Tooltip>
   );
 }

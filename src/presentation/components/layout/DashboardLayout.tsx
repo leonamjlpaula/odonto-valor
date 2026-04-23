@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/presentation/components/ui/button';
+import { TooltipProvider } from '@/presentation/components/ui/tooltip';
 import { NavigationProgress } from '@/presentation/components/ui/NavigationProgress';
 import Image from 'next/image';
 import banner from '@/assets/odonto_valor_banner.png';
@@ -72,6 +73,7 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
   }
 
   return (
+    <TooltipProvider delayDuration={200}>
     <div className="flex h-screen bg-background">
       <NavigationProgress />
       {/* Desktop Sidebar */}
@@ -192,5 +194,6 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
         )}
       </nav>
     </div>
+    </TooltipProvider>
   );
 }
