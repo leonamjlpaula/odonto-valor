@@ -6,7 +6,7 @@ import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 import { Label } from '@/presentation/components/ui/label';
-import { Card, CardHeader, CardTitle, CardContent } from '@/presentation/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/presentation/components/ui/card';
 import { TermTooltip } from '@/presentation/components/ui/TermTooltip';
 import type { CustoFixoConfig, CustoFixoItem } from '@prisma/client';
 
@@ -216,7 +216,8 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
       {/* Section 1 — Custos Mensais */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Seção 1 — Custos Mensais</CardTitle>
+          <CardTitle className="text-base">O que pago todo mês</CardTitle>
+          <CardDescription>Seção 1 — Custos Mensais</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <div className="divide-y">
@@ -308,9 +309,8 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
       {/* Section 2 — Depreciação */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">
-            Seção 2 — <TermTooltip term="depreciacao">Depreciação</TermTooltip> de Equipamentos
-          </CardTitle>
+          <CardTitle className="text-base">Meus equipamentos</CardTitle>
+          <CardDescription>Seção 2 — Depreciação de Equipamentos</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -340,7 +340,8 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
       {/* Section 3 — Remuneração Profissional */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Seção 3 — Remuneração Profissional</CardTitle>
+          <CardTitle className="text-base">Meu salário e encargos</CardTitle>
+          <CardDescription>Seção 3 — Remuneração Profissional</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -396,7 +397,8 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
       {/* Section 4 — Taxa de Retorno */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Seção 4 — Taxa de Retorno sobre Investimento</CardTitle>
+          <CardTitle className="text-base">Retorno do investimento</CardTitle>
+          <CardDescription>Seção 4 — Taxa de Retorno sobre Investimento</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -425,7 +427,8 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
       {/* Section 5 — Contexto do Consultório */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Seção 5 — Contexto do Consultório</CardTitle>
+          <CardTitle className="text-base">Meu consultório</CardTitle>
+          <CardDescription>Seção 5 — Contexto do Consultório</CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
