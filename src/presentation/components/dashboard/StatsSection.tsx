@@ -10,6 +10,7 @@ import {
   getDashboardStats,
   contarProcedimentosNoVermelho,
 } from '@/application/usecases/dashboardActions';
+import { margemColor } from '@/application/usecases/calcularPrecoProcedimento';
 import { TermTooltip } from '@/presentation/components/ui/TermTooltip';
 
 function formatBRL(value: number) {
@@ -26,6 +27,8 @@ export async function StatsSection({ userId }: { userId: string }) {
     totalProcedimentosNoVermelho > 0 ||
     stats.custosDesatualizados ||
     stats.ociosidadeNaoConfigurada;
+
+  const corMargemMedia = margemColor(stats.margemMedia);
 
   return (
     <>
@@ -67,6 +70,63 @@ export async function StatsSection({ userId }: { userId: string }) {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Link href="/procedimentos/diagnostico" className="block">
+          <Card className="h-full transition-shadow hover:shadow-md">
+            <CardHeader className="pb-2">
+              <CardDescription>Procedimentos no Vermelho</CardDescription>
+              <CardTitle className="text-3xl tabular-nums">
+                {totalProcedimentosNoVermelho > 0 ? (
+                  <span className="text-red-600">{totalProcedimentosNoVermelho}</span>
+                ) : (
+                  <span className="text-green-600">0</span>
+                )}
+                <span className="ml-1 text-lg font-normal text-muted-foreground">
+                  / {stats.totalProcedimentosComPreco}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground">
+                {totalProcedimentosNoVermelho > 0
+                  ? 'Margem abaixo de 10% — clique para ver'
+                  : 'Todos os procedimentos com preço estão saudáveis'}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/procedimentos" className="block">
+          <Card className="h-full transition-shadow hover:shadow-md">
+            <CardHeader className="pb-2">
+              <CardDescription>Margem Média</CardDescription>
+              <CardTitle className="text-3xl tabular-nums">
+                {stats.margemMedia !== null ? (
+                  <span
+                    className={
+                      corMargemMedia === 'green'
+                        ? 'text-green-600'
+                        : corMargemMedia === 'yellow'
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                    }
+                  >
+                    {(stats.margemMedia * 100).toFixed(1)}%
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground text-2xl">—</span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-muted-foreground">
+                {stats.margemMedia !== null
+                  ? 'Média dos procedimentos com preço de venda'
+                  : 'Configure preços de venda nos procedimentos'}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
         <Link href="/custos-fixos" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
             <CardHeader className="pb-2">
@@ -81,35 +141,6 @@ export async function StatsSection({ userId }: { userId: string }) {
             </CardContent>
           </Card>
         </Link>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Total Custos Fixos Mensais</CardDescription>
-            <CardTitle className="text-3xl tabular-nums">
-              {formatBRL(stats.totalCustosFixosMensais)}
-              <span className="ml-1 text-lg font-normal text-muted-foreground">/ mês</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              {stats.lastUpdate
-                ? `Atualizado em ${new Date(stats.lastUpdate).toLocaleDateString('pt-BR')}`
-                : 'Nenhuma configuração salva'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardDescription>Procedimentos Cadastrados</CardDescription>
-            <CardTitle className="text-3xl tabular-nums">{stats.totalProcedimentos}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xs text-muted-foreground">
-              {stats.totalMateriais} materiais cadastrados
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
       {stats.breakEven.comProLabore > 0 && (

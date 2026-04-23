@@ -14,6 +14,8 @@ export type DashboardStats = {
   totalCustosFixosMensais: number;
   totalProcedimentos: number;
   totalMateriais: number;
+  totalProcedimentosComPreco: number;
+  margemMedia: number | null;
   breakEven: {
     semProLabore: number;
     comProLabore: number;
@@ -76,13 +78,14 @@ const getAllProcedimentos = cache(async function getAllProcedimentos(
 // ─── getDashboardStats ─────────────────────────────────────────────────────────
 
 export async function getDashboardStats(userId: string): Promise<DashboardStats> {
-  const [config, totalProcedimentos, totalMateriais] = await Promise.all([
+  const [config, totalProcedimentos, totalMateriais, procedimentos] = await Promise.all([
     prisma.custoFixoConfig.findUnique({
       where: { userId },
       include: { items: true },
     }),
     prisma.procedimento.count({ where: { userId } }),
     prisma.material.count({ where: { userId } }),
+    getAllProcedimentos(userId),
   ]);
 
   let custoFixoPorMinuto = 0;
@@ -100,6 +103,24 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     };
   }
 
+  const { percImpostos, percTaxaCartao } = config
+    ? { percImpostos: config.percImpostos, percTaxaCartao: config.percTaxaCartao }
+    : { percImpostos: 0, percTaxaCartao: 0 };
+
+  const procedimentosComPreco = procedimentos.filter((p) => p.precoVenda != null);
+
+  const margensCalculadas = procedimentosComPreco
+    .map((p) => {
+      const calc = calcularPrecoProcedimento(p, custoFixoPorMinuto, percImpostos, percTaxaCartao);
+      return calc.margemLucro;
+    })
+    .filter((m): m is number => m !== null);
+
+  const margemMedia =
+    margensCalculadas.length > 0
+      ? margensCalculadas.reduce((a, b) => a + b, 0) / margensCalculadas.length
+      : null;
+
   const sixMonthsAgo = new Date();
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -108,6 +129,8 @@ export async function getDashboardStats(userId: string): Promise<DashboardStats>
     totalCustosFixosMensais,
     totalProcedimentos,
     totalMateriais,
+    totalProcedimentosComPreco: procedimentosComPreco.length,
+    margemMedia,
     breakEven,
     ociosidadeNaoConfigurada: config?.percOciosidade === 0,
     custosDesatualizados: config !== null && new Date(config.updatedAt) < sixMonthsAgo,
