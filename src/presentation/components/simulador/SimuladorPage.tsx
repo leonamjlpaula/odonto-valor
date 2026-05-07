@@ -5,6 +5,7 @@ import { RotateCcw, TrendingDown, TrendingUp } from 'lucide-react';
 import { cn, parseBR } from '@/lib/utils';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
+import { CurrencyInput } from '@/presentation/components/ui/CurrencyInput';
 import { Label } from '@/presentation/components/ui/label';
 import {
   Card,
@@ -261,10 +262,10 @@ export function SimuladorPage({
                   Custo fixo mensal (R$)
                 </Label>
                 <p className="text-xs text-muted-foreground">Atual: {formatBRL(totalItens)}</p>
-                <Input
+                <CurrencyInput
                   id="sim-totalItens"
                   value={inputValues.totalItens}
-                  onChange={(e) => handleNumericInput('totalItens', 'totalItens', e.target.value)}
+                  onChange={(v) => handleNumericInput('totalItens', 'totalItens', v)}
                 />
               </div>
 

@@ -21,6 +21,7 @@ import { parseBR } from '@/lib/utils';
 import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
+import { CurrencyInput } from '@/presentation/components/ui/CurrencyInput';
 import { Label } from '@/presentation/components/ui/label';
 import { Badge } from '@/presentation/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/presentation/components/ui/card';
@@ -461,12 +462,9 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
           </div>
           {editingPreco ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">R$</span>
-              <Input
-                type="text"
-                inputMode="decimal"
+              <CurrencyInput
                 value={precoValue}
-                onChange={(e) => setPrecoValue(e.target.value)}
+                onChange={(v) => setPrecoValue(v)}
                 className="w-28"
                 placeholder="ex: 280,00"
                 onKeyDown={(e) => {
@@ -585,12 +583,9 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
           </div>
           {editingLab ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">R$</span>
-              <Input
-                type="text"
-                inputMode="decimal"
+              <CurrencyInput
                 value={labValue}
-                onChange={(e) => setLabValue(e.target.value)}
+                onChange={(v) => setLabValue(v)}
                 className="w-28"
                 placeholder="ex: 350,00"
                 onKeyDown={(e) => {

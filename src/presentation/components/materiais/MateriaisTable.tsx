@@ -13,6 +13,7 @@ import { parseBR } from '@/lib/utils';
 import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
+import { CurrencyInput } from '@/presentation/components/ui/CurrencyInput';
 import { Label } from '@/presentation/components/ui/label';
 import { Badge } from '@/presentation/components/ui/badge';
 import {
@@ -305,13 +306,10 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
                       </td>
                       <td className="px-4 py-3 text-right">
                         {editingId === material.id ? (
-                          <Input
-                            type="number"
+                          <CurrencyInput
                             value={editingPreco}
-                            onChange={(e) => setEditingPreco(e.target.value)}
-                            className="w-28 h-8 text-right"
-                            min={0}
-                            step={0.01}
+                            onChange={(v) => setEditingPreco(v)}
+                            className="w-28 h-8"
                             autoFocus
                             onKeyDown={(e) => {
                               if (e.key === 'Enter') confirmEdit(material);
@@ -520,14 +518,11 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="add-preco">Preço (R$)</Label>
-              <Input
+              <CurrencyInput
                 id="add-preco"
-                type="number"
                 placeholder="0,00"
                 value={addPreco}
-                onChange={(e) => setAddPreco(e.target.value)}
-                min={0}
-                step={0.01}
+                onChange={(v) => setAddPreco(v)}
               />
               {addErrors.preco && <p className="text-xs text-destructive">{addErrors.preco}</p>}
             </div>
