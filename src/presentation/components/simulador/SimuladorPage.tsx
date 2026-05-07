@@ -135,7 +135,10 @@ export function SimuladorPage({
 
   // Track input strings separately to allow free-form editing
   const [inputValues, setInputValues] = useState({
-    totalItens: totalItens.toFixed(2).replace('.', ','),
+    totalItens: new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(totalItens),
     numeroCadeiras: String(config.numeroCadeiras),
     percOciosidade: String(config.percOciosidade),
     percImpostos: String(config.percImpostos),
@@ -158,7 +161,10 @@ export function SimuladorPage({
       percTaxaCartao: config.percTaxaCartao,
     });
     setInputValues({
-      totalItens: totalItens.toFixed(2).replace('.', ','),
+      totalItens: new Intl.NumberFormat('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(totalItens),
       numeroCadeiras: String(config.numeroCadeiras),
       percOciosidade: String(config.percOciosidade),
       percImpostos: String(config.percImpostos),

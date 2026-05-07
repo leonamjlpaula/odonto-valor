@@ -69,6 +69,13 @@ function formatBRL(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
+function numToBRL(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 interface Props {
   userId: string;
   initialConfig: CustoFixoConfig;
@@ -237,7 +244,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
                 <span className="flex-1 text-sm leading-snug">{item.nome}</span>
                 <div className="w-36 shrink-0">
                   <CurrencyInput
-                    value={String(item.valor).replace('.', ',')}
+                    value={numToBRL(item.valor)}
                     onChange={(v) => updateItemValor(index, parseBR(v) || 0)}
                   />
                 </div>
@@ -314,7 +321,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
           <div className="space-y-2">
             <Label>Investimento total em equipamentos (R$)</Label>
             <CurrencyInput
-              value={String(config.investimentoEquipamentos).replace('.', ',')}
+              value={numToBRL(config.investimentoEquipamentos)}
               onChange={(v) => updateConfig('investimentoEquipamentos', parseBR(v) || 0)}
             />
           </div>
@@ -340,7 +347,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
           <div className="space-y-2">
             <Label>Salário base (R$)</Label>
             <CurrencyInput
-              value={String(config.salarioBase).replace('.', ',')}
+              value={numToBRL(config.salarioBase)}
               onChange={(v) => updateConfig('salarioBase', parseBR(v) || 0)}
             />
           </div>
