@@ -251,6 +251,40 @@ export async function getProcedimentosNoVermelho(
   return noVermelho.slice(0, limit);
 }
 
+// ─── getProgressoOnboarding ───────────────────────────────────────────────────
+
+export type ProgressoOnboarding = {
+  custosConfigurados: boolean;
+  materiaisRevisados: boolean;
+  procedimentoComPreco: boolean;
+};
+
+export const getProgressoOnboarding = cache(async function getProgressoOnboarding(
+  userId: string
+): Promise<ProgressoOnboarding> {
+  const [config, materiaisRevisados, procComPreco] = await Promise.all([
+    prisma.custoFixoConfig.findFirst({
+      where: { userId },
+      select: { id: true },
+    }),
+    prisma.$queryRaw<{ id: string }[]>`
+      SELECT id FROM "Material"
+      WHERE "userId" = ${userId} AND "updatedAt" > "createdAt"
+      LIMIT 1
+    `,
+    prisma.procedimento.findFirst({
+      where: { userId, precoVenda: { not: null } },
+      select: { id: true },
+    }),
+  ]);
+
+  return {
+    custosConfigurados: config !== null,
+    materiaisRevisados: materiaisRevisados.length > 0,
+    procedimentoComPreco: procComPreco !== null,
+  };
+});
+
 /**
  * Counts all procedures with precoVenda set and margemLucro < 10%.
  * Used for the post-save alert.
