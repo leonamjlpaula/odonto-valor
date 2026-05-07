@@ -126,7 +126,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
     if (isNaN(divisorPadrao) || divisorPadrao < 1) {
       toast({
         title: 'Usos inválido',
-        description: 'Usos por embalagem deve ser pelo menos 1.',
+        description: 'Rendimento deve ser pelo menos 1.',
         variant: 'destructive',
       });
       return;
@@ -459,7 +459,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Atualizar usos por embalagem</DialogTitle>
+            <DialogTitle>Atualizar rendimento</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
             O novo valor de usos/embalagem ({propagationDialog?.divisorPadrao}) será salvo para{' '}
@@ -555,7 +555,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
               {addErrors.preco && <p className="text-xs text-destructive">{addErrors.preco}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="add-divisor">Usos por embalagem</Label>
+              <Label htmlFor="add-divisor">Rendimento</Label>
               <Input
                 id="add-divisor"
                 type="number"
