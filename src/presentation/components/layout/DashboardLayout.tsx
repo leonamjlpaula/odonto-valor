@@ -25,6 +25,7 @@ import { TooltipProvider } from '@/presentation/components/ui/tooltip';
 import { NavigationProgress } from '@/presentation/components/ui/NavigationProgress';
 import Image from 'next/image';
 import banner from '@/assets/odonto_valor_banner.png';
+import type { ProgressoOnboarding } from '@/application/usecases/dashboardActions';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -52,12 +53,6 @@ const mobileMoreItems = [
   { label: 'Meus Registros', href: '/historico', icon: Clock },
   { label: 'Baixar Tabela de Preços', href: '/exportar', icon: Download },
 ];
-
-interface ProgressoOnboarding {
-  custosConfigurados: boolean;
-  materiaisRevisados: boolean;
-  procedimentoComPreco: boolean;
-}
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

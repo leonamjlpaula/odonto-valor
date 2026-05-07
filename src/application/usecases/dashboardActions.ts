@@ -265,7 +265,7 @@ export const getProgressoOnboarding = cache(async function getProgressoOnboardin
   const [config, materiaisRevisados, procComPreco] = await Promise.all([
     prisma.custoFixoConfig.findFirst({
       where: { userId },
-      select: { id: true },
+      select: { id: true, items: { select: { id: true }, take: 1 } },
     }),
     prisma.$queryRaw<{ id: string }[]>`
       SELECT id FROM "Material"
@@ -279,7 +279,7 @@ export const getProgressoOnboarding = cache(async function getProgressoOnboardin
   ]);
 
   return {
-    custosConfigurados: config !== null,
+    custosConfigurados: config !== null && config.items.length > 0,
     materiaisRevisados: materiaisRevisados.length > 0,
     procedimentoComPreco: procComPreco !== null,
   };
