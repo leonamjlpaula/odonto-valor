@@ -30,7 +30,7 @@ const navItems = [
   { label: 'Custos Fixos', href: '/custos-fixos', icon: DollarSign },
   { label: 'Materiais', href: '/materiais', icon: Package },
   { label: 'Procedimentos', href: '/procedimentos', icon: ClipboardList },
-  { label: 'Comparativo VRPO', href: '/comparativo-vrpo', icon: BarChart2 },
+  { label: 'Referência de Convênios', href: '/comparativo-vrpo', icon: BarChart2 },
   { label: 'Simulador', href: '/simulador', icon: Sliders },
   { label: 'Histórico', href: '/historico', icon: Clock },
   { label: 'Exportar', href: '/exportar', icon: Download },
@@ -45,7 +45,7 @@ const mobileMainItems = [
 const mobileMoreItems = [
   { label: 'Primeiros Passos', href: '/primeiros-passos', icon: BookOpen },
   { label: 'Materiais', href: '/materiais', icon: Package },
-  { label: 'Comparativo VRPO', href: '/comparativo-vrpo', icon: BarChart2 },
+  { label: 'Referência de Convênios', href: '/comparativo-vrpo', icon: BarChart2 },
   { label: 'Simulador', href: '/simulador', icon: Sliders },
   { label: 'Histórico', href: '/historico', icon: Clock },
   { label: 'Exportar', href: '/exportar', icon: Download },

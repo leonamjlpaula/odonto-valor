@@ -68,10 +68,10 @@ export function ComparativoVRPOPage({ data }: Props) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold">Comparativo VRPO</h1>
+        <h1 className="text-2xl font-bold">Referência de Convênios</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Veja sua margem de negociação em relação à tabela VRPO — procedimentos abaixo do valor de
-          referência têm menos espaço para desconto em convênios.
+          Compare seus preços com a tabela de referência nacional. Procedimentos abaixo do valor de
+          referência têm menos margem para oferecer desconto a convênios.
         </p>
       </div>
 
@@ -86,7 +86,7 @@ export function ComparativoVRPOPage({ data }: Props) {
               : 'border-red-200 bg-red-50 text-red-700 hover:bg-red-100'
           )}
         >
-          {totalAbaixo} com margem reduzida (abaixo da VRPO)
+          {totalAbaixo} abaixo da tabela de referência
         </button>
         <button
           onClick={() => handleSituacaoChange('acima')}
@@ -97,7 +97,7 @@ export function ComparativoVRPOPage({ data }: Props) {
               : 'border-green-200 bg-green-50 text-green-700 hover:bg-green-100'
           )}
         >
-          {totalAcima} com folga para negociação (acima da VRPO)
+          {totalAcima} acima — boa margem para convênios
         </button>
         <button
           onClick={() => handleSituacaoChange('sem_referencia')}
@@ -108,7 +108,7 @@ export function ComparativoVRPOPage({ data }: Props) {
               : 'border-gray-200 bg-gray-50 text-gray-600 hover:bg-gray-100'
           )}
         >
-          {totalSemReferencia} sem referência VRPO
+          {totalSemReferencia} sem valor de referência
         </button>
         {situacaoFilter !== 'todos' && (
           <button
@@ -154,7 +154,7 @@ export function ComparativoVRPOPage({ data }: Props) {
                 <th className="px-4 py-3 text-right">Meu Preço</th>
                 <th className="px-4 py-3 text-right">
                   <span className="inline-flex items-center gap-1">
-                    VRPO Ref.
+                    Ref. Nacional
                     <VRPOPopover />
                   </span>
                 </th>
@@ -288,16 +288,16 @@ function VRPOPopover() {
           className="z-50 w-72 rounded-md border bg-popover p-4 text-sm text-popover-foreground shadow-md"
         >
           <div className="flex items-start justify-between gap-2">
-            <p className="font-semibold">O que é VRPO?</p>
+            <p className="font-semibold">Tabela de referência nacional</p>
             <Popover.Close className="text-muted-foreground hover:text-foreground">
               <X className="h-3.5 w-3.5" />
             </Popover.Close>
           </div>
           <p className="mt-2 leading-relaxed text-muted-foreground">
-            VRPO (Valores Referenciais para Procedimentos Odontológicos) é a tabela de referência
-            publicada pelo CFO que orienta a precificação mínima dos procedimentos odontológicos.
-            Procedimentos com preço calculado abaixo da VRPO têm menos margem para oferecer desconto
-            sem prejudicar a saúde financeira do consultório. A VRPO é frequentemente exigida em
+            A tabela de referência nacional (VRPO — Valores Referenciais para Procedimentos
+            Odontológicos) é publicada pelo CFO e orienta a precificação mínima dos procedimentos.
+            Procedimentos com preço abaixo dessa referência têm menos margem para oferecer desconto
+            sem prejudicar a saúde financeira do consultório. Frequentemente exigida em
             credenciamentos de convênios.
           </p>
           <Popover.Arrow className="fill-border" />
