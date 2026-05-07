@@ -8,6 +8,7 @@ import type { Especialidade } from '@prisma/client';
 import type { ProcedimentoComPrecoLista } from '@/application/usecases/procedimentoActions';
 import { createProcedimentoCustomizado } from '@/application/usecases/procedimentoActions';
 import { margemColor } from '@/application/usecases/calcularPrecoProcedimento';
+import { parseBR } from '@/lib/utils';
 import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
@@ -116,7 +117,7 @@ export function ProcedimentosPage({
     const errors: Record<string, string> = {};
     if (!addCodigo.trim()) errors.codigo = 'Código é obrigatório';
     if (!addNome.trim()) errors.nome = 'Nome é obrigatório';
-    const tempo = parseFloat(addTempo.replace(',', '.'));
+    const tempo = parseBR(addTempo);
     if (isNaN(tempo) || tempo <= 0) errors.tempo = 'Tempo deve ser maior que zero';
     if (Object.keys(errors).length > 0) {
       setAddErrors(errors);

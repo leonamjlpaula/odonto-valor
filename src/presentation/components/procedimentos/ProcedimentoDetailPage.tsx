@@ -17,6 +17,7 @@ import {
   deleteProcedimento,
 } from '@/application/usecases/procedimentoActions';
 import { margemColor } from '@/application/usecases/calcularPrecoProcedimento';
+import { parseBR } from '@/lib/utils';
 import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
@@ -66,8 +67,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
   );
 
   function handleSavePreco() {
-    const raw = precoValue.replace(',', '.').trim();
-    const valor = raw === '' ? null : parseFloat(raw);
+    const valor = precoValue.trim() === '' ? null : parseBR(precoValue);
     if (valor !== null && (isNaN(valor) || valor < 0)) {
       toast({
         title: 'Preço inválido',
@@ -97,8 +97,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
   );
 
   function handleSaveLab() {
-    const raw = labValue.replace(',', '.').trim();
-    const valor = raw === '' ? null : parseFloat(raw);
+    const valor = labValue.trim() === '' ? null : parseBR(labValue);
     if (valor !== null && (isNaN(valor) || valor < 0)) {
       toast({
         title: 'Valor inválido',
@@ -124,7 +123,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
   const [tempoValue, setTempoValue] = useState(String(procedimento.tempoMinutos));
 
   function handleSaveTempo() {
-    const tempo = parseFloat(tempoValue.replace(',', '.'));
+    const tempo = parseBR(tempoValue);
     if (isNaN(tempo) || tempo <= 0) {
       toast({
         title: 'Tempo inválido',
@@ -163,7 +162,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
   }
 
   function handleSaveMaterial(pmaId: string) {
-    const consumo = parseFloat(editConsumo.replace(',', '.'));
+    const consumo = parseBR(editConsumo);
     if (isNaN(consumo) || consumo <= 0) {
       toast({
         title: 'Consumo inválido',
@@ -172,7 +171,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
       });
       return;
     }
-    const divisor = parseFloat(editDivisor.replace(',', '.'));
+    const divisor = parseBR(editDivisor);
     if (isNaN(divisor) || divisor <= 0) {
       toast({
         title: 'Usos/embalagem inválido',
@@ -226,7 +225,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
       toast({ title: 'Selecione um material', variant: 'destructive' });
       return;
     }
-    const consumo = parseFloat(addConsumo.replace(',', '.'));
+    const consumo = parseBR(addConsumo);
     const divisor = addMatInfo?.divisorPadrao ?? 1;
     if (isNaN(consumo) || consumo <= 0) {
       toast({

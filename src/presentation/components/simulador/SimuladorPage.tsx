@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { RotateCcw, TrendingDown, TrendingUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, parseBR } from '@/lib/utils';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 import { Label } from '@/presentation/components/ui/label';
@@ -171,7 +171,7 @@ export function SimuladorPage({
     raw: string
   ) {
     setInputValues((prev) => ({ ...prev, [inputField]: raw }));
-    const parsed = parseFloat(raw.replace(',', '.'));
+    const parsed = parseBR(raw);
     if (!isNaN(parsed) && parsed >= 0) {
       setParams((prev) => ({ ...prev, [field]: parsed }));
     }

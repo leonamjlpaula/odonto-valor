@@ -9,6 +9,7 @@ import {
   createMaterial,
   deleteMaterial,
 } from '@/application/usecases/materialActions';
+import { parseBR } from '@/lib/utils';
 import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
@@ -112,7 +113,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
   }
 
   function confirmEdit(material: Material) {
-    const preco = parseFloat(editingPreco.replace(',', '.'));
+    const preco = parseBR(editingPreco);
     const divisorPadrao = parseInt(editingDivisorPadrao, 10);
     if (isNaN(preco) || preco <= 0) {
       toast({
@@ -179,7 +180,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
     const errors: Record<string, string> = {};
     if (!addNome.trim()) errors.nome = 'Nome é obrigatório';
     if (!addUnidade.trim()) errors.unidade = 'Unidade é obrigatória';
-    const preco = parseFloat(addPreco.replace(',', '.'));
+    const preco = parseBR(addPreco);
     if (isNaN(preco) || preco <= 0) errors.preco = 'Preço deve ser maior que zero';
     const divisorPadrao = parseInt(addDivisorPadrao, 10);
     if (isNaN(divisorPadrao) || divisorPadrao < 1)
