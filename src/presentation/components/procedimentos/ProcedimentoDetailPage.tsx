@@ -67,8 +67,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
   );
 
   function handleSavePreco() {
-    const raw = precoValue.replace(',', '.').trim();
-    const valor = raw === '' ? null : parseFloat(raw);
+    const valor = precoValue.trim() === '' ? null : parseBR(precoValue);
     if (valor !== null && (isNaN(valor) || valor < 0)) {
       toast({
         title: 'Preço inválido',
@@ -98,8 +97,7 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
   );
 
   function handleSaveLab() {
-    const raw = labValue.replace(',', '.').trim();
-    const valor = raw === '' ? null : parseFloat(raw);
+    const valor = labValue.trim() === '' ? null : parseBR(labValue);
     if (valor !== null && (isNaN(valor) || valor < 0)) {
       toast({
         title: 'Valor inválido',
