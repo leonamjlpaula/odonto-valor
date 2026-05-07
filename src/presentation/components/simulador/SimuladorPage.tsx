@@ -322,17 +322,23 @@ export function SimuladorPage({
                   % Impostos (ISS / Simples)
                 </Label>
                 <p className="text-xs text-muted-foreground">Atual: {config.percImpostos}%</p>
-                <Input
-                  id="sim-impostos"
-                  type="number"
-                  min={0}
-                  max={30}
-                  step={0.1}
-                  value={inputValues.percImpostos}
-                  onChange={(e) =>
-                    handleNumericInput('percImpostos', 'percImpostos', e.target.value)
-                  }
-                />
+                <div className="relative">
+                  <Input
+                    id="sim-impostos"
+                    type="number"
+                    className="pr-8"
+                    min={0}
+                    max={30}
+                    step={0.1}
+                    value={inputValues.percImpostos}
+                    onChange={(e) =>
+                      handleNumericInput('percImpostos', 'percImpostos', e.target.value)
+                    }
+                  />
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                    %
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-1.5">
@@ -340,17 +346,23 @@ export function SimuladorPage({
                   % Taxa de cartão
                 </Label>
                 <p className="text-xs text-muted-foreground">Atual: {config.percTaxaCartao}%</p>
-                <Input
-                  id="sim-cartao"
-                  type="number"
-                  min={0}
-                  max={10}
-                  step={0.1}
-                  value={inputValues.percTaxaCartao}
-                  onChange={(e) =>
-                    handleNumericInput('percTaxaCartao', 'percTaxaCartao', e.target.value)
-                  }
-                />
+                <div className="relative">
+                  <Input
+                    id="sim-cartao"
+                    type="number"
+                    className="pr-8"
+                    min={0}
+                    max={10}
+                    step={0.1}
+                    value={inputValues.percTaxaCartao}
+                    onChange={(e) =>
+                      handleNumericInput('percTaxaCartao', 'percTaxaCartao', e.target.value)
+                    }
+                  />
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                    %
+                  </span>
+                </div>
               </div>
 
               <Button
