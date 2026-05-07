@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { MaterialCombobox } from '@/presentation/components/ui/material-combobox';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit2, Trash2, Plus, Check, X } from 'lucide-react';
+import { Edit2, Trash2, Plus, Check, X, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { Material } from '@prisma/client';
 import type { ProcedimentoComPreco } from '@/application/usecases/procedimentoActions';
 import {
@@ -271,16 +271,50 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
     });
   }
 
+  // ─── Derived display values ───────────────────────────────────────────────
+  const color = margemColor(precoCalculado.margemLucro);
+  const especialidadeNome = procedimento.especialidade.nome;
+
+  const margemBgClass =
+    color === 'green'
+      ? 'border-green-200 bg-green-50'
+      : color === 'yellow'
+        ? 'border-yellow-200 bg-yellow-50'
+        : color === 'red'
+          ? 'border-red-200 bg-red-50'
+          : '';
+  const margemTextClass =
+    color === 'green'
+      ? 'text-green-800'
+      : color === 'yellow'
+        ? 'text-yellow-800'
+        : color === 'red'
+          ? 'text-red-800'
+          : 'text-muted-foreground';
+  const MargemIcon = color === 'green' ? TrendingUp : color === 'red' ? TrendingDown : Minus;
+
   return (
     <div className="space-y-6">
-      {/* Back link */}
-      <Link
-        href={`/procedimentos/${especialidadeSlug}`}
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      {/* Breadcrumb */}
+      <nav
+        className="flex items-center gap-1.5 text-sm text-muted-foreground"
+        aria-label="Navegação"
       >
-        <ArrowLeft className="h-4 w-4" />
-        Voltar para {procedimento.especialidade.nome}
-      </Link>
+        <Link href="/procedimentos" className="hover:text-foreground transition-colors">
+          Procedimentos
+        </Link>
+        <span>/</span>
+        <Link
+          href={`/procedimentos/${especialidadeSlug}`}
+          className="hover:text-foreground transition-colors"
+        >
+          {especialidadeNome}
+        </Link>
+        <span>/</span>
+        <span className="text-foreground font-medium truncate max-w-[200px]">
+          {procedimento.nome}
+        </span>
+      </nav>
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -300,13 +334,53 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
         )}
       </div>
 
-      {/* Financial summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* ── Financial metrics — visual hierarchy ─────────────────────────── */}
+
+      {/* PRIMARY — Custo de produção (break-even) */}
+      <Card className="border-primary/30 bg-primary/5">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Seu custo de produção
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          <p className="text-3xl font-bold tabular-nums text-primary">
+            {formatBRL(precoCalculado.precoFinal)}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            materiais{' '}
+            <span className="font-medium text-foreground tabular-nums">
+              {formatBRL(precoCalculado.custoVariavel)}
+            </span>{' '}
+            + operacional{' '}
+            <span className="font-medium text-foreground tabular-nums">
+              {formatBRL(precoCalculado.custoFixoTotal)}
+            </span>
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* SECONDARY — Preço mínimo para 30% de lucro */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium text-muted-foreground">
+            Preço mínimo para 30% de lucro
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          <p className="text-2xl font-bold tabular-nums">
+            {formatBRL(precoCalculado.precoMinimoParaMargem30)}
+          </p>
+          <p className="text-xs text-muted-foreground">após impostos e taxa de cartão</p>
+        </CardContent>
+      </Card>
+
+      {/* TERTIARY — breakdown + conditional margin card */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {/* Materiais */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Custo Variável
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Materiais</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xl font-bold tabular-nums">
@@ -320,9 +394,10 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
           </CardContent>
         </Card>
 
+        {/* Operacional */}
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Custo Fixo</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Operacional</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xl font-bold tabular-nums">
@@ -334,114 +409,64 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
           </CardContent>
         </Card>
 
-        <Card className="border-primary/30 bg-primary/5">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Preço Final</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold tabular-nums text-primary">
-              {formatBRL(precoCalculado.precoFinal)}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">custo fixo + custo variável</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              VRPO Referência
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {vrpoReferencia !== null ? (
-              <>
-                <p className="text-xl font-bold tabular-nums">{formatBRL(vrpoReferencia)}</p>
-                <p
-                  className={cn(
-                    'text-xs font-medium mt-1',
-                    diferencaPerc !== null && diferencaPerc >= 0 ? 'text-green-600' : 'text-red-600'
-                  )}
-                >
-                  {diferencaPerc !== null ? formatPerc(diferencaPerc) : ''}
-                </p>
-              </>
-            ) : (
-              <p className="text-lg text-muted-foreground">Não disponível</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Margem de lucro */}
-        {(() => {
-          const color = margemColor(precoCalculado.margemLucro);
-          const colorClass =
-            color === 'green'
-              ? 'border-green-200 bg-green-50'
-              : color === 'yellow'
-                ? 'border-yellow-200 bg-yellow-50'
-                : color === 'red'
-                  ? 'border-red-200 bg-red-50'
-                  : '';
-          const textClass =
-            color === 'green'
-              ? 'text-green-800'
-              : color === 'yellow'
-                ? 'text-yellow-800'
-                : color === 'red'
-                  ? 'text-red-800'
-                  : 'text-muted-foreground';
-          return (
-            <Card className={cn(color !== null && colorClass)}>
-              <CardHeader className="pb-2">
-                <CardTitle
-                  className={cn(
-                    'text-sm font-medium',
-                    color !== null ? textClass : 'text-muted-foreground'
-                  )}
-                >
-                  Margem de Lucro
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {precoCalculado.margemLucro !== null ? (
-                  <>
-                    <p className={cn('text-xl font-bold tabular-nums', textClass)}>
-                      {(precoCalculado.margemLucro * 100).toFixed(1)}%
-                    </p>
-                    <p className={cn('text-xs mt-1', textClass)}>
-                      {color === 'green'
-                        ? 'Acima de 30%'
-                        : color === 'yellow'
-                          ? 'Abaixo de 30%'
-                          : 'Abaixo de 10%'}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-lg text-muted-foreground">—</p>
-                    <p className="text-xs text-muted-foreground mt-1">Defina o preço de venda</p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })()}
-
-        {/* Preço mínimo para 30% */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Mínimo p/ 30%
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-bold tabular-nums">
-              {formatBRL(precoCalculado.precoMinimoParaMargem30)}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">após impostos e cartão</p>
-          </CardContent>
-        </Card>
+        {/* Margem atual — only when precoVenda is set */}
+        {precoCalculado.margemLucro !== null ? (
+          <Card className={cn(margemBgClass)}>
+            <CardHeader className="pb-2">
+              <CardTitle
+                className={cn('text-sm font-medium flex items-center gap-1.5', margemTextClass)}
+              >
+                <MargemIcon className="h-3.5 w-3.5" />
+                Sua margem atual
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className={cn('text-xl font-bold tabular-nums', margemTextClass)}>
+                {(precoCalculado.margemLucro * 100).toFixed(1)}%
+              </p>
+              <p className={cn('text-xs mt-1', margemTextClass)}>
+                {color === 'green'
+                  ? 'Acima de 30% — ótimo!'
+                  : color === 'yellow'
+                    ? 'Entre 10% e 30%'
+                    : 'Abaixo de 10% — atenção'}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-dashed">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Margem atual
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-lg text-muted-foreground">—</p>
+              <p className="text-xs text-muted-foreground mt-1">Defina o preço de venda</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
+
+      {/* VRPO — referência de convênio */}
+      {vrpoReferencia !== null && (
+        <div className="rounded-lg border px-4 py-3 flex items-center justify-between gap-4 flex-wrap text-sm">
+          <div>
+            <span className="text-muted-foreground">Referência de convênio (VRPO): </span>
+            <span className="font-semibold tabular-nums">{formatBRL(vrpoReferencia)}</span>
+          </div>
+          {diferencaPerc !== null && (
+            <span
+              className={cn(
+                'font-medium tabular-nums',
+                diferencaPerc >= 0 ? 'text-green-600' : 'text-red-600'
+              )}
+            >
+              Seu custo está {formatPerc(diferencaPerc)} em relação à tabela
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Preço de venda */}
       <div className="border rounded-lg p-4">
