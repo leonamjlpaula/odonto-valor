@@ -6,6 +6,7 @@ import { parseBR } from '@/lib/utils';
 import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
+import { CurrencyInput } from '@/presentation/components/ui/CurrencyInput';
 import { Label } from '@/presentation/components/ui/label';
 import {
   Card,
@@ -66,6 +67,13 @@ function calcCustoFixoPorMinuto(config: ConfigState, items: ItemState[]): number
 
 function formatBRL(value: number): string {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+}
+
+function numToBRL(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
 }
 
 interface Props {
@@ -230,17 +238,10 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
                 className="flex items-center gap-3 px-6 py-3 hover:bg-muted/30 transition-colors"
               >
                 <span className="flex-1 text-sm leading-snug">{item.nome}</span>
-                <div className="relative w-36 shrink-0">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
-                    R$
-                  </span>
-                  <Input
-                    type="number"
-                    className="pl-8"
-                    value={item.valor}
-                    onChange={(e) => updateItemValor(index, parseFloat(e.target.value) || 0)}
-                    min={0}
-                    step={0.01}
+                <div className="w-36 shrink-0">
+                  <CurrencyInput
+                    value={numToBRL(item.valor)}
+                    onChange={(v) => updateItemValor(index, parseBR(v) || 0)}
                   />
                 </div>
                 {item.isCustom && (
@@ -273,13 +274,10 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
                   </div>
                   <div className="w-36 space-y-1">
                     <Label className="text-xs">Valor (R$)</Label>
-                    <Input
-                      type="number"
+                    <CurrencyInput
                       placeholder="0,00"
                       value={newItemValor}
-                      onChange={(e) => setNewItemValor(e.target.value)}
-                      min={0}
-                      step={0.01}
+                      onChange={(v) => setNewItemValor(v)}
                     />
                   </div>
                 </div>
@@ -323,14 +321,9 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
         <CardContent className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Investimento total em equipamentos (R$)</Label>
-            <Input
-              type="number"
-              value={config.investimentoEquipamentos}
-              onChange={(e) =>
-                updateConfig('investimentoEquipamentos', parseFloat(e.target.value) || 0)
-              }
-              min={0}
-              step={0.01}
+            <CurrencyInput
+              value={numToBRL(config.investimentoEquipamentos)}
+              onChange={(v) => updateConfig('investimentoEquipamentos', parseBR(v) || 0)}
             />
           </div>
           <div className="space-y-2">
@@ -357,12 +350,9 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
         <CardContent className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Salário base (R$)</Label>
-            <Input
-              type="number"
-              value={config.salarioBase}
-              onChange={(e) => updateConfig('salarioBase', parseFloat(e.target.value) || 0)}
-              min={0}
-              step={0.01}
+            <CurrencyInput
+              value={numToBRL(config.salarioBase)}
+              onChange={(v) => updateConfig('salarioBase', parseBR(v) || 0)}
             />
           </div>
           <div className="space-y-2">

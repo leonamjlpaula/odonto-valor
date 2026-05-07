@@ -5,6 +5,7 @@ import { RotateCcw, TrendingDown, TrendingUp } from 'lucide-react';
 import { cn, parseBR } from '@/lib/utils';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
+import { CurrencyInput } from '@/presentation/components/ui/CurrencyInput';
 import { Label } from '@/presentation/components/ui/label';
 import {
   Card,
@@ -134,7 +135,10 @@ export function SimuladorPage({
 
   // Track input strings separately to allow free-form editing
   const [inputValues, setInputValues] = useState({
-    totalItens: totalItens.toFixed(2).replace('.', ','),
+    totalItens: new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(totalItens),
     numeroCadeiras: String(config.numeroCadeiras),
     percOciosidade: String(config.percOciosidade),
     percImpostos: String(config.percImpostos),
@@ -157,7 +161,10 @@ export function SimuladorPage({
       percTaxaCartao: config.percTaxaCartao,
     });
     setInputValues({
-      totalItens: totalItens.toFixed(2).replace('.', ','),
+      totalItens: new Intl.NumberFormat('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(totalItens),
       numeroCadeiras: String(config.numeroCadeiras),
       percOciosidade: String(config.percOciosidade),
       percImpostos: String(config.percImpostos),
@@ -261,10 +268,10 @@ export function SimuladorPage({
                   Custo fixo mensal (R$)
                 </Label>
                 <p className="text-xs text-muted-foreground">Atual: {formatBRL(totalItens)}</p>
-                <Input
+                <CurrencyInput
                   id="sim-totalItens"
                   value={inputValues.totalItens}
-                  onChange={(e) => handleNumericInput('totalItens', 'totalItens', e.target.value)}
+                  onChange={(v) => handleNumericInput('totalItens', 'totalItens', v)}
                 />
               </div>
 
