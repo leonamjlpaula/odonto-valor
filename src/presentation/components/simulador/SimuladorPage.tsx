@@ -260,7 +260,7 @@ export function SimuladorPage({
                 <Label htmlFor="sim-totalItens" className="text-sm">
                   Custo fixo mensal (R$)
                 </Label>
-                <p className="text-xs text-muted-foreground">Salvo: {formatBRL(totalItens)}</p>
+                <p className="text-xs text-muted-foreground">Atual: {formatBRL(totalItens)}</p>
                 <Input
                   id="sim-totalItens"
                   value={inputValues.totalItens}
@@ -272,7 +272,7 @@ export function SimuladorPage({
                 <Label htmlFor="sim-cadeiras" className="text-sm">
                   Número de cadeiras
                 </Label>
-                <p className="text-xs text-muted-foreground">Salvo: {config.numeroCadeiras}</p>
+                <p className="text-xs text-muted-foreground">Atual: {config.numeroCadeiras}</p>
                 <Input
                   id="sim-cadeiras"
                   type="number"
@@ -290,7 +290,7 @@ export function SimuladorPage({
                   Taxa de ociosidade (%)
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  Salvo: {config.percOciosidade}% — típico: 20%
+                  Atual: {config.percOciosidade}% — típico: 20%
                 </p>
                 <div className="flex gap-2 items-center">
                   <input
@@ -321,7 +321,7 @@ export function SimuladorPage({
                 <Label htmlFor="sim-impostos" className="text-sm">
                   % Impostos (ISS / Simples)
                 </Label>
-                <p className="text-xs text-muted-foreground">Salvo: {config.percImpostos}%</p>
+                <p className="text-xs text-muted-foreground">Atual: {config.percImpostos}%</p>
                 <Input
                   id="sim-impostos"
                   type="number"
@@ -339,7 +339,7 @@ export function SimuladorPage({
                 <Label htmlFor="sim-cartao" className="text-sm">
                   % Taxa de cartão
                 </Label>
-                <p className="text-xs text-muted-foreground">Salvo: {config.percTaxaCartao}%</p>
+                <p className="text-xs text-muted-foreground">Atual: {config.percTaxaCartao}%</p>
                 <Input
                   id="sim-cartao"
                   type="number"
@@ -392,7 +392,7 @@ export function SimuladorPage({
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Salvo: {formatBRL(custoFixoPorMinutoAtual)}/min
+                  Atual: {formatBRL(custoFixoPorMinutoAtual)}/min
                 </p>
               </CardContent>
             </Card>
@@ -411,7 +411,7 @@ export function SimuladorPage({
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Salvo: {noVermelhoSalvo} · Com preço: {comPreco.length}
+                  Atual: {noVermelhoSalvo} · Com preço: {comPreco.length}
                 </p>
               </CardContent>
             </Card>
