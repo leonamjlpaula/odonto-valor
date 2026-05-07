@@ -19,7 +19,6 @@ import {
   Clock,
   Download,
   ArrowRight,
-  TrendingUp,
 } from 'lucide-react';
 
 const configuracaoSteps = [
@@ -28,9 +27,9 @@ const configuracaoSteps = [
     icon: DollarSign,
     title: 'Configure seus Custos Fixos',
     description:
-      'Aluguel, salários, contas, depreciação de equipamentos — o sistema calcula o custo exato por minuto usando a metodologia CNCC com 11 meses de trabalho por ano.',
+      'Aluguel, salários, contas, desgaste de equipamentos — o sistema calcula quanto custa cada minuto do seu atendimento, considerando um mês de férias por ano.',
     href: '/custos-fixos',
-    tip: 'Inclua o número de cadeiras e sua taxa de ociosidade para maior precisão.',
+    tip: 'Informe o número de cadeiras e quanto tempo fica sem pacientes — isso aumenta a precisão do cálculo.',
   },
   {
     number: 2,
@@ -46,7 +45,7 @@ const configuracaoSteps = [
     icon: ClipboardList,
     title: 'Defina seu preço de venda',
     description:
-      'Com os custos configurados, cadastre o preço que você cobra por cada procedimento. O sistema calcula a margem de lucro automaticamente e alerta quando está abaixo de 30%.',
+      'Com os custos configurados, informe o preço que você cobra em cada procedimento. O sistema calcula automaticamente se você está lucrando e avisa quando o preço está baixo demais.',
     href: '/procedimentos/diagnostico',
     tip: 'Margem verde ≥ 30% · amarelo 10–29% · vermelho < 10%.',
   },
@@ -56,9 +55,9 @@ const analiseSteps = [
   {
     number: 4,
     icon: BarChart2,
-    title: 'Compare com a tabela VRPO',
+    title: 'Veja onde pode negociar com convênios',
     description:
-      'Veja quais dos seus procedimentos estão abaixo do valor de referência nacional. Use essa diferença como margem de negociação com convênios.',
+      'Compare seus preços com a tabela de referência nacional. Procedimentos abaixo da tabela têm menos margem para oferecer desconto — saiba onde você pode negociar com segurança.',
     href: '/comparativo-vrpo',
   },
   {
@@ -99,53 +98,29 @@ export function PrimeirosPassosPage() {
         <h1 className="text-2xl font-bold tracking-tight">Primeiros Passos</h1>
         <p className="text-muted-foreground leading-relaxed max-w-2xl">
           Configure o OdontoValor em poucos passos e descubra se cada procedimento está gerando
-          lucro real — com base nos seus custos reais e na metodologia oficial da CNCC.
+          lucro real — com base nos seus custos reais do consultório.
         </p>
       </div>
 
-      {/* Formula */}
+      {/* How it works */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Como funciona o cálculo</CardTitle>
-          <CardDescription>Fórmula simplificada baseada na metodologia VRPO/CNCC</CardDescription>
+          <CardTitle className="text-base">Como o sistema calcula seus preços</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row items-stretch gap-2 text-center">
-            <div className="flex-1 rounded-lg border bg-muted/50 p-4 space-y-1">
-              <p className="text-sm font-semibold">Tempo (min)</p>
-              <p className="text-xs text-muted-foreground">duração do procedimento</p>
-            </div>
-            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">
-              ×
-            </div>
-            <div className="flex-1 rounded-lg border bg-muted/50 p-4 space-y-1">
-              <p className="text-sm font-semibold">Custo Fixo/min</p>
-              <p className="text-xs text-muted-foreground">custo do consultório por minuto</p>
-            </div>
-            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">
-              +
-            </div>
-            <div className="flex-1 rounded-lg border bg-muted/50 p-4 space-y-1">
-              <p className="text-sm font-semibold">Custo Variável</p>
-              <p className="text-xs text-muted-foreground">materiais usados no procedimento</p>
-            </div>
-            <div className="flex items-center justify-center text-lg font-bold text-muted-foreground px-1">
-              =
-            </div>
-            <div className="flex-1 rounded-lg border border-primary bg-primary/5 p-4 space-y-1">
-              <p className="text-sm font-semibold text-primary">Preço de Custo</p>
-              <p className="text-xs text-muted-foreground">base para calcular sua margem</p>
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-start gap-2 rounded-md bg-muted/50 px-4 py-3 text-sm text-muted-foreground">
-            <TrendingUp className="h-4 w-4 shrink-0 mt-0.5 text-primary" aria-hidden="true" />
-            <span>
-              A <strong className="text-foreground">margem de lucro</strong> é calculada sobre o
-              preço de venda que você pratica, descontando impostos (ISS/Simples) e taxa de cartão.
-              Meta: <strong className="text-foreground">30% ou mais</strong>.
-            </span>
-          </div>
+        <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <p>
+            O OdontoValor calcula o custo real de cada procedimento com base em três fatores: o{' '}
+            <strong className="text-foreground">tempo que você gasta</strong>, os{' '}
+            <strong className="text-foreground">gastos mensais do consultório</strong> (aluguel,
+            salários, contas) e os <strong className="text-foreground">materiais usados</strong>.
+          </p>
+          <p>
+            Você informa o preço que cobra e o sistema calcula automaticamente se está{' '}
+            <strong className="text-green-700">lucrando</strong> (margem ≥ 30%),{' '}
+            <strong className="text-yellow-700">no limite</strong> (10–29%) ou{' '}
+            <strong className="text-red-700">no prejuízo</strong> ({'<'}10%), descontando impostos e
+            taxa de cartão.
+          </p>
         </CardContent>
       </Card>
 
