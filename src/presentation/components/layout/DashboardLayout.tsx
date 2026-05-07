@@ -16,6 +16,8 @@ import {
   MoreHorizontal,
   BookOpen,
   Sliders,
+  CheckCircle2,
+  Circle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/presentation/components/ui/button';
@@ -26,14 +28,14 @@ import banner from '@/assets/odonto_valor_banner.png';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Primeiros Passos', href: '/primeiros-passos', icon: BookOpen },
-  { label: 'Custos Fixos', href: '/custos-fixos', icon: DollarSign },
+  { label: 'Como Funciona', href: '/primeiros-passos', icon: BookOpen },
+  { label: 'Meus Gastos', href: '/custos-fixos', icon: DollarSign },
   { label: 'Materiais', href: '/materiais', icon: Package },
   { label: 'Procedimentos', href: '/procedimentos', icon: ClipboardList },
   { label: 'Referência de Convênios', href: '/comparativo-vrpo', icon: BarChart2 },
-  { label: 'Simulador', href: '/simulador', icon: Sliders },
-  { label: 'Histórico', href: '/historico', icon: Clock },
-  { label: 'Exportar', href: '/exportar', icon: Download },
+  { label: 'Simular Cenários', href: '/simulador', icon: Sliders },
+  { label: 'Meus Registros', href: '/historico', icon: Clock },
+  { label: 'Baixar Tabela de Preços', href: '/exportar', icon: Download },
 ];
 
 const mobileMainItems = [
@@ -43,20 +45,27 @@ const mobileMainItems = [
 ];
 
 const mobileMoreItems = [
-  { label: 'Primeiros Passos', href: '/primeiros-passos', icon: BookOpen },
+  { label: 'Como Funciona', href: '/primeiros-passos', icon: BookOpen },
   { label: 'Materiais', href: '/materiais', icon: Package },
   { label: 'Referência de Convênios', href: '/comparativo-vrpo', icon: BarChart2 },
-  { label: 'Simulador', href: '/simulador', icon: Sliders },
-  { label: 'Histórico', href: '/historico', icon: Clock },
-  { label: 'Exportar', href: '/exportar', icon: Download },
+  { label: 'Simular Cenários', href: '/simulador', icon: Sliders },
+  { label: 'Meus Registros', href: '/historico', icon: Clock },
+  { label: 'Baixar Tabela de Preços', href: '/exportar', icon: Download },
 ];
+
+interface ProgressoOnboarding {
+  custosConfigurados: boolean;
+  materiaisRevisados: boolean;
+  procedimentoComPreco: boolean;
+}
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
   userName: string;
+  progresso: ProgressoOnboarding;
 }
 
-export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
+export function DashboardLayout({ children, userName, progresso }: DashboardLayoutProps) {
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = useState(false);
 
@@ -107,6 +116,63 @@ export function DashboardLayout({ children, userName }: DashboardLayoutProps) {
               );
             })}
           </nav>
+
+          {/* Onboarding progress indicator */}
+          {(() => {
+            const passosCompletos = [
+              progresso.custosConfigurados,
+              progresso.materiaisRevisados,
+              progresso.procedimentoComPreco,
+            ].filter(Boolean).length;
+            if (passosCompletos >= 3) return null;
+            return (
+              <div className="px-4 py-3 border-t space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">
+                  Configuração: {passosCompletos}/3
+                </p>
+                <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all"
+                    style={{ width: `${(passosCompletos / 3) * 100}%` }}
+                  />
+                </div>
+                <div className="space-y-1">
+                  {[
+                    {
+                      label: 'Meus Gastos',
+                      done: progresso.custosConfigurados,
+                      href: '/custos-fixos',
+                    },
+                    {
+                      label: 'Materiais',
+                      done: progresso.materiaisRevisados,
+                      href: '/materiais',
+                    },
+                    {
+                      label: 'Preço de venda',
+                      done: progresso.procedimentoComPreco,
+                      href: '/procedimentos/diagnostico',
+                    },
+                  ].map((step) => (
+                    <Link
+                      key={step.href}
+                      href={step.href}
+                      className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {step.done ? (
+                        <CheckCircle2 className="h-3 w-3 text-green-600 shrink-0" />
+                      ) : (
+                        <Circle className="h-3 w-3 shrink-0" />
+                      )}
+                      <span className={step.done ? 'line-through opacity-60' : ''}>
+                        {step.label}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </aside>
 
         {/* Main Content */}
