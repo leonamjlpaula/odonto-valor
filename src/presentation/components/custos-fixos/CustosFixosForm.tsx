@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useTransition } from 'react';
 import { saveCustoFixoConfig } from '@/application/usecases/custoFixoActions';
+import { parseBR } from '@/lib/utils';
 import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
@@ -123,7 +124,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
   }
 
   function addItem() {
-    const valor = parseFloat(newItemValor.replace(',', '.'));
+    const valor = parseBR(newItemValor);
     if (!newItemNome.trim() || isNaN(valor) || valor < 0) return;
     const maxOrdem = Math.max(0, ...items.map((i) => i.ordem));
     setItems((prev) => [
