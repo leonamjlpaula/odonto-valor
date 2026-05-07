@@ -171,3 +171,23 @@ export async function deleteCustoFixoItem(
     return { errors: { general: ['Erro ao excluir item. Tente novamente.'] } };
   }
 }
+
+// ─── saveEspecialidadesSelecionadas ───────────────────────────────────────────
+
+export async function saveEspecialidadesSelecionadas(
+  userId: string,
+  especialidadeIds: string[]
+): Promise<{ success: true } | { errors: { general: string[] } }> {
+  if (especialidadeIds.length === 0) {
+    return { errors: { general: ['Selecione pelo menos uma especialidade.'] } };
+  }
+  await prisma.custoFixoConfig.upsert({
+    where: { userId },
+    update: { especialidadesSelecionadas: especialidadeIds },
+    create: {
+      userId,
+      especialidadesSelecionadas: especialidadeIds,
+    },
+  });
+  return { success: true };
+}

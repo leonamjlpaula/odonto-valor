@@ -31,6 +31,7 @@ interface Props {
   currentEspecialidade: Especialidade;
   initialProcedimentos: ProcedimentoComPrecoLista[];
   initialSearchQuery: string;
+  showTodas?: boolean;
 }
 
 function formatBRL(value: number): string {
@@ -48,6 +49,7 @@ export function ProcedimentosPage({
   currentEspecialidade,
   initialProcedimentos,
   initialSearchQuery: _initialSearchQuery,
+  showTodas = false,
 }: Props) {
   const router = useRouter();
   const { toast } = useToast();
@@ -156,6 +158,14 @@ export function ProcedimentosPage({
               </Link>
             );
           })}
+          {showTodas && (
+            <Link
+              href="/procedimentos/diagnostico"
+              className="flex items-center px-3 py-2 rounded-md text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors mt-2 border-t pt-3"
+            >
+              Ver todas as especialidades
+            </Link>
+          )}
         </nav>
       </aside>
 
@@ -173,6 +183,7 @@ export function ProcedimentosPage({
                 {esp.nome} ({esp.count})
               </option>
             ))}
+            {showTodas && <option value="diagnostico">Ver todas as especialidades</option>}
           </select>
         </div>
 

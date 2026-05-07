@@ -363,3 +363,13 @@ export async function updatePrecoVenda(
   });
   return { success: true };
 }
+
+// ─── getEspecialidadesSelecionadas ────────────────────────────────────────────
+
+export async function getEspecialidadesSelecionadas(userId: string): Promise<string[]> {
+  const config = await prisma.custoFixoConfig.findUnique({
+    where: { userId },
+    select: { especialidadesSelecionadas: true },
+  });
+  return config?.especialidadesSelecionadas ?? [];
+}
