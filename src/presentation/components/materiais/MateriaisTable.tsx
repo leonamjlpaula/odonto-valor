@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useTransition } from 'react';
-import { Pencil, X, Check } from 'lucide-react';
+import { Pencil, X, Check, Lock } from 'lucide-react';
 import type { Material } from '@prisma/client';
 import {
   updateMaterial,
@@ -247,6 +247,15 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
         </Button>
       </div>
 
+      {/* Info banner */}
+      <div className="rounded-md bg-muted/50 border px-4 py-3 text-sm text-muted-foreground">
+        <span className="font-medium text-foreground">
+          {materiais.filter((m) => m.isDefault).length} materiais já configurados
+        </span>{' '}
+        com preços de referência VRPO. Verifique apenas os que você compra — atualize o preço se
+        diferir do seu fornecedor.
+      </div>
+
       {/* Search */}
       <Input
         placeholder="Buscar material pelo nome..."
@@ -274,7 +283,7 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
                   Preço (R$)
                 </th>
                 <th className="text-right px-4 py-3 font-medium text-muted-foreground">
-                  Usos/emb.
+                  Rendimento
                 </th>
                 <th className="text-center px-4 py-3 font-medium text-muted-foreground">Ações</th>
               </tr>
@@ -298,7 +307,12 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
                       <td className="px-4 py-3 text-muted-foreground">{material.unidade}</td>
                       <td className="px-4 py-3">
                         {material.isDefault ? (
-                          <Badge variant="secondary">Padrão VRPO</Badge>
+                          <span
+                            title="Material pré-configurado VRPO"
+                            aria-label="Material pré-configurado VRPO"
+                          >
+                            <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                          </span>
                         ) : (
                           <Badge variant="outline">Customizado</Badge>
                         )}
@@ -319,7 +333,16 @@ export function MateriaisTable({ userId, initialMateriais }: Props) {
                             }}
                           />
                         ) : (
-                          <span>{formatBRL(material.preco)}</span>
+                          <span
+                            className={material.preco === 0 ? 'text-yellow-600' : undefined}
+                            title={
+                              material.preco === 0
+                                ? 'Sem preço — impacta cálculos dos procedimentos'
+                                : undefined
+                            }
+                          >
+                            {formatBRL(material.preco)}
+                          </span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right">
