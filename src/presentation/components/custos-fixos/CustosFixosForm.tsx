@@ -182,11 +182,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
           <p className="text-sm font-medium opacity-80">Custo Fixo por Minuto</p>
           <p className="text-4xl font-bold mt-1">{formatBRL(custoFixoPorMinuto)} / min</p>
           <p className="text-xs opacity-70 mt-2">
-            Total mensal ÷ {config.diasUteis} dias × {config.horasTrabalho}h × 60min
-            {config.percOciosidade > 0 &&
-              ` × ${(100 - config.percOciosidade).toFixed(0)}% ocupação`}
-            {config.numeroCadeiras > 1 && ` ÷ ${config.numeroCadeiras} cadeiras`} + Depreciação (11
-            meses) + Remuneração + Retorno
+            Gastos mensais ÷ minutos disponíveis + equipamentos + salário + retorno do capital
           </p>
         </CardContent>
       </Card>
@@ -316,8 +312,13 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
       {/* Section 2 — Depreciação */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Meus equipamentos</CardTitle>
-          <CardDescription>Seção 2 — Depreciação de Equipamentos</CardDescription>
+          <CardTitle className="text-base">
+            Meus equipamentos — <TermTooltip term="depreciacao">depreciação</TermTooltip>
+          </CardTitle>
+          <CardDescription>
+            O custo dos seus equipamentos diluído ao longo do tempo de uso — entra no cálculo do
+            custo por minuto.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -340,6 +341,9 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
               onChange={(e) => updateConfig('anosDepreciacao', parseInt(e.target.value) || 1)}
               min={1}
             />
+            <p className="text-xs text-muted-foreground">
+              CNCC usa 11 meses/ano (1 mês de férias).
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -405,11 +409,15 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Retorno do investimento</CardTitle>
-          <CardDescription>Seção 4 — Taxa de Retorno sobre Investimento</CardDescription>
+          <CardDescription>
+            Percentual do seu investimento que o sistema reserva como retorno anual do capital.
+          </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Taxa de retorno (%)</Label>
+            <Label>
+              <TermTooltip term="taxaRetorno">Taxa de retorno</TermTooltip> (%)
+            </Label>
             <Input
               type="number"
               value={config.taxaRetornoPerc}
@@ -418,6 +426,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
               max={100}
               step={0.1}
             />
+            <p className="text-xs text-muted-foreground">Padrão CNCC: 3%</p>
           </div>
           <div className="space-y-2">
             <Label>Prazo de retorno (anos)</Label>
@@ -427,6 +436,7 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
               onChange={(e) => updateConfig('anosRetorno', parseInt(e.target.value) || 1)}
               min={1}
             />
+            <p className="text-xs text-muted-foreground">Padrão CNCC: 3 anos</p>
           </div>
         </CardContent>
       </Card>
