@@ -39,6 +39,8 @@ export function EspecialidadeSelectorPage({ userId, especialidades }: Props) {
       if ('success' in result) {
         const first = especialidades.find((e) => selected.has(e.id));
         router.push(first ? `/procedimentos/${first.codigo}` : '/procedimentos/diagnostico');
+      } else {
+        setError('Erro ao salvar. Tente novamente.');
       }
     });
   }
