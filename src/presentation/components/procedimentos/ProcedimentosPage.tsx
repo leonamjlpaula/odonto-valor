@@ -3,7 +3,7 @@
 import { useState, useTransition, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, Plus, X } from 'lucide-react';
+import { Search, Plus, X, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Especialidade } from '@prisma/client';
 import type { ProcedimentoComPrecoLista } from '@/application/usecases/procedimentoActions';
 import { createProcedimentoCustomizado } from '@/application/usecases/procedimentoActions';
@@ -56,6 +56,7 @@ export function ProcedimentosPage({
   const [isPending, startTransition] = useTransition();
 
   const [filterQuery, setFilterQuery] = useState('');
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addCodigo, setAddCodigo] = useState('');
   const [addNome, setAddNome] = useState('');
@@ -239,30 +240,65 @@ export function ProcedimentosPage({
             <table className="w-full text-sm">
               <thead className="bg-muted/50">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-muted-foreground">Código</th>
+                  {/* Default 5 columns */}
                   <th className="text-left px-4 py-3 font-medium text-muted-foreground">Nome</th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground">
                     Tempo (min)
                   </th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground">
-                    Custo Variável
+                    Custo de produção
                   </th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground">
-                    Preço Calculado
+                    Meu preço
                   </th>
                   <th className="text-right px-4 py-3 font-medium text-muted-foreground">Margem</th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
-                    VRPO Ref.
-                  </th>
-                  <th className="text-right px-4 py-3 font-medium text-muted-foreground">
-                    Diferença (%)
+                  {/* Advanced columns — hidden by default */}
+                  {showAdvanced && (
+                    <>
+                      <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                        Código
+                      </th>
+                      <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                        Custo Variável
+                      </th>
+                      <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                        Ref. Nacional
+                      </th>
+                      <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                        Diferença (%)
+                      </th>
+                    </>
+                  )}
+                  {/* Toggle button column */}
+                  <th className="px-4 py-3 text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowAdvanced((prev) => !prev)}
+                      className="text-xs text-muted-foreground hover:text-foreground gap-1"
+                    >
+                      {showAdvanced ? (
+                        <>
+                          Ocultar comparativo
+                          <ChevronUp className="h-3 w-3" />
+                        </>
+                      ) : (
+                        <>
+                          Mostrar comparativo VRPO
+                          <ChevronDown className="h-3 w-3" />
+                        </>
+                      )}
+                    </Button>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {filteredProcedimentos.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-8 text-muted-foreground">
+                    <td
+                      colSpan={showAdvanced ? 10 : 6}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       {filterQuery
                         ? 'Nenhum procedimento encontrado para o filtro.'
                         : 'Nenhum procedimento cadastrado para esta especialidade.'}
@@ -292,43 +328,64 @@ export function ProcedimentosPage({
                           router.push(`/procedimentos/${especialidadeSlug}/${procedimento.id}`)
                         }
                       >
+                        {/* Nome — inline Código badge if custom */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <span className="font-mono text-xs">{procedimento.codigo}</span>
+                            <span>{procedimento.nome}</span>
                             {procedimento.isCustom && (
-                              <Badge variant="outline" className="text-xs">
+                              <Badge variant="outline" className="text-xs shrink-0">
                                 Customizado
                               </Badge>
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3">{procedimento.nome}</td>
+                        {/* Tempo */}
                         <td className="px-4 py-3 text-right text-muted-foreground tabular-nums">
                           {procedimento.tempoMinutos}
                         </td>
-                        <td className="px-4 py-3 text-right tabular-nums">
-                          {formatBRL(precoCalculado.custoVariavel)}
-                        </td>
+                        {/* Custo de produção (break-even) */}
                         <td className="px-4 py-3 text-right font-semibold tabular-nums">
                           {formatBRL(precoCalculado.precoFinal)}
                         </td>
+                        {/* Meu preço */}
+                        <td className="px-4 py-3 text-right tabular-nums">
+                          {procedimento.precoVenda !== null ? (
+                            formatBRL(procedimento.precoVenda)
+                          ) : (
+                            <span className="text-muted-foreground">—</span>
+                          )}
+                        </td>
+                        {/* Margem */}
                         <td className="px-4 py-3 text-right">
                           <MargemBadge
                             margemLucro={precoCalculado.margemLucro}
                             precoMinimoParaMargem30={precoCalculado.precoMinimoParaMargem30}
                           />
                         </td>
-                        <td className="px-4 py-3 text-right text-muted-foreground tabular-nums">
-                          {vrpoReferencia !== null ? formatBRL(vrpoReferencia) : '—'}
-                        </td>
-                        <td
-                          className={cn(
-                            'px-4 py-3 text-right font-medium tabular-nums',
-                            diferencaColor
-                          )}
-                        >
-                          {diferenca !== null ? formatPercentage(diferenca) : '—'}
-                        </td>
+                        {/* Advanced columns */}
+                        {showAdvanced && (
+                          <>
+                            <td className="px-4 py-3">
+                              <span className="font-mono text-xs">{procedimento.codigo}</span>
+                            </td>
+                            <td className="px-4 py-3 text-right tabular-nums">
+                              {formatBRL(precoCalculado.custoVariavel)}
+                            </td>
+                            <td className="px-4 py-3 text-right text-muted-foreground tabular-nums">
+                              {vrpoReferencia !== null ? formatBRL(vrpoReferencia) : '—'}
+                            </td>
+                            <td
+                              className={cn(
+                                'px-4 py-3 text-right font-medium tabular-nums',
+                                diferencaColor
+                              )}
+                            >
+                              {diferenca !== null ? formatPercentage(diferenca) : '—'}
+                            </td>
+                          </>
+                        )}
+                        {/* Empty cell under toggle column */}
+                        <td />
                       </tr>
                     );
                   })
