@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# git worktrees
+.worktrees/
+
 # dependencies
 /node_modules
 /.pnp
@@ -51,3 +54,5 @@ tasks/
 
 # leads database (marketing, não vai pro git)
 leads/
+
+.playwright-mcp/
