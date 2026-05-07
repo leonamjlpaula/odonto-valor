@@ -40,9 +40,8 @@ export async function StatsSection({ userId }: { userId: string }) {
             <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
               <AlertCircle className="inline h-4 w-4 shrink-0 mr-1" />{' '}
               {totalProcedimentosNoVermelho} procedimento
-              {totalProcedimentosNoVermelho > 1 ? 's' : ''} sendo cobrado
-              {totalProcedimentosNoVermelho > 1 ? 's' : ''} abaixo do custo mínimo — você pode estar
-              perdendo dinheiro a cada atendimento.{' '}
+              {totalProcedimentosNoVermelho > 1 ? 's' : ''} com preço baixo demais — margem abaixo
+              de 10%.{' '}
               <Link
                 href="/procedimentos/diagnostico"
                 className="font-medium underline underline-offset-2"
