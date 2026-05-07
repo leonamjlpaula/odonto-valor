@@ -40,7 +40,8 @@ export async function StatsSection({ userId }: { userId: string }) {
             <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
               <AlertCircle className="inline h-4 w-4 shrink-0 mr-1" />{' '}
               {totalProcedimentosNoVermelho} procedimento
-              {totalProcedimentosNoVermelho > 1 ? 's' : ''} com margem abaixo de 10%.{' '}
+              {totalProcedimentosNoVermelho > 1 ? 's' : ''} com preço baixo demais — margem abaixo
+              de 10%.{' '}
               <Link
                 href="/procedimentos/diagnostico"
                 className="font-medium underline underline-offset-2"
@@ -51,9 +52,9 @@ export async function StatsSection({ userId }: { userId: string }) {
           )}
           {stats.custosDesatualizados && (
             <div className="rounded-md border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
-              <AlertTriangle className="inline h-4 w-4 shrink-0 mr-1" /> Os custos fixos não são
-              atualizados há mais de 6 meses. Revise os valores para manter sua precificação
-              precisa.{' '}
+              <AlertTriangle className="inline h-4 w-4 shrink-0 mr-1" /> Seus gastos mensais do
+              consultório não foram revisados há mais de 6 meses. Seus preços podem estar
+              desatualizados.{' '}
               <Link href="/custos-fixos" className="font-medium underline underline-offset-2">
                 Atualizar agora
               </Link>
@@ -61,10 +62,9 @@ export async function StatsSection({ userId }: { userId: string }) {
           )}
           {stats.ociosidadeNaoConfigurada && (
             <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-              <Lightbulb className="inline h-4 w-4 shrink-0 mr-1" /> Sua taxa de{' '}
-              <TermTooltip term="ociosidade">ociosidade</TermTooltip> está em 0%. Clínicas típicas
-              ficam com 20% do tempo ocioso — configurar esse valor torna o custo por minuto mais
-              realista.{' '}
+              <Lightbulb className="inline h-4 w-4 shrink-0 mr-1" /> Você não informou quanto tempo
+              fica sem pacientes por dia. Sem essa configuração, seu custo por atendimento pode
+              estar subestimado.{' '}
               <Link href="/custos-fixos" className="font-medium underline underline-offset-2">
                 Configurar agora
               </Link>
@@ -77,7 +77,7 @@ export async function StatsSection({ userId }: { userId: string }) {
         <Link href="/procedimentos/diagnostico" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription>Procedimentos no Vermelho</CardDescription>
+              <CardDescription>Procedimentos abaixo do custo</CardDescription>
               <CardTitle className="text-3xl tabular-nums">
                 {totalProcedimentosNoVermelho > 0 ? (
                   <span className="text-red-600">{totalProcedimentosNoVermelho}</span>
@@ -92,8 +92,8 @@ export async function StatsSection({ userId }: { userId: string }) {
             <CardContent>
               <p className="text-xs text-muted-foreground">
                 {totalProcedimentosNoVermelho > 0
-                  ? 'Margem abaixo de 10% — clique para ver'
-                  : 'Todos os procedimentos com preço estão saudáveis'}
+                  ? 'Preço abaixo do custo mínimo — clique para ver'
+                  : 'Todos os procedimentos com preço estão com boa margem'}
               </p>
             </CardContent>
           </Card>
@@ -102,7 +102,7 @@ export async function StatsSection({ userId }: { userId: string }) {
         <Link href="/procedimentos" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription>Margem Média</CardDescription>
+              <CardDescription>Lucro médio por procedimento</CardDescription>
               <CardTitle className="text-3xl tabular-nums">
                 {stats.margemMedia !== null ? (
                   <span
@@ -125,7 +125,7 @@ export async function StatsSection({ userId }: { userId: string }) {
               <p className="text-xs text-muted-foreground">
                 {stats.margemMedia !== null
                   ? 'Média dos procedimentos com preço de venda'
-                  : 'Configure preços de venda nos procedimentos'}
+                  : 'Informe o preço que você cobra em cada procedimento'}
               </p>
             </CardContent>
           </Card>
@@ -134,14 +134,16 @@ export async function StatsSection({ userId }: { userId: string }) {
         <Link href="/custos-fixos" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
             <CardHeader className="pb-2">
-              <CardDescription>Custo Fixo por Minuto</CardDescription>
+              <CardDescription>Custo por minuto de atendimento</CardDescription>
               <CardTitle className="text-3xl tabular-nums">
                 {formatBRL(stats.custoFixoPorMinuto)}
                 <span className="ml-1 text-lg font-normal text-muted-foreground">/ min</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-muted-foreground">Clique para editar os custos fixos</p>
+              <p className="text-xs text-muted-foreground">
+                Clique para revisar seus gastos mensais
+              </p>
             </CardContent>
           </Card>
         </Link>
@@ -150,10 +152,10 @@ export async function StatsSection({ userId }: { userId: string }) {
       {stats.breakEven.comProLabore > 0 && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Pontos de Equilíbrio Mensal</CardTitle>
+            <CardTitle className="text-base">Meta mínima de faturamento mensal</CardTitle>
             <CardDescription>
-              Estimativa com ocupação 100% — quanto você precisa faturar para cobrir cada nível de
-              custo.
+              Quanto você precisa faturar por mês para cobrir seus gastos. Calculado com agenda 100%
+              cheia.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
