@@ -122,11 +122,18 @@ export async function StatsSection({ userId }: { userId: string }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-xs text-muted-foreground">
-                {stats.margemMedia !== null
-                  ? 'Média dos procedimentos com preço de venda'
-                  : 'Informe o preço que você cobra em cada procedimento'}
-              </p>
+              {stats.margemMedia !== null ? (
+                <p className="text-xs text-muted-foreground">
+                  Média dos procedimentos com preço de venda
+                </p>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-muted-foreground">
+                    Nenhum procedimento com preço de venda
+                  </p>
+                  <p className="text-xs text-primary font-medium">→ Definir preços de venda</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </Link>

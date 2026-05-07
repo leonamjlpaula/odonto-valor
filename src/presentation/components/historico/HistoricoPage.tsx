@@ -209,6 +209,7 @@ export function HistoricoPage({ userId, initialSnapshots }: Props) {
           onView={handleView}
           onCompare={handleCompare}
           onDelete={(id) => setDeleteId(id)}
+          onCreateOpen={handleCreateOpen}
         />
       )}
 
@@ -305,15 +306,35 @@ type SnapshotListProps = {
   onView: (id: string) => void;
   onCompare: (id: string) => void;
   onDelete: (id: string) => void;
+  onCreateOpen?: () => void;
 };
 
-function SnapshotList({ snapshots, isPending, onView, onCompare, onDelete }: SnapshotListProps) {
+function SnapshotList({
+  snapshots,
+  isPending,
+  onView,
+  onCompare,
+  onDelete,
+  onCreateOpen,
+}: SnapshotListProps) {
   if (snapshots.length === 0) {
     return (
-      <div className="rounded-md border border-dashed p-12 text-center">
-        <p className="text-muted-foreground">
-          Nenhum registro salvo. Registre o estado atual da sua precificação.
-        </p>
+      <div className="rounded-md border border-dashed p-12 text-center space-y-4">
+        <Camera className="mx-auto h-10 w-10 text-muted-foreground/50" />
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">Registre sua precificação hoje</p>
+          <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+            Guarde uma foto do seu cálculo atual. Depois de ajustes futuros, compare para ver sua
+            evolução.
+          </p>
+        </div>
+        {onCreateOpen && (
+          <Button onClick={onCreateOpen} disabled={isPending}>
+            <Camera className="mr-2 h-4 w-4" />
+            Registrar Agora
+          </Button>
+        )}
+        <p className="text-xs text-muted-foreground">Você pode guardar até 10 registros.</p>
       </div>
     );
   }
