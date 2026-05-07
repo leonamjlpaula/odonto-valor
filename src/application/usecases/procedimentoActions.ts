@@ -25,6 +25,7 @@ export type ProcedimentoListItem = {
   nome: string;
   tempoMinutos: number;
   isCustom: boolean;
+  precoVenda: number | null;
   especialidade: { codigo: string };
 };
 
@@ -70,6 +71,7 @@ export async function getProcedimentosByEspecialidade(
       nome: procedimento.nome,
       tempoMinutos: procedimento.tempoMinutos,
       isCustom: procedimento.isCustom,
+      precoVenda: procedimento.precoVenda ?? null,
       especialidade: { codigo: procedimento.especialidade.codigo },
     },
     precoCalculado: calcularPrecoProcedimento(
@@ -123,6 +125,7 @@ export async function searchProcedimentos(
       nome: procedimento.nome,
       tempoMinutos: procedimento.tempoMinutos,
       isCustom: procedimento.isCustom,
+      precoVenda: procedimento.precoVenda ?? null,
       especialidade: { codigo: procedimento.especialidade.codigo },
     },
     precoCalculado: calcularPrecoProcedimento(
