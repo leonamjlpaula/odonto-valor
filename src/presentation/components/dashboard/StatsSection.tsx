@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AlertCircle, AlertTriangle, Lightbulb } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -37,7 +38,8 @@ export async function StatsSection({ userId }: { userId: string }) {
           <h2 className="text-sm font-semibold text-foreground">Atenção necessária</h2>
           {totalProcedimentosNoVermelho > 0 && (
             <div className="rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-              🔴 {totalProcedimentosNoVermelho} procedimento
+              <AlertCircle className="inline h-4 w-4 shrink-0 mr-1" />{' '}
+              {totalProcedimentosNoVermelho} procedimento
               {totalProcedimentosNoVermelho > 1 ? 's' : ''} com margem abaixo de 10%.{' '}
               <Link
                 href="/procedimentos/diagnostico"
@@ -49,8 +51,9 @@ export async function StatsSection({ userId }: { userId: string }) {
           )}
           {stats.custosDesatualizados && (
             <div className="rounded-md border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-800">
-              ⚠️ Os custos fixos não são atualizados há mais de 6 meses. Revise os valores para
-              manter sua precificação precisa.{' '}
+              <AlertTriangle className="inline h-4 w-4 shrink-0 mr-1" /> Os custos fixos não são
+              atualizados há mais de 6 meses. Revise os valores para manter sua precificação
+              precisa.{' '}
               <Link href="/custos-fixos" className="font-medium underline underline-offset-2">
                 Atualizar agora
               </Link>
@@ -58,9 +61,10 @@ export async function StatsSection({ userId }: { userId: string }) {
           )}
           {stats.ociosidadeNaoConfigurada && (
             <div className="rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-              💡 Sua taxa de <TermTooltip term="ociosidade">ociosidade</TermTooltip> está em 0%.
-              Clínicas típicas ficam com 20% do tempo ocioso — configurar esse valor torna o custo
-              por minuto mais realista.{' '}
+              <Lightbulb className="inline h-4 w-4 shrink-0 mr-1" /> Sua taxa de{' '}
+              <TermTooltip term="ociosidade">ociosidade</TermTooltip> está em 0%. Clínicas típicas
+              ficam com 20% do tempo ocioso — configurar esse valor torna o custo por minuto mais
+              realista.{' '}
               <Link href="/custos-fixos" className="font-medium underline underline-offset-2">
                 Configurar agora
               </Link>
