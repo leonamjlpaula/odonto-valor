@@ -126,7 +126,7 @@ export function ExportarPage({ data }: Props) {
       <div>
         <h1 className="text-2xl font-bold">Exportar Tabela de Preços</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Baixe sua tabela de procedimentos em PDF ou Excel para apresentar a convênios e pacientes.
+          Baixe sua tabela completa de procedimentos com preços calculados e memória de cálculo.
         </p>
       </div>
 
@@ -168,7 +168,7 @@ export function ExportarPage({ data }: Props) {
               className="rounded-md border border-input bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="all">Todos</option>
-              <option value="standard">Apenas Padrão VRPO</option>
+              <option value="standard">Apenas procedimentos padrão</option>
               <option value="custom">Apenas Customizados</option>
             </select>
           </div>
@@ -227,9 +227,9 @@ export function ExportarPage({ data }: Props) {
           <div>
             <h2 className="text-sm font-semibold">PDF de Credenciamento</h2>
             <p className="mt-0.5 text-xs text-muted-foreground max-w-prose">
-              Exporta todos os procedimentos com memória completa de cálculo (cada item de custo,
-              depreciação, remuneração, taxa de retorno) e a metodologia CNCC referenciada. Indicado
-              para negociações com operadoras e processos de credenciamento.
+              Gera um PDF com todos os seus procedimentos e a memória completa do cálculo de cada
+              preço. Use para apresentar a operadoras de plano ao se credenciar — mostra como seus
+              preços foram calculados com base nos seus custos reais.
             </p>
           </div>
           <button
@@ -267,7 +267,7 @@ export function ExportarPage({ data }: Props) {
                   <th className="px-4 py-3 text-right">Tempo (min)</th>
                   <th className="px-4 py-3 text-right">Custo Variável</th>
                   <th className="px-4 py-3 text-right">Preço Calculado</th>
-                  <th className="px-4 py-3 text-right">VRPO Ref.</th>
+                  <th className="px-4 py-3 text-right">Ref. Nacional</th>
                 </tr>
               </thead>
               <tbody>
