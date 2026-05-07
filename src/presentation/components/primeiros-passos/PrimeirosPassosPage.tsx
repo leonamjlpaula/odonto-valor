@@ -19,7 +19,11 @@ import {
   Clock,
   Download,
   ArrowRight,
+  CheckCircle2,
+  Circle,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { ProgressoOnboarding } from '@/application/usecases/dashboardActions';
 
 const configuracaoSteps = [
   {
@@ -90,7 +94,17 @@ const ferramentas = [
   },
 ];
 
-export function PrimeirosPassosPage() {
+type Props = {
+  progresso: ProgressoOnboarding;
+};
+
+export function PrimeirosPassosPage({ progresso }: Props) {
+  const stepDone: Record<number, boolean> = {
+    1: progresso.custosConfigurados,
+    2: progresso.materiaisRevisados,
+    3: progresso.procedimentoComPreco,
+  };
+
   return (
     <div className="space-y-10 max-w-4xl">
       {/* Hero */}
@@ -101,6 +115,44 @@ export function PrimeirosPassosPage() {
           lucro real — com base nos seus custos reais do consultório.
         </p>
       </div>
+
+      {/* Progress bar de configuração */}
+      {(() => {
+        const total = 3;
+        const feitos = [
+          progresso.custosConfigurados,
+          progresso.materiaisRevisados,
+          progresso.procedimentoComPreco,
+        ].filter(Boolean).length;
+        const pct = Math.round((feitos / total) * 100);
+        return (
+          <div className="rounded-lg border bg-card p-4 space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium">
+                {feitos === total
+                  ? 'Configuração completa!'
+                  : `${feitos} de ${total} passos de configuração concluídos`}
+              </span>
+              <span className="text-muted-foreground tabular-nums">{pct}%</span>
+            </div>
+            <div className="h-2 rounded-full bg-muted overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all',
+                  feitos === total ? 'bg-green-500' : 'bg-primary'
+                )}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+            {feitos === total && (
+              <p className="text-xs text-muted-foreground">
+                Seus custos estão configurados. Mantenha os preços atualizados conforme os insumos
+                mudam.
+              </p>
+            )}
+          </div>
+        );
+      })()}
 
       {/* How it works */}
       <Card>
@@ -132,8 +184,9 @@ export function PrimeirosPassosPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {configuracaoSteps.map((step) => {
             const Icon = step.icon;
+            const done = stepDone[step.number] ?? false;
             return (
-              <Card key={step.number} className="flex flex-col">
+              <Card key={step.number} className={cn('flex flex-col', done && 'opacity-60')}>
                 <CardHeader className="pb-3">
                   <div className="flex items-start gap-3">
                     <span
@@ -142,6 +195,17 @@ export function PrimeirosPassosPage() {
                     >
                       {step.number}
                     </span>
+                    {done ? (
+                      <CheckCircle2
+                        className="h-4 w-4 text-green-600 shrink-0 mt-2"
+                        aria-label="Concluído"
+                      />
+                    ) : (
+                      <Circle
+                        className="h-4 w-4 text-muted-foreground shrink-0 mt-2"
+                        aria-label="Pendente"
+                      />
+                    )}
                     <div className="space-y-0.5">
                       <div className="flex items-center gap-2">
                         <Icon className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
