@@ -5,6 +5,7 @@ import { getEspecialidades } from '@/lib/referenceData';
 import {
   getProcedimentosByEspecialidade,
   searchProcedimentos,
+  getEspecialidadesSelecionadas,
 } from '@/application/usecases/procedimentoActions';
 import { ProcedimentosPage } from '@/presentation/components/procedimentos/ProcedimentosPage';
 
@@ -21,7 +22,10 @@ export default async function Page({
   const { especialidade: especialidadeSlug } = await params;
   const { q: searchQuery } = await searchParams;
 
-  const especialidades = await getEspecialidades();
+  const [especialidades, selecionadas] = await Promise.all([
+    getEspecialidades(),
+    getEspecialidadesSelecionadas(userId),
+  ]);
 
   const currentEspecialidade = especialidades.find((e) => e.codigo === especialidadeSlug);
   if (!currentEspecialidade) redirect('/procedimentos/diagnostico');
@@ -38,6 +42,12 @@ export default async function Page({
     count: countMap.get(e.id) ?? 0,
   }));
 
+  // Filter sidebar to selected specialties only; fall back to all if none selected
+  const filtered =
+    selecionadas.length > 0
+      ? especialidadesWithCount.filter((e) => selecionadas.includes(e.id))
+      : especialidadesWithCount;
+
   const procedimentos = searchQuery
     ? await searchProcedimentos(userId, searchQuery)
     : await getProcedimentosByEspecialidade(userId, especialidadeSlug);
@@ -45,10 +55,11 @@ export default async function Page({
   return (
     <ProcedimentosPage
       userId={userId}
-      especialidades={especialidadesWithCount}
+      especialidades={filtered}
       currentEspecialidade={currentEspecialidade}
       initialProcedimentos={procedimentos}
       initialSearchQuery={searchQuery ?? ''}
+      showTodas={selecionadas.length > 0}
     />
   );
 }
