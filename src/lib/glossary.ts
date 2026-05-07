@@ -8,7 +8,8 @@ export type TermKey =
   | 'breakEven'
   | 'ISS'
   | 'simplesNacional'
-  | 'depreciacao';
+  | 'depreciacao'
+  | 'taxaRetorno';
 
 export interface GlossaryEntry {
   short: string;
@@ -35,8 +36,9 @@ export const GLOSSARY: Record<TermKey, GlossaryEntry> = {
   },
   proLabore: {
     short: 'pró-labore',
-    friendly: 'TODO(#20)',
-    tooltip: 'TODO(#20): remuneração do dentista proprietário',
+    friendly: 'seu salário',
+    tooltip:
+      'Remuneração do dentista proprietário — o salário que você paga a si mesmo, incluído no cálculo do break-even.',
   },
   insalubridade: {
     short: 'insalubridade',
@@ -51,8 +53,9 @@ export const GLOSSARY: Record<TermKey, GlossaryEntry> = {
   },
   breakEven: {
     short: 'break-even',
-    friendly: 'TODO(#20)',
-    tooltip: 'TODO(#20): preço mínimo que cobre todos os custos',
+    friendly: 'ponto de equilíbrio',
+    tooltip:
+      'Faturamento mínimo necessário para cobrir todos os custos sem lucro. Abaixo disso você está no prejuízo.',
   },
   ISS: {
     short: 'ISS',
@@ -66,7 +69,14 @@ export const GLOSSARY: Record<TermKey, GlossaryEntry> = {
   },
   depreciacao: {
     short: 'depreciação',
-    friendly: 'TODO(#20)',
-    tooltip: 'TODO(#20): desgaste contábil do equipamento ao longo do tempo',
+    friendly: 'desgaste dos equipamentos',
+    tooltip:
+      'O custo dos seus equipamentos dividido pela vida útil. Ex: cadeira de R$ 10.000 em 10 anos = R$ 1.000/ano incluídos no seu custo por minuto.',
+  },
+  taxaRetorno: {
+    short: 'taxa de retorno',
+    friendly: 'lucro sobre o investimento',
+    tooltip:
+      'Percentual do seu investimento em equipamentos que o sistema reserva como lucro do capital por ano. Padrão CNCC: 3% ao ano por 3 anos.',
   },
 };
