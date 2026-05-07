@@ -7,6 +7,7 @@ import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 import { CurrencyInput } from '@/presentation/components/ui/CurrencyInput';
 import { Label } from '@/presentation/components/ui/label';
+import { MargemBadge } from '@/presentation/components/ui/MargemBadge';
 import {
   Card,
   CardContent,
@@ -14,7 +15,6 @@ import {
   CardTitle,
   CardDescription,
 } from '@/presentation/components/ui/card';
-import { Badge } from '@/presentation/components/ui/badge';
 import type {
   SimuladorConfig,
   SimuladorProcedimento,
@@ -73,13 +73,6 @@ function calcMargem(
 ): number {
   const percTotal = percImpostos + percTaxaCartao;
   return (precoVenda - custoBreakEven - (precoVenda * percTotal) / 100) / precoVenda;
-}
-
-function margemLabel(margem: number): string {
-  const pct = margem * 100;
-  if (pct >= 30) return 'verde';
-  if (pct >= 10) return 'amarelo';
-  return 'vermelho';
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -476,7 +469,9 @@ export function SimuladorPage({
                           </div>
                         </td>
                         <td className="px-4 py-2 text-right">
-                          {p.margemSim !== null && <MargemBadge margem={p.margemSim} />}
+                          {p.margemSim !== null && (
+                            <MargemBadge margemLucro={p.margemSim} precoMinimoParaMargem30={0} />
+                          )}
                         </td>
                         <td className="px-4 py-2 text-right">
                           {p.deltaMargem !== null && (
@@ -515,23 +510,6 @@ export function SimuladorPage({
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-
-function MargemBadge({ margem }: { margem: number }) {
-  const pct = margem * 100;
-  const label = margemLabel(margem);
-  return (
-    <Badge
-      className={cn(
-        'text-white text-xs',
-        label === 'verde' && 'bg-green-600',
-        label === 'amarelo' && 'bg-yellow-500',
-        label === 'vermelho' && 'bg-red-600'
-      )}
-    >
-      {pct.toFixed(1)}%
-    </Badge>
-  );
-}
 
 type DeltaChipProps = {
   value: number;

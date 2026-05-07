@@ -7,7 +7,6 @@ import { Search, Plus, X } from 'lucide-react';
 import type { Especialidade } from '@prisma/client';
 import type { ProcedimentoComPrecoLista } from '@/application/usecases/procedimentoActions';
 import { createProcedimentoCustomizado } from '@/application/usecases/procedimentoActions';
-import { margemColor } from '@/application/usecases/calcularPrecoProcedimento';
 import { parseBR } from '@/lib/utils';
 import { useToast } from '@/presentation/hooks/use-toast';
 import { Button } from '@/presentation/components/ui/button';
@@ -21,6 +20,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/presentation/components/ui/dialog';
+import { MargemBadge } from '@/presentation/components/ui/MargemBadge';
 import { cn } from '@/lib/utils';
 
 type EspecialidadeWithCount = Especialidade & { count: number };
@@ -40,43 +40,6 @@ function formatBRL(value: number): string {
 function formatPercentage(value: number): string {
   const sign = value >= 0 ? '+' : '';
   return `${sign}${value.toFixed(1)}%`;
-}
-
-function MargemBadge({
-  margemLucro,
-  precoMinimoParaMargem30,
-}: {
-  margemLucro: number | null;
-  precoMinimoParaMargem30: number;
-}) {
-  const color = margemColor(margemLucro);
-
-  if (color === null) {
-    return (
-      <span className="text-xs text-muted-foreground whitespace-nowrap">
-        Mín: {formatBRL(precoMinimoParaMargem30)}
-      </span>
-    );
-  }
-
-  const pct = (margemLucro! * 100).toFixed(1);
-  const colorClass =
-    color === 'green'
-      ? 'bg-green-100 text-green-800 border-green-200'
-      : color === 'yellow'
-        ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-        : 'bg-red-100 text-red-800 border-red-200';
-
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border tabular-nums',
-        colorClass
-      )}
-    >
-      {pct}%
-    </span>
-  );
 }
 
 export function ProcedimentosPage({
