@@ -369,38 +369,56 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
             <Label>
               <TermTooltip term="fundoReserva">Reserva emergencial</TermTooltip> (%)
             </Label>
-            <Input
-              type="number"
-              value={config.percFundoReserva}
-              onChange={(e) => updateConfig('percFundoReserva', parseFloat(e.target.value) || 0)}
-              min={0}
-              max={100}
-              step={0.1}
-            />
+            <div className="relative">
+              <Input
+                type="number"
+                className="pr-8"
+                value={config.percFundoReserva}
+                onChange={(e) => updateConfig('percFundoReserva', parseFloat(e.target.value) || 0)}
+                min={0}
+                max={100}
+                step={0.1}
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                %
+              </span>
+            </div>
           </div>
           <div className="space-y-2">
             <Label>
               <TermTooltip term="insalubridade">Insalubridade</TermTooltip> (%)
             </Label>
-            <Input
-              type="number"
-              value={config.percInsalubridade}
-              onChange={(e) => updateConfig('percInsalubridade', parseFloat(e.target.value) || 0)}
-              min={0}
-              max={100}
-              step={0.1}
-            />
+            <div className="relative">
+              <Input
+                type="number"
+                className="pr-8"
+                value={config.percInsalubridade}
+                onChange={(e) => updateConfig('percInsalubridade', parseFloat(e.target.value) || 0)}
+                min={0}
+                max={100}
+                step={0.1}
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                %
+              </span>
+            </div>
           </div>
           <div className="space-y-2">
             <Label>Margem de imprevistos (%)</Label>
-            <Input
-              type="number"
-              value={config.percImprevistos}
-              onChange={(e) => updateConfig('percImprevistos', parseFloat(e.target.value) || 0)}
-              min={0}
-              max={100}
-              step={0.1}
-            />
+            <div className="relative">
+              <Input
+                type="number"
+                className="pr-8"
+                value={config.percImprevistos}
+                onChange={(e) => updateConfig('percImprevistos', parseFloat(e.target.value) || 0)}
+                min={0}
+                max={100}
+                step={0.1}
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                %
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -418,14 +436,20 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
             <Label>
               <TermTooltip term="taxaRetorno">Taxa de retorno</TermTooltip> (%)
             </Label>
-            <Input
-              type="number"
-              value={config.taxaRetornoPerc}
-              onChange={(e) => updateConfig('taxaRetornoPerc', parseFloat(e.target.value) || 0)}
-              min={0}
-              max={100}
-              step={0.1}
-            />
+            <div className="relative">
+              <Input
+                type="number"
+                className="pr-8"
+                value={config.taxaRetornoPerc}
+                onChange={(e) => updateConfig('taxaRetornoPerc', parseFloat(e.target.value) || 0)}
+                min={0}
+                max={100}
+                step={0.1}
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                %
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground">Padrão CNCC: 3%</p>
           </div>
           <div className="space-y-2">
@@ -465,28 +489,40 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
             <Label>
               <TermTooltip term="ociosidade">% agenda vazia</TermTooltip> (%)
             </Label>
-            <Input
-              type="number"
-              value={config.percOciosidade}
-              onChange={(e) => updateConfig('percOciosidade', parseFloat(e.target.value) || 0)}
-              min={0}
-              max={99}
-              step={1}
-            />
+            <div className="relative">
+              <Input
+                type="number"
+                className="pr-8"
+                value={config.percOciosidade}
+                onChange={(e) => updateConfig('percOciosidade', parseFloat(e.target.value) || 0)}
+                min={0}
+                max={99}
+                step={1}
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                %
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground">
               % do tempo produtivo não utilizado. Recomendado: 20% para clínicas típicas.
             </p>
           </div>
           <div className="space-y-2">
             <Label>Impostos sobre faturamento (%)</Label>
-            <Input
-              type="number"
-              value={config.percImpostos}
-              onChange={(e) => updateConfig('percImpostos', parseFloat(e.target.value) || 0)}
-              min={0}
-              max={100}
-              step={0.1}
-            />
+            <div className="relative">
+              <Input
+                type="number"
+                className="pr-8"
+                value={config.percImpostos}
+                onChange={(e) => updateConfig('percImpostos', parseFloat(e.target.value) || 0)}
+                min={0}
+                max={100}
+                step={0.1}
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                %
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground">
               <TermTooltip term="ISS">ISS</TermTooltip> /{' '}
               <TermTooltip term="simplesNacional">Simples Nacional</TermTooltip> incidente sobre o
@@ -495,14 +531,20 @@ export function CustosFixosForm({ userId, initialConfig, initialItems }: Props) 
           </div>
           <div className="space-y-2">
             <Label>Taxa de cartão (%)</Label>
-            <Input
-              type="number"
-              value={config.percTaxaCartao}
-              onChange={(e) => updateConfig('percTaxaCartao', parseFloat(e.target.value) || 0)}
-              min={0}
-              max={100}
-              step={0.1}
-            />
+            <div className="relative">
+              <Input
+                type="number"
+                className="pr-8"
+                value={config.percTaxaCartao}
+                onChange={(e) => updateConfig('percTaxaCartao', parseFloat(e.target.value) || 0)}
+                min={0}
+                max={100}
+                step={0.1}
+              />
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                %
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground">
               Taxa média cobrada pela operadora de cartão. Usado no cálculo de margem.
             </p>
