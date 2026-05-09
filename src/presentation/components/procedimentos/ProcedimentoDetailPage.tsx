@@ -50,12 +50,23 @@ interface Props {
   materiais: Material[];
 }
 
+function calcPreviewMargem(
+  precoVendaStr: string,
+  custoBreakEven: number,
+  percTotal: number
+): number | null {
+  if (!precoVendaStr.trim()) return null;
+  const pv = parseBR(precoVendaStr);
+  if (isNaN(pv) || pv <= 0) return null;
+  return (pv - custoBreakEven - (pv * percTotal) / 100) / pv;
+}
+
 export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, materiais }: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
-  const { procedimento, precoCalculado, vrpoReferencia } = detail;
+  const { procedimento, precoCalculado, vrpoReferencia, percTotal } = detail;
   const diferencaPerc =
     vrpoReferencia !== null
       ? ((precoCalculado.precoFinal - vrpoReferencia) / vrpoReferencia) * 100
@@ -66,6 +77,10 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
   const [precoValue, setPrecoValue] = useState(
     procedimento.precoVenda != null ? String(procedimento.precoVenda).replace('.', ',') : ''
   );
+  const previewMargem = editingPreco
+    ? calcPreviewMargem(precoValue, precoCalculado.precoFinal, percTotal)
+    : null;
+  const previewColor = margemColor(previewMargem);
 
   function handleSavePreco() {
     const valor = precoValue.trim() === '' ? null : parseBR(precoValue);
@@ -486,42 +501,63 @@ export function ProcedimentoDetailPage({ userId, especialidadeSlug, detail, mate
             </p>
           </div>
           {editingPreco ? (
-            <div className="flex items-center gap-2">
-              <CurrencyInput
-                value={precoValue}
-                onChange={(v) => setPrecoValue(v)}
-                className="w-28"
-                placeholder="ex: 280,00"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSavePreco();
-                  if (e.key === 'Escape') {
+            <div className="flex flex-col items-end gap-1.5">
+              <div className="flex items-center gap-2">
+                <CurrencyInput
+                  value={precoValue}
+                  onChange={(v) => setPrecoValue(v)}
+                  className="w-28"
+                  placeholder="ex: 280,00"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSavePreco();
+                    if (e.key === 'Escape') {
+                      setEditingPreco(false);
+                      setPrecoValue(
+                        procedimento.precoVenda != null
+                          ? String(procedimento.precoVenda).replace('.', ',')
+                          : ''
+                      );
+                    }
+                  }}
+                  autoFocus
+                />
+                <Button size="icon" variant="ghost" onClick={handleSavePreco} disabled={isPending}>
+                  <Check className="h-4 w-4 text-green-600" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => {
                     setEditingPreco(false);
                     setPrecoValue(
                       procedimento.precoVenda != null
                         ? String(procedimento.precoVenda).replace('.', ',')
                         : ''
                     );
-                  }
-                }}
-                autoFocus
-              />
-              <Button size="icon" variant="ghost" onClick={handleSavePreco} disabled={isPending}>
-                <Check className="h-4 w-4 text-green-600" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => {
-                  setEditingPreco(false);
-                  setPrecoValue(
-                    procedimento.precoVenda != null
-                      ? String(procedimento.precoVenda).replace('.', ',')
-                      : ''
-                  );
-                }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              {previewMargem !== null && (
+                <span
+                  className={cn(
+                    'text-xs font-medium tabular-nums',
+                    previewColor === 'green'
+                      ? 'text-green-700'
+                      : previewColor === 'yellow'
+                        ? 'text-yellow-700'
+                        : 'text-red-700'
+                  )}
+                >
+                  Margem: {(previewMargem * 100).toFixed(1)}%
+                  {previewColor === 'green'
+                    ? ' ✓'
+                    : previewColor === 'yellow'
+                      ? ' — atenção'
+                      : ' — abaixo do mínimo'}
+                </span>
+              )}
             </div>
           ) : (
             <Button variant="outline" size="sm" onClick={() => setEditingPreco(true)}>
