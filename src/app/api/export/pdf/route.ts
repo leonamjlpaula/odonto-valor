@@ -1,5 +1,7 @@
 import type { NextRequest } from 'next/server';
+import { headers } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit } from '@/lib/ratelimit';
 import { prisma } from '@/lib/db';
 import { calcularCustoFixoPorMinuto } from '@/application/usecases/calcularCustoFixoPorMinuto';
 import { calcularPrecoProcedimento } from '@/application/usecases/calcularPrecoProcedimento';
@@ -10,6 +12,16 @@ import {
 } from '@/infrastructure/services/PdfExportService';
 
 export async function GET(request: NextRequest) {
+  const headersList = await headers();
+  const ip = headersList.get('x-forwarded-for') ?? 'anonymous';
+  const { success, reset } = await checkRateLimit(`export:${ip}`);
+  if (!success) {
+    return new Response('Rate limit atingido. Tente novamente em alguns instantes.', {
+      status: 429,
+      headers: { 'Retry-After': String(Math.ceil(((reset ?? Date.now()) - Date.now()) / 1000)) },
+    });
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
