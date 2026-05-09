@@ -56,3 +56,6 @@ tasks/
 leads/
 
 .playwright-mcp/
+
+# repomix (snapshot gerado, não versionar)
+repomix-output.md
