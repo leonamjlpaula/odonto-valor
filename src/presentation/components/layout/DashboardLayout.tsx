@@ -19,6 +19,8 @@ import {
   CheckCircle2,
   Circle,
   User,
+  HelpCircle,
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/presentation/components/ui/button';
@@ -39,6 +41,8 @@ const navItems = [
   { label: 'Meus Registros', href: '/historico', icon: Clock },
   { label: 'Baixar Tabela de Preços', href: '/exportar', icon: Download },
   { label: 'Minha Conta', href: '/conta', icon: User },
+  { label: 'Suporte', href: '/suporte', icon: HelpCircle },
+  { label: 'Em Breve', href: '/em-breve', icon: Sparkles },
 ];
 
 const mobileMainItems = [
