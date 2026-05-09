@@ -11,8 +11,8 @@ export function CookieBanner() {
     setStatus(getConsent());
   }, []);
 
-  if (status !== null && status !== 'loading') return null;
-  if (status === 'loading') return null;
+  // Hide while reading localStorage (avoid flash) or after user decided
+  if (status === 'loading' || status !== null) return null;
 
   function handleAccept() {
     setConsent('accepted');
