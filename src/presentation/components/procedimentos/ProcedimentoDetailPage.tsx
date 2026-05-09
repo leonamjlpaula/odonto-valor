@@ -57,7 +57,7 @@ function calcPreviewMargem(
 ): number | null {
   if (!precoVendaStr.trim()) return null;
   const pv = parseBR(precoVendaStr);
-  if (isNaN(pv) || pv <= 0) return null;
+  if (isNaN(pv) || !isFinite(pv) || pv <= 0) return null;
   return (pv - custoBreakEven - (pv * percTotal) / 100) / pv;
 }
 
