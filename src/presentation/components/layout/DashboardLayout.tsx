@@ -18,6 +18,7 @@ import {
   Sliders,
   CheckCircle2,
   Circle,
+  User,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/presentation/components/ui/button';
@@ -37,6 +38,7 @@ const navItems = [
   { label: 'Simular Cenários', href: '/simulador', icon: Sliders },
   { label: 'Meus Registros', href: '/historico', icon: Clock },
   { label: 'Baixar Tabela de Preços', href: '/exportar', icon: Download },
+  { label: 'Minha Conta', href: '/conta', icon: User },
 ];
 
 const mobileMainItems = [
@@ -52,6 +54,7 @@ const mobileMoreItems = [
   { label: 'Simular Cenários', href: '/simulador', icon: Sliders },
   { label: 'Meus Registros', href: '/historico', icon: Clock },
   { label: 'Baixar Tabela de Preços', href: '/exportar', icon: Download },
+  { label: 'Minha Conta', href: '/conta', icon: User },
 ];
 
 interface DashboardLayoutProps {

@@ -37,7 +37,9 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/comparativo-vrpo') ||
     request.nextUrl.pathname.startsWith('/historico') ||
     request.nextUrl.pathname.startsWith('/exportar') ||
-    request.nextUrl.pathname.startsWith('/primeiros-passos');
+    request.nextUrl.pathname.startsWith('/primeiros-passos') ||
+    request.nextUrl.pathname.startsWith('/conta') ||
+    request.nextUrl.pathname.startsWith('/simulador');
 
   if (!session && isProtected) {
     return NextResponse.redirect(new URL('/login', request.url));
