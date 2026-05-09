@@ -20,7 +20,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/presentation/components/ui/dialog';
-import { MargemBadge } from '@/presentation/components/ui/MargemBadge';
+import { margemColor } from '@/application/usecases/calcularPrecoProcedimento';
 import { cn } from '@/lib/utils';
 
 type EspecialidadeWithCount = Especialidade & { count: number };
@@ -41,6 +41,49 @@ function formatBRL(value: number): string {
 function formatPercentage(value: number): string {
   const sign = value >= 0 ? '+' : '';
   return `${sign}${value.toFixed(1)}%`;
+}
+
+function MargemBadge({
+  margemLucro,
+  precoMinimoParaMargem30: _precoMinimoParaMargem30,
+  href,
+}: {
+  margemLucro: number | null;
+  precoMinimoParaMargem30: number;
+  href: string;
+}) {
+  const color = margemColor(margemLucro);
+
+  if (color === null) {
+    return (
+      <Link
+        href={href}
+        className="text-xs text-primary font-medium hover:underline whitespace-nowrap"
+        onClick={(e) => e.stopPropagation()}
+      >
+        → Definir preço
+      </Link>
+    );
+  }
+
+  const pct = (margemLucro! * 100).toFixed(1);
+  const colorClass =
+    color === 'green'
+      ? 'bg-green-100 text-green-800 border-green-200'
+      : color === 'yellow'
+        ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
+        : 'bg-red-100 text-red-800 border-red-200';
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border tabular-nums',
+        colorClass
+      )}
+    >
+      {pct}%
+    </span>
+  );
 }
 
 export function ProcedimentosPage({
@@ -360,6 +403,7 @@ export function ProcedimentosPage({
                           <MargemBadge
                             margemLucro={precoCalculado.margemLucro}
                             precoMinimoParaMargem30={precoCalculado.precoMinimoParaMargem30}
+                            href={`/procedimentos/${especialidadeSlug}/${procedimento.id}`}
                           />
                         </td>
                         {/* Advanced columns */}
