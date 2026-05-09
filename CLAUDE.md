@@ -4,6 +4,14 @@ SaaS de precificação para consultórios odontológicos brasileiros. Posicionam
 
 ---
 
+## Contexto da aplicação
+
+Para qualquer contexto sobre o código-fonte da aplicação (estrutura de arquivos, implementações, componentes, lógica existente), consultar:
+
+- `@repomix-output.md` — snapshot completo do repositório gerado pelo repomix
+
+---
+
 ## Documentação essencial
 
 Antes de qualquer tarefa de produto, leia:
