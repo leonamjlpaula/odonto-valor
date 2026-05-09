@@ -16,6 +16,7 @@ export type ProcedimentoComPreco = {
   procedimento: ProcedimentoWithMateriais;
   precoCalculado: PrecoCalculado;
   vrpoReferencia: number | null;
+  percTotal: number;
 };
 
 /** Lean type for the list view — strips materiais to reduce RSC payload size. */
@@ -212,6 +213,7 @@ export async function getProcedimentoDetail(
       percTaxaCartao
     ),
     vrpoReferencia: vrpoRef?.valorReferencia ?? null,
+    percTotal: percImpostos + percTaxaCartao,
   };
 }
 
