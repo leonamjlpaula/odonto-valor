@@ -11,12 +11,20 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// Dados pessoais (LGPD): nome e email são dados pessoais identificáveis.
+// Retenção: mantidos enquanto a conta estiver ativa.
+// Após exclusão da conta (direito ao esquecimento), todos os registros abaixo
+// são deletados em cascata via deleteAccount() em contaActions.ts.
+// Dados anonimizados não são mantidos.
 model User {
   id                   String          @id
+  // Dado pessoal: nome do titular
   nome                 String
+  // Dado pessoal: endereço de e-mail (identificador único)
   email                String          @unique
   onboardingCompleted  Boolean         @default(false)
   perfilConsultorio    String?
+  // Registro de criação — usado para calcular tempo de retenção
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
   custoFixoConfig      CustoFixoConfig?
