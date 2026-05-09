@@ -31,9 +31,6 @@ export function SuportePage({ nome, email }: SuportePageProps) {
         </div>
       ) : (
         <form action={action} className="space-y-4">
-          <input type="hidden" name="nome" value={nome} />
-          <input type="hidden" name="email" value={email} />
-
           <div className="space-y-1">
             <p className="text-xs text-muted-foreground">Nome</p>
             <p className="text-sm font-medium">{nome}</p>

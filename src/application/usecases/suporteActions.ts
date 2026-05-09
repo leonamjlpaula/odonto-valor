@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { Resend } from 'resend';
 import { getAuthUser } from '@/lib/supabase/server';
+import { prisma } from '@/lib/db';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -14,8 +15,6 @@ const categoriaLabels: Record<string, string> = {
 };
 
 const schema = z.object({
-  nome: z.string().min(1),
-  email: z.string().email(),
   categoria: z.enum(['problema', 'duvida', 'sugestao', 'funcionalidade']),
   mensagem: z.string().min(10, 'Mensagem deve ter no mínimo 10 caracteres'),
 });
@@ -32,9 +31,14 @@ export async function sendSupportEmail(
   const user = await getAuthUser();
   if (!user) return { errors: { general: ['Não autenticado'] } };
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { nome: true, email: true },
+  });
+
+  if (!dbUser) return { errors: { general: ['Usuário não encontrado'] } };
+
   const result = schema.safeParse({
-    nome: formData.get('nome'),
-    email: formData.get('email'),
     categoria: formData.get('categoria'),
     mensagem: formData.get('mensagem'),
   });
@@ -43,15 +47,15 @@ export async function sendSupportEmail(
     return { errors: result.error.flatten().fieldErrors as SuporteState['errors'] };
   }
 
-  const { nome, email, categoria, mensagem } = result.data;
+  const { categoria, mensagem } = result.data;
   const categoriaLabel = categoriaLabels[categoria];
 
   const { error } = await resend.emails.send({
     from: 'OdontoValor <onboarding@resend.dev>',
     to: process.env.SUPPORT_EMAIL ?? 'leonamjlpaula@gmail.com',
-    replyTo: email,
-    subject: `[Suporte] ${categoriaLabel} — ${nome}`,
-    text: `De: ${nome} <${email}>\nCategoria: ${categoriaLabel}\n\n${mensagem}`,
+    replyTo: dbUser.email,
+    subject: `[Suporte] ${categoriaLabel} — ${dbUser.nome}`,
+    text: `De: ${dbUser.nome} <${dbUser.email}>\nCategoria: ${categoriaLabel}\n\n${mensagem}`,
   });
 
   if (error) {
