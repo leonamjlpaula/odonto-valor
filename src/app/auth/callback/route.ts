@@ -25,10 +25,16 @@ export async function GET(request: NextRequest) {
           data.user.user_metadata?.name ??
           data.user.email!.split('@')[0];
 
-        await prisma.user.create({
-          data: { id: data.user.id, nome, email: data.user.email! },
-        });
-        await createDefaultDataForUser(data.user.id);
+        try {
+          await prisma.user.create({
+            data: { id: data.user.id, nome, email: data.user.email! },
+          });
+          await createDefaultDataForUser(data.user.id);
+        } catch {
+          return NextResponse.redirect(
+            `${origin}/login?error=Erro+ao+criar+conta.+Tente+novamente.`
+          );
+        }
         return NextResponse.redirect(`${origin}/primeiros-passos`);
       }
 

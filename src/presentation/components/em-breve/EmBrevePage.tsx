@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { usePosthogEvents } from '@/presentation/hooks/usePosthogEvents';
 import { Button } from '@/presentation/components/ui/button';
 
@@ -71,6 +72,13 @@ const demandColor: Record<Feature['demand'], string> = {
 
 export function EmBrevePage() {
   const events = usePosthogEvents();
+  const [voted, setVoted] = useState<Set<string>>(new Set());
+
+  function handleVote(id: string) {
+    if (voted.has(id)) return;
+    events.featureInterestRegistered(id);
+    setVoted((prev) => new Set(prev).add(id));
+  }
 
   return (
     <div className="space-y-8">
@@ -97,9 +105,10 @@ export function EmBrevePage() {
               variant="outline"
               size="sm"
               className="w-full text-xs"
-              onClick={() => events.featureInterestRegistered(feature.id)}
+              onClick={() => handleVote(feature.id)}
+              disabled={voted.has(feature.id)}
             >
-              Me avise quando estiver pronto
+              {voted.has(feature.id) ? 'Interesse registrado ✓' : 'Me avise quando estiver pronto'}
             </Button>
           </div>
         ))}

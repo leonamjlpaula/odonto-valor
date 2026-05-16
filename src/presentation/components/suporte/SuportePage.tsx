@@ -8,11 +8,12 @@ import { Label } from '@/presentation/components/ui/label';
 interface SuportePageProps {
   nome: string;
   email: string;
+  whatsappNumber: string | null;
 }
 
 const initialState: SuporteState = {};
 
-export function SuportePage({ nome, email }: SuportePageProps) {
+export function SuportePage({ nome, email, whatsappNumber }: SuportePageProps) {
   const [state, action, isPending] = useActionState(sendSupportEmail, initialState);
 
   return (
@@ -84,18 +85,20 @@ export function SuportePage({ nome, email }: SuportePageProps) {
         </form>
       )}
 
-      <div className="rounded-lg border p-4 space-y-2">
-        <p className="text-sm font-medium">Prefere o WhatsApp?</p>
-        <a
-          href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '5511999999999'}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-primary underline-offset-4 hover:underline"
-        >
-          Abrir conversa no WhatsApp
-        </a>
-        <p className="text-xs text-muted-foreground">Atendimento em horário comercial</p>
-      </div>
+      {whatsappNumber && (
+        <div className="rounded-lg border p-4 space-y-2">
+          <p className="text-sm font-medium">Prefere o WhatsApp?</p>
+          <a
+            href={`https://wa.me/${whatsappNumber}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-primary underline-offset-4 hover:underline"
+          >
+            Abrir conversa no WhatsApp
+          </a>
+          <p className="text-xs text-muted-foreground">Atendimento em horário comercial</p>
+        </div>
+      )}
     </div>
   );
 }

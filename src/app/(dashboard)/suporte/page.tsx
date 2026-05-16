@@ -12,5 +12,11 @@ export default async function SuporteRoute() {
     select: { nome: true, email: true },
   });
 
-  return <SuportePage nome={dbUser?.nome ?? ''} email={dbUser?.email ?? user.email ?? ''} />;
+  return (
+    <SuportePage
+      nome={dbUser?.nome ?? ''}
+      email={dbUser?.email ?? user.email ?? ''}
+      whatsappNumber={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? null}
+    />
+  );
 }
