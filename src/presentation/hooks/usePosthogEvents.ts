@@ -9,5 +9,7 @@ export function usePosthogEvents() {
     pdfExportado: (tipo: 'tabela' | 'credenciamento') => captureEvent('pdf_exportado', { tipo }),
     simuladorUsado: () => captureEvent('simulador_usado'),
     snapshotGerado: () => captureEvent('snapshot_gerado'),
+    featureInterestRegistered: (feature: string) =>
+      captureEvent('feature_interest_registered', { feature }),
   };
 }

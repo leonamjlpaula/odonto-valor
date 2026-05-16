@@ -39,7 +39,9 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/exportar') ||
     request.nextUrl.pathname.startsWith('/primeiros-passos') ||
     request.nextUrl.pathname.startsWith('/conta') ||
-    request.nextUrl.pathname.startsWith('/simulador');
+    request.nextUrl.pathname.startsWith('/simulador') ||
+    request.nextUrl.pathname.startsWith('/suporte') ||
+    request.nextUrl.pathname.startsWith('/em-breve');
 
   if (!session && isProtected) {
     return NextResponse.redirect(new URL('/login', request.url));

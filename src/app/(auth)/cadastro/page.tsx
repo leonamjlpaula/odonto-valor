@@ -17,6 +17,7 @@ import {
   CardTitle,
 } from '@/presentation/components/ui/card';
 import { createUser, type CreateUserState } from '@/application/usecases/createUser';
+import { GoogleAuthButton } from '@/presentation/components/auth/GoogleAuthButton';
 
 const initialState: CreateUserState = {};
 
@@ -181,6 +182,17 @@ export default function CadastroPage() {
               <Button type="submit" className="w-full" loading={isPending}>
                 Criar conta
               </Button>
+
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">ou</span>
+                </div>
+              </div>
+
+              <GoogleAuthButton label="Cadastrar com Google" />
             </form>
           )}
 
