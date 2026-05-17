@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
   const service = new ExcelExportService();
   const excelBuffer = service.generate(procedimentosExport, userName, generatedAt);
 
-  // Build filename: odontovalor-[nome-slug]-[YYYY-MM-DD].xlsx
+  // Build filename: lucrodental-[nome-slug]-[YYYY-MM-DD].xlsx
   const dateStr = new Date().toISOString().split('T')[0];
   const nameSlug = userName
     .toLowerCase()
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '');
-  const filename = `odontovalor-${nameSlug}-${dateStr}.xlsx`;
+  const filename = `lucrodental-${nameSlug}-${dateStr}.xlsx`;
 
   return new Response(new Uint8Array(excelBuffer), {
     headers: {
