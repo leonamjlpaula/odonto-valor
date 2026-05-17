@@ -111,7 +111,7 @@ export function PrimeirosPassosPage({ progresso }: Props) {
       <div className="space-y-3">
         <h1 className="text-2xl font-bold tracking-tight">Primeiros Passos</h1>
         <p className="text-muted-foreground leading-relaxed max-w-2xl">
-          Configure o OdontoValor em poucos passos e descubra se cada procedimento está gerando
+          Configure o LucroDental em poucos passos e descubra se cada procedimento está gerando
           lucro real — com base nos seus custos reais do consultório.
         </p>
       </div>
@@ -161,7 +161,7 @@ export function PrimeirosPassosPage({ progresso }: Props) {
         </CardHeader>
         <CardContent className="space-y-3 text-sm text-muted-foreground">
           <p>
-            O OdontoValor calcula o custo real de cada procedimento com base em três fatores: o{' '}
+            O LucroDental calcula o custo real de cada procedimento com base em três fatores: o{' '}
             <strong className="text-foreground">tempo que você gasta</strong>, os{' '}
             <strong className="text-foreground">gastos mensais do consultório</strong> (aluguel,
             salários, contas) e os <strong className="text-foreground">materiais usados</strong>.

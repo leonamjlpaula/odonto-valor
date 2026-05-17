@@ -111,7 +111,7 @@ export function ExportarPage({ data }: Props) {
       // Extract filename from Content-Disposition header
       const disposition = response.headers.get('Content-Disposition') ?? '';
       const match = disposition.match(/filename="([^"]+)"/);
-      a.download = match ? match[1] : format === 'pdf' ? 'odontovalor.pdf' : 'odontovalor.xlsx';
+      a.download = match ? match[1] : format === 'pdf' ? 'lucrodental.pdf' : 'lucrodental.xlsx';
 
       document.body.appendChild(a);
       a.click();

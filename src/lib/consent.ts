@@ -1,4 +1,4 @@
-export const CONSENT_KEY = 'odontovalor_cookie_consent';
+export const CONSENT_KEY = 'lucrodental_cookie_consent';
 export type ConsentStatus = 'accepted' | 'rejected' | null;
 
 export function getConsent(): ConsentStatus {

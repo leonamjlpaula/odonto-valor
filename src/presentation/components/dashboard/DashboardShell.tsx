@@ -19,7 +19,7 @@ import { Camera, BookOpen, X, ArrowRight } from 'lucide-react';
 import { createSnapshot } from '@/application/usecases/snapshotActions';
 import { OnboardingWizard } from '@/presentation/components/layout/OnboardingWizard';
 
-const GUIA_BANNER_KEY = 'odontovalor_guia_dispensado';
+const GUIA_BANNER_KEY = 'lucrodental_guia_dispensado';
 
 type Props = {
   userId: string;
@@ -108,7 +108,7 @@ export function DashboardShell({ userId, onboardingCompleted, perfilConsultorio 
           <script
             dangerouslySetInnerHTML={{
               __html:
-                "(function(){try{if(!localStorage.getItem('odontovalor_guia_dispensado')){var b=document.getElementById('guia-banner-primeiros-passos');if(b)b.style.display=''}}catch(e){}})();",
+                "(function(){try{if(!localStorage.getItem('lucrodental_guia_dispensado')){var b=document.getElementById('guia-banner-primeiros-passos');if(b)b.style.display=''}}catch(e){}})();",
             }}
           />
         </>
