@@ -60,7 +60,7 @@ export default function AtualizarSenhaPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <div className="px-6 pt-6">
-          <Image src={banner} alt="OdontoValor" className="w-full h-auto rounded-md" priority />
+          <Image src={banner} alt="LucroDental" className="w-full h-auto rounded-md" priority />
         </div>
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Nova senha</CardTitle>
