@@ -199,7 +199,7 @@ function CredenciamentoDocument({
             <Text style={s.subtitle}>{userName}</Text>
           </View>
           <View style={s.headerRight}>
-            <Text style={[s.subtitle, { fontFamily: 'Helvetica-Bold' }]}>OdontoValor</Text>
+            <Text style={[s.subtitle, { fontFamily: 'Helvetica-Bold' }]}>LucroDental</Text>
             <Text style={s.dateText}>Gerado em {generatedAt}</Text>
           </View>
         </View>
@@ -311,7 +311,7 @@ function CredenciamentoDocument({
             <Text style={s.subtitle}>{userName}</Text>
           </View>
           <View style={s.headerRight}>
-            <Text style={[s.subtitle, { fontFamily: 'Helvetica-Bold' }]}>OdontoValor</Text>
+            <Text style={[s.subtitle, { fontFamily: 'Helvetica-Bold' }]}>LucroDental</Text>
             <Text style={s.dateText}>
               Custo/min: {formatCurrency(breakdown.porMinuto)}/min · Gerado em {generatedAt}
             </Text>
