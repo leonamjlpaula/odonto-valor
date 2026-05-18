@@ -25,7 +25,7 @@ import { Button } from '@/presentation/components/ui/button';
 import { TooltipProvider } from '@/presentation/components/ui/tooltip';
 import { NavigationProgress } from '@/presentation/components/ui/NavigationProgress';
 import Image from 'next/image';
-import banner from '@/assets/odonto_valor_banner.png';
+import banner from '@/assets/lucro_dental_banner.png';
 import type { ProgressoOnboarding } from '@/application/usecases/dashboardActions';
 
 const navItems = [

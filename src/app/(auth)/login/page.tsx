@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import banner from '@/assets/odonto_valor_banner.png';
+import banner from '@/assets/lucro_dental_banner.png';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 import { PasswordInput } from '@/presentation/components/ui/password-input';

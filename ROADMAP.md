@@ -1,4 +1,4 @@
-# Roadmap do OdontoValor
+# Roadmap do LucroDental
 
 Priorização em dois eixos: **correção do produto** (bugs de cálculo que produzem números errados) e **retenção do primeiro usuário** (dentista que cria conta e não encontra seus procedimentos vai embora antes de sentir o valor). Fases independentes e entregáveis de forma isolada.
 
@@ -192,7 +192,7 @@ _Área do usuário (`/conta`):_ 9. Página `/conta` acessível pela sidebar (nov
 
 10. Integração com portal do cliente Stripe (`stripe.billingPortal.sessions.create`): permite ao usuário trocar cartão, ver histórico de faturas e cancelar sem necessidade de UI customizada.
 
-_Propriedade intelectual — iniciar nesta fase:_ 11. Protocolar pedido de **Registro de Marca** do nome "OdontoValor" no INPI (e-INPI) nas classes NCL 42 (serviços de tecnologia/SaaS) e NCL 44 (serviços relacionados à saúde). **Fazer no início desta fase** — o processo leva 18–24 meses e a data do protocolo define a prioridade; esperar o lançamento expõe o nome publicamente antes de qualquer proteção.
+_Propriedade intelectual — iniciar nesta fase:_ 11. Protocolar pedido de **Registro de Marca** do nome "LucroDental" no INPI (e-INPI) nas classes NCL 42 (serviços de tecnologia/SaaS) e NCL 44 (serviços relacionados à saúde). **Fazer no início desta fase** — o processo leva 18–24 meses e a data do protocolo define a prioridade; esperar o lançamento expõe o nome publicamente antes de qualquer proteção.
 
 **Dependências:** Fases 6 e 7 (segurança e LGPD devem estar prontos antes de coletar dados de pagamento; Posthog para rastrear eventos de conversão do trial).
 
