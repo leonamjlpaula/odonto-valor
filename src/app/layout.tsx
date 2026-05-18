@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'OdontoValor',
+  title: 'LucroDental',
   description: 'SaaS de precificação para consultórios odontológicos',
   icons: {
     icon: '/icon.png',

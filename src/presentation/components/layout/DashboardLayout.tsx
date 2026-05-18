@@ -27,7 +27,7 @@ import { Button } from '@/presentation/components/ui/button';
 import { TooltipProvider } from '@/presentation/components/ui/tooltip';
 import { NavigationProgress } from '@/presentation/components/ui/NavigationProgress';
 import Image from 'next/image';
-import banner from '@/assets/odonto_valor_banner.png';
+import banner from '@/assets/lucro_dental_banner.png';
 import type { ProgressoOnboarding } from '@/application/usecases/dashboardActions';
 
 const navItems = [
@@ -91,7 +91,7 @@ export function DashboardLayout({ children, userName, progresso }: DashboardLayo
         <aside className="hidden md:flex w-64 flex-col bg-card border-r shrink-0">
           {/* Logo */}
           <div className="px-6 py-3 border-b">
-            <Image src={banner} alt="Odonto Valor" className="w-full h-auto" priority />
+            <Image src={banner} alt="LucroDental" className="w-full h-auto" priority />
           </div>
 
           {/* Navigation */}
@@ -182,7 +182,7 @@ export function DashboardLayout({ children, userName, progresso }: DashboardLayo
           {/* Header */}
           <header className="flex items-center justify-between px-4 md:px-6 py-3 border-b bg-card shrink-0">
             {/* Mobile: show logo */}
-            <h1 className="md:hidden text-lg font-bold text-primary">OdontoValor</h1>
+            <h1 className="md:hidden text-lg font-bold text-primary">LucroDental</h1>
             {/* Desktop: spacer */}
             <div className="hidden md:block" />
 

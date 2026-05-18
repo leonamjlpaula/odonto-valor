@@ -1,4 +1,4 @@
-# OdontoValor — CLAUDE.md
+# LucroDental — CLAUDE.md
 
 SaaS de precificação para consultórios odontológicos brasileiros. Posicionamento central: **"Configure em 10 minutos e saiba se está no lucro ou no prejuízo em cada procedimento."**
 

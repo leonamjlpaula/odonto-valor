@@ -49,11 +49,11 @@ type DocProps = {
   generatedAt: string;
 };
 
-const OdontoValorDocument = ({ procedimentos, userName, generatedAt }: DocProps) => (
+const LucroDentalDocument = ({ procedimentos, userName, generatedAt }: DocProps) => (
   <Document>
     <Page size="A4" orientation="landscape" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>OdontoValor</Text>
+        <Text style={styles.title}>LucroDental</Text>
         <Text style={styles.subtitle}>{userName}</Text>
         <Text style={styles.date}>Gerado em {generatedAt}</Text>
       </View>
@@ -94,7 +94,7 @@ export class PdfExportService {
     generatedAt: string
   ): Promise<Buffer> {
     return renderToBuffer(
-      <OdontoValorDocument
+      <LucroDentalDocument
         procedimentos={procedimentos}
         userName={userName}
         generatedAt={generatedAt}
